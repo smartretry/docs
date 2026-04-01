@@ -30,7 +30,7 @@ curl --request GET \
   "updated_at": "2026-03-31T14:22:13Z",
   "status": {
     "status": "APPROVED",
-    "reasonCode": null,
+    "reasonCode": "AUTH.APPROVED",
     "name": "Approved",
     "description": "The transaction was approved by the issuer.",
     "domain": "AUTH"
@@ -41,15 +41,19 @@ curl --request GET \
     "provider_order_id": "prov-88271",
     "description": "Order #20260331-001",
     "payer": {
+      "friendly_id": "PY4A8C2D",
       "first_name": "Jane",
       "last_name": "Doe",
-      "email": "jane.doe@example.com"
+      "email_username": "jane.doe",
+      "email_domain": "example.com"
     },
     "payment_instrument": {
-      "last_four": "1111",
-      "bin": "411111",
-      "brand": "Visa",
-      "issuer": "Example Bank"
+      "token": "tok_4111...",
+      "payment_method": "cards",
+      "card_cardholder_name": "Jane Doe",
+      "card_card_last_four_digit": "1111",
+      "card_bin": "411111",
+      "expiration_date": "2027-12-31T00:00:00Z"
     }
   }
 }
@@ -123,8 +127,8 @@ curl --request GET \
       The high-level status code. See [Status values](#status-values) below.
     </ResponseField>
 
-    <ResponseField name="reasonCode" type="string">
-      A machine-readable code providing specific detail about a decline or error. `null` for approved transactions.
+    <ResponseField name="reasonCode" type="string" required>
+      A machine-readable code in `{domain}.{reason}` format (e.g., `AUTH.APPROVED`, `RISK.DECLINED`). Always present — use this to build targeted retry logic or surface specific error messages.
     </ResponseField>
 
     <ResponseField name="name" type="string">
@@ -165,6 +169,10 @@ curl --request GET \
       Identity details for the payer associated with this order.
 
       <Expandable title="properties">
+        <ResponseField name="friendly_id" type="string" required>
+          SmartRetry's unique identifier for this payer. Exactly 8 characters.
+        </ResponseField>
+
         <ResponseField name="first_name" type="string">
           Payer's first name.
         </ResponseField>
@@ -173,8 +181,16 @@ curl --request GET \
           Payer's last name.
         </ResponseField>
 
-        <ResponseField name="email" type="string">
-          Payer's email address.
+        <ResponseField name="email_username" type="string">
+          The local part of the payer's email address (before the `@`).
+        </ResponseField>
+
+        <ResponseField name="email_domain" type="string">
+          The domain part of the payer's email address (after the `@`).
+        </ResponseField>
+
+        <ResponseField name="phone_number" type="string">
+          Payer's phone number in [E.164](https://en.wikipedia.org/wiki/E.164) format.
         </ResponseField>
       </Expandable>
     </ResponseField>
@@ -183,20 +199,74 @@ curl --request GET \
       Tokenized summary of the payment instrument used. Full card numbers are never returned.
 
       <Expandable title="properties">
-        <ResponseField name="last_four" type="string">
+        <ResponseField name="token" type="string" required>
+          SmartRetry's 88-character payment instrument token. Use this for subsequent tokenized payments.
+        </ResponseField>
+
+        <ResponseField name="payment_method" type="string" required>
+          Payment method type (e.g., `cards`, `digital_wallets`).
+        </ResponseField>
+
+        <ResponseField name="card_cardholder_name" type="string">
+          Name as it appears on the card.
+        </ResponseField>
+
+        <ResponseField name="card_card_last_four_digit" type="string">
           Last four digits of the card number.
         </ResponseField>
 
-        <ResponseField name="bin" type="string">
-          Bank Identification Number (first six digits of the card). Used to identify the issuing bank and card product.
+        <ResponseField name="card_bin" type="string">
+          Bank Identification Number (first six or eleven digits of the card). Used to identify the issuing bank and card product.
         </ResponseField>
 
-        <ResponseField name="brand" type="string">
-          Card network brand (e.g., `Visa`, `Mastercard`, `Amex`).
+        <ResponseField name="expiration_date" type="string">
+          Card expiration date in ISO 8601 format.
         </ResponseField>
 
-        <ResponseField name="issuer" type="string">
-          Name of the card-issuing bank or institution.
+        <ResponseField name="card_profile" type="object">
+          Enriched card profile data.
+
+          <Expandable title="properties">
+            <ResponseField name="fingerprint" type="string" required>
+              Card profile fingerprint. Exactly 88 characters.
+            </ResponseField>
+
+            <ResponseField name="issuer" type="object">
+              Issuing bank information.
+
+              <Expandable title="properties">
+                <ResponseField name="name" type="string" required>
+                  Name of the card-issuing bank or institution.
+                </ResponseField>
+              </Expandable>
+            </ResponseField>
+
+            <ResponseField name="brand" type="object">
+              Card network brand information.
+
+              <Expandable title="properties">
+                <ResponseField name="name" type="string" required>
+                  Card network brand name (e.g., `Visa`, `Mastercard`, `Amex`).
+                </ResponseField>
+              </Expandable>
+            </ResponseField>
+
+            <ResponseField name="category" type="string">
+              Card category (e.g., `consumer`, `commercial`).
+            </ResponseField>
+
+            <ResponseField name="cardType" type="string" required>
+              Card type (e.g., `credit`, `debit`).
+            </ResponseField>
+
+            <ResponseField name="panLength" type="integer">
+              Length of the card's primary account number (13–19 digits).
+            </ResponseField>
+
+            <ResponseField name="cardUsage" type="string">
+              Intended card usage (e.g., `personal`, `business`).
+            </ResponseField>
+          </Expandable>
         </ResponseField>
       </Expandable>
     </ResponseField>

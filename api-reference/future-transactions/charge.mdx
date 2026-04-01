@@ -18,8 +18,7 @@ curl --request POST \
   --header 'x-api-key: YOUR_API_KEY' \
   --data '{
     "future_transaction_id": "FT3D8E1C",
-    "recurring_id": "RC9F4A2B",
-    "merchant_transaction_id": "sub-renewal-001"
+    "recurring_id": "RC9F4A2B"
   }'
 ```
 
@@ -39,8 +38,8 @@ curl --request POST \
   The 8-character identifier of the recurring series this future transaction belongs to.
 </ParamField>
 
-<ParamField body="merchant_transaction_id" type="string" required>
-  Your unique identifier for this charge event. Used for idempotency — retrying with the same value returns the original result without triggering a second charge.
+<ParamField body="amount" type="integer">
+  Override the scheduled amount for this charge only, in minor currency units. Minimum `1`, maximum `999999999`. If omitted, the amount defined on the future transaction is used.
 </ParamField>
 
 ## Response

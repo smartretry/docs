@@ -69,6 +69,10 @@ curl --request POST \
   Amount to refund in minor currency units. If omitted, the full transaction amount is refunded. Partial refunds are supported — you can issue multiple partial refunds as long as the total does not exceed the original transaction amount.
 </ParamField>
 
+<ParamField body="currency" type="string">
+  Three-letter [ISO 4217](https://en.wikipedia.org/wiki/ISO_4217) currency code. If omitted, the currency of the original transaction is used.
+</ParamField>
+
 ## Response
 
 <ResponseField name="transaction_id" type="string" required>

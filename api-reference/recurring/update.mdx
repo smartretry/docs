@@ -39,8 +39,8 @@ curl --request PUT \
   New default charge amount for future payments in this series, in minor currency units. Does not affect charges that have already been processed.
 </ParamField>
 
-<ParamField body="currency" type="string">
-  New currency for future payments. Must be a valid ISO 4217 code.
+<ParamField body="first_payment_date" type="string">
+  New start date for the series in `YYYY-MM-DD` format. Only supported when `managed_by` is `our_platform`.
 </ParamField>
 
 <ParamField body="recurring_date_type" type="string">
@@ -53,10 +53,6 @@ curl --request PUT \
 
 <ParamField body="number_of_payments" type="integer">
   New total payment count for the series. Minimum value: `1`. The count includes payments already completed — setting this to a value lower than `completed_payments` will immediately complete the series.
-</ParamField>
-
-<ParamField body="cancellation_date" type="string">
-  New end date for the agreement in `YYYY-MM-DD` format. No charges are processed on or after this date. Set to a past date to end the series immediately.
 </ParamField>
 
 ## Response

@@ -18,8 +18,7 @@ curl --request POST \
   --header 'Content-Type: application/json' \
   --data '{
     "transaction_reference_id": "TX8A3F2C",
-    "order_reference_id": "OR7B9E1D",
-    "merchant_transaction_id": "void-20260331-001"
+    "order_reference_id": "OR7B9E1D"
   }'
 ```
 
@@ -31,7 +30,6 @@ curl --request POST \
 {
   "transaction_id": "TX5F1K2L",
   "order_id": "OR7B9E1D",
-  "merchant_transaction_id": "void-20260331-001",
   "accepted": true
 }
 ```
@@ -64,10 +62,6 @@ curl --request POST \
   The `order_id` associated with the pre-authorization. Exactly 8 characters.
 </ParamField>
 
-<ParamField body="merchant_transaction_id" type="string" required>
-  Your unique identifier for this void transaction. Must be different from the `merchant_transaction_id` of the original pre-authorization.
-</ParamField>
-
 ## Response
 
 <ResponseField name="transaction_id" type="string" required>
@@ -76,10 +70,6 @@ curl --request POST \
 
 <ResponseField name="order_id" type="string" required>
   The order identifier, matching the `order_id` from the original pre-authorization.
-</ResponseField>
-
-<ResponseField name="merchant_transaction_id" type="string" required>
-  The `merchant_transaction_id` you provided in the request, echoed back for confirmation.
 </ResponseField>
 
 <ResponseField name="accepted" type="boolean" required>

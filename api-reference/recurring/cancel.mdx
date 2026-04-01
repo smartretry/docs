@@ -17,8 +17,7 @@ curl --request POST \
   --header 'Content-Type: application/json' \
   --header 'x-api-key: YOUR_API_KEY' \
   --data '{
-    "recurring_id": "RC9F4A2B",
-    "merchant_transaction_id": "sub-renewal-001"
+    "recurring_id": "RC9F4A2B"
   }'
 ```
 
@@ -32,10 +31,6 @@ curl --request POST \
 
 <ParamField body="recurring_id" type="string" required>
   The 8-character identifier of the recurring series to cancel.
-</ParamField>
-
-<ParamField body="merchant_transaction_id" type="string" required>
-  Your unique identifier for this cancellation event. Used for idempotency — retrying with the same value returns the original result without cancelling again or returning an error.
 </ParamField>
 
 ## Response

@@ -65,12 +65,16 @@ curl --request POST \
   The `order_id` returned by the original pre-authorization. Exactly 8 characters.
 </ParamField>
 
-<ParamField body="merchant_transaction_id" type="string" required>
+<ParamField body="merchant_transaction_id" type="string">
   Your unique identifier for this capture transaction. Must be different from the `merchant_transaction_id` used in the pre-authorization.
 </ParamField>
 
 <ParamField body="amount" type="integer">
   Amount to capture in minor currency units. If omitted, the full authorized amount is captured. If provided, must be less than or equal to the authorized amount.
+</ParamField>
+
+<ParamField body="description" type="string">
+  Human-readable description of the capture. Maximum 500 characters.
 </ParamField>
 
 ## Response

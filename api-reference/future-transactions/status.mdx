@@ -9,7 +9,7 @@ Returns the details of a specific future transaction — its scheduled date, amo
 
 ```bash cURL
 curl --request GET \
-  --url 'https://api.smartretry.com/v1/payments/recurring/future-transactions/status/ABC123?future_transaction_id=FT3D8E1C&recurring_id=RC9F4A2B' \
+  --url 'https://api.smartretry.com/v1/payments/recurring/future-transactions/status/ABC123?future_transaction_id=FT3D8E1C' \
   --header 'x-api-key: YOUR_API_KEY'
 ```
 
@@ -23,10 +23,6 @@ curl --request GET \
 
 <ParamField query="future_transaction_id" type="string" required>
   The 8-character identifier of the future transaction to look up.
-</ParamField>
-
-<ParamField query="recurring_id" type="string" required>
-  The 8-character identifier of the recurring series this future transaction belongs to.
 </ParamField>
 
 ## Response
@@ -63,6 +59,18 @@ curl --request GET \
   - `completed` — successfully processed.
   - `failed` — processing attempted but unsuccessful.
   - `cancelled` — this specific occurrence was cancelled.
+</ResponseField>
+
+<ResponseField name="executed_transaction" type="string">
+  The `transaction_id` of the transaction that executed this future payment. Present only when `status` is `completed`.
+</ResponseField>
+
+<ResponseField name="executed_at" type="string">
+  ISO 8601 timestamp of when this future transaction was executed. Present only when `status` is `completed`.
+</ResponseField>
+
+<ResponseField name="notes" type="string">
+  Optional notes associated with this future transaction.
 </ResponseField>
 
 ```json Example response
