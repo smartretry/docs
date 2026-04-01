@@ -1,0 +1,204 @@
+---
+title: Webhooks
+description: Receive real-time notifications when transaction events occur.
+---
+
+Webhooks let SmartRetry push event notifications to your server in real time. Instead of polling the status endpoint, you receive an HTTP POST request whenever a transaction's state changes.
+
+## How webhooks work
+
+<Steps>
+
+<Step title="Configure your endpoint">
+  Register a webhook URL in your SmartRetry dashboard. This endpoint must be publicly accessible and respond to HTTPS POST requests.
+</Step>
+
+<Step title="Receive events">
+  When a transaction event occurs (approval, decline, retry attempt, etc.), SmartRetry sends a JSON payload to your endpoint.
+</Step>
+
+<Step title="Acknowledge receipt">
+  Return a `2xx` status code within 30 seconds to confirm receipt. Any other response triggers a retry.
+</Step>
+
+</Steps>
+
+## Event types
+
+| Event | Description |
+|-------|-------------|
+| `transaction.approved` | A transaction was approved by the issuer. |
+| `transaction.declined` | A transaction was declined. Check `reason_code` for details. |
+| `transaction.pending` | A transaction is awaiting final status (e.g., 3DS challenge). |
+| `transaction.retry_scheduled` | SmartRetry scheduled an automatic retry for a soft decline. |
+| `transaction.retry_attempted` | A retry attempt was made. |
+| `recurring.created` | A new recurring series was initialized. |
+| `recurring.charged` | A recurring payment was processed. |
+| `recurring.cancelled` | A recurring series was cancelled. |
+| `recurring.completed` | A recurring series reached its payment limit. |
+| `future_transaction.scheduled` | A future payment was scheduled. |
+| `future_transaction.executed` | A scheduled payment was processed. |
+| `future_transaction.cancelled` | A scheduled payment was cancelled. |
+
+## Webhook payload
+
+All webhook payloads follow a consistent structure:
+
+```json
+{
+  "id": "evt_8A3F2C1D",
+  "type": "transaction.approved",
+  "created_at": "2026-04-01T14:22:13Z",
+  "data": {
+    "transaction_id": "TX8A3F2C",
+    "order_id": "OR7B9E1D",
+    "merchant_transaction_id": "order-20260331-001",
+    "amount": 49.99,
+    "currency": "USD",
+    "status": {
+      "status": "APPROVED",
+      "reasonCode": "AUTH.APPROVED",
+      "domain": "AUTH"
+    }
+  }
+}
+```
+
+<ResponseField name="id" type="string" required>
+  Unique identifier for this webhook event. Use this to deduplicate retried deliveries.
+</ResponseField>
+
+<ResponseField name="type" type="string" required>
+  The event type. See [Event types](#event-types) above.
+</ResponseField>
+
+<ResponseField name="created_at" type="string" required>
+  ISO 8601 timestamp of when the event occurred.
+</ResponseField>
+
+<ResponseField name="data" type="object" required>
+  Event-specific payload. Structure varies by event type but always includes relevant IDs.
+</ResponseField>
+
+## Verifying webhook signatures
+
+Every webhook request includes a signature header to verify the request originated from SmartRetry.
+
+```
+X-SmartRetry-Signature: t=1711979533,v1=5257a869e7ecebeda32affa62cdca3fa51cad7e77a0e56ff536d0ce8e108d8bd
+```
+
+The signature header contains:
+- `t` — Unix timestamp of when the signature was generated
+- `v1` — HMAC-SHA256 signature of the payload
+
+### Verification steps
+
+<CodeGroup>
+
+```python Python
+import hmac
+import hashlib
+import time
+
+def verify_webhook(payload: bytes, signature_header: str, webhook_secret: str) -> bool:
+    # Parse the signature header
+    parts = dict(part.split("=") for part in signature_header.split(","))
+    timestamp = parts["t"]
+    expected_signature = parts["v1"]
+
+    # Reject if timestamp is too old (5 minute tolerance)
+    if abs(time.time() - int(timestamp)) > 300:
+        return False
+
+    # Compute expected signature
+    signed_payload = f"{timestamp}.{payload.decode()}"
+    computed = hmac.new(
+        webhook_secret.encode(),
+        signed_payload.encode(),
+        hashlib.sha256
+    ).hexdigest()
+
+    return hmac.compare_digest(computed, expected_signature)
+```
+
+```javascript Node.js
+const crypto = require('crypto');
+
+function verifyWebhook(payload, signatureHeader, webhookSecret) {
+  // Parse the signature header
+  const parts = Object.fromEntries(
+    signatureHeader.split(',').map(part => part.split('='))
+  );
+  const timestamp = parts.t;
+  const expectedSignature = parts.v1;
+
+  // Reject if timestamp is too old (5 minute tolerance)
+  if (Math.abs(Date.now() / 1000 - parseInt(timestamp)) > 300) {
+    return false;
+  }
+
+  // Compute expected signature
+  const signedPayload = `${timestamp}.${payload}`;
+  const computed = crypto
+    .createHmac('sha256', webhookSecret)
+    .update(signedPayload)
+    .digest('hex');
+
+  return crypto.timingSafeEqual(
+    Buffer.from(computed),
+    Buffer.from(expectedSignature)
+  );
+}
+```
+
+</CodeGroup>
+
+<Warning>
+  Always verify webhook signatures before processing events. Never trust the payload without verification.
+</Warning>
+
+## Retry behavior
+
+If your endpoint doesn't return a `2xx` response, SmartRetry retries the delivery with exponential backoff:
+
+| Attempt | Delay |
+|---------|-------|
+| 1 | Immediate |
+| 2 | 1 minute |
+| 3 | 5 minutes |
+| 4 | 30 minutes |
+| 5 | 2 hours |
+| 6 | 8 hours |
+| 7 | 24 hours |
+
+After 7 failed attempts, the webhook is marked as failed. You can manually retry failed webhooks from the dashboard.
+
+<Tip>
+  Use the `id` field to deduplicate webhook deliveries. The same event may be delivered multiple times if your endpoint returned an error or timed out.
+</Tip>
+
+## Best practices
+
+1. **Respond quickly** — Return a `2xx` response immediately and process the event asynchronously. If processing takes longer than 30 seconds, the request times out and triggers a retry.
+
+2. **Idempotent handlers** — Design your webhook handlers to safely process the same event multiple times. Use the `id` field as a deduplication key.
+
+3. **Verify signatures** — Always validate the `X-SmartRetry-Signature` header before processing any webhook.
+
+4. **Use HTTPS** — Webhook endpoints must use HTTPS. HTTP URLs are rejected.
+
+5. **Handle all event types** — Your handler should gracefully ignore event types it doesn't recognize, allowing for future expansion.
+
+## Testing webhooks
+
+In sandbox mode, you can trigger test webhook events from the dashboard:
+
+1. Navigate to **Settings > Webhooks**
+2. Click **Send test event**
+3. Select an event type
+4. Review the payload delivered to your endpoint
+
+<Note>
+  Sandbox webhook events include `"environment": "sandbox"` in the payload to distinguish them from production events.
+</Note>

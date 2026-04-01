@@ -1,0 +1,227 @@
+---
+title: Rate limiting
+description: Understand API rate limits and implement proper retry logic.
+---
+
+SmartRetry applies rate limits to ensure fair usage and protect the platform from abuse. This page explains the limits and how to handle them gracefully.
+
+## Rate limits
+
+| Endpoint type | Limit | Window |
+|--------------|-------|--------|
+| Payment operations (sale, capture, refund, void) | 100 requests | per second |
+| Status queries | 500 requests | per second |
+| Recurring operations | 100 requests | per second |
+| All endpoints combined | 1,000 requests | per second |
+
+Limits are applied per API key. Contact [support@smartretry.com](mailto:support@smartretry.com) if you need higher limits.
+
+## Rate limit headers
+
+Every response includes headers showing your current usage:
+
+```
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 87
+X-RateLimit-Reset: 1711979533
+```
+
+| Header | Description |
+|--------|-------------|
+| `X-RateLimit-Limit` | Maximum requests allowed in the current window |
+| `X-RateLimit-Remaining` | Requests remaining in the current window |
+| `X-RateLimit-Reset` | Unix timestamp when the window resets |
+
+## Handling rate limits
+
+When you exceed the rate limit, SmartRetry returns a `429 Too Many Requests` response:
+
+```json
+{
+  "type": "https://api.smartretry.com/errors/rate-limit",
+  "title": "Too Many Requests",
+  "status": 429,
+  "detail": "Rate limit exceeded. Retry after 1 second.",
+  "reason_code": "RATE_LIMIT_EXCEEDED"
+}
+```
+
+The response includes a `Retry-After` header indicating how long to wait:
+
+```
+Retry-After: 1
+```
+
+## Exponential backoff
+
+Implement exponential backoff to handle rate limits and transient errors gracefully. This strategy progressively increases wait times between retries to avoid overwhelming the API.
+
+<CodeGroup>
+
+```python Python
+import requests
+import time
+import random
+
+def make_request_with_backoff(url, headers, json_data, max_retries=5):
+    """Make an API request with exponential backoff retry logic."""
+    base_delay = 1  # Start with 1 second
+    max_delay = 60  # Cap at 60 seconds
+
+    for attempt in range(max_retries):
+        response = requests.post(url, headers=headers, json=json_data)
+
+        if response.status_code == 200:
+            return response.json()
+
+        if response.status_code == 429:
+            # Use Retry-After header if available
+            retry_after = response.headers.get("Retry-After")
+            if retry_after:
+                delay = int(retry_after)
+            else:
+                # Exponential backoff with jitter
+                delay = min(base_delay * (2 ** attempt), max_delay)
+                delay += random.uniform(0, delay * 0.1)  # Add 10% jitter
+
+            print(f"Rate limited. Retrying in {delay:.1f} seconds...")
+            time.sleep(delay)
+            continue
+
+        if response.status_code >= 500:
+            # Server error - retry with backoff
+            delay = min(base_delay * (2 ** attempt), max_delay)
+            delay += random.uniform(0, delay * 0.1)
+            print(f"Server error. Retrying in {delay:.1f} seconds...")
+            time.sleep(delay)
+            continue
+
+        # Client error (4xx except 429) - don't retry
+        response.raise_for_status()
+
+    raise Exception(f"Max retries ({max_retries}) exceeded")
+
+
+# Example usage
+response = make_request_with_backoff(
+    "https://api.smartretry.com/v1/payments/sale/ABC123",
+    headers={
+        "x-api-key": "YOUR_API_KEY",
+        "Content-Type": "application/json",
+        "Idempotency-Key": "order-123"
+    },
+    json_data={
+        "amount": 49.99,
+        "currency": "USD",
+        # ... other fields
+    }
+)
+```
+
+```javascript Node.js
+async function makeRequestWithBackoff(url, options, maxRetries = 5) {
+  const baseDelay = 1000; // Start with 1 second
+  const maxDelay = 60000; // Cap at 60 seconds
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    const response = await fetch(url, options);
+
+    if (response.ok) {
+      return response.json();
+    }
+
+    if (response.status === 429) {
+      // Use Retry-After header if available
+      const retryAfter = response.headers.get("Retry-After");
+      let delay;
+
+      if (retryAfter) {
+        delay = parseInt(retryAfter) * 1000;
+      } else {
+        // Exponential backoff with jitter
+        delay = Math.min(baseDelay * Math.pow(2, attempt), maxDelay);
+        delay += Math.random() * delay * 0.1; // Add 10% jitter
+      }
+
+      console.log(`Rate limited. Retrying in ${(delay / 1000).toFixed(1)} seconds...`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      continue;
+    }
+
+    if (response.status >= 500) {
+      // Server error - retry with backoff
+      let delay = Math.min(baseDelay * Math.pow(2, attempt), maxDelay);
+      delay += Math.random() * delay * 0.1;
+      console.log(`Server error. Retrying in ${(delay / 1000).toFixed(1)} seconds...`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      continue;
+    }
+
+    // Client error (4xx except 429) - don't retry
+    throw new Error(`Request failed with status ${response.status}`);
+  }
+
+  throw new Error(`Max retries (${maxRetries}) exceeded`);
+}
+
+
+// Example usage
+const response = await makeRequestWithBackoff(
+  "https://api.smartretry.com/v1/payments/sale/ABC123",
+  {
+    method: "POST",
+    headers: {
+      "x-api-key": "YOUR_API_KEY",
+      "Content-Type": "application/json",
+      "Idempotency-Key": "order-123"
+    },
+    body: JSON.stringify({
+      amount: 49.99,
+      currency: "USD"
+      // ... other fields
+    })
+  }
+);
+```
+
+</CodeGroup>
+
+## Best practices
+
+<CardGroup cols={2}>
+  <Card title="Use idempotency keys" icon="key">
+    Always include an `Idempotency-Key` header on POST requests. This ensures retried requests don't create duplicate transactions.
+  </Card>
+  <Card title="Add jitter" icon="shuffle">
+    Add random jitter to retry delays to prevent thundering herd problems when multiple clients retry simultaneously.
+  </Card>
+  <Card title="Monitor remaining quota" icon="gauge">
+    Check `X-RateLimit-Remaining` headers and throttle proactively before hitting limits.
+  </Card>
+  <Card title="Batch when possible" icon="layer-group">
+    For high-volume operations, use bulk endpoints (coming soon) instead of individual requests.
+  </Card>
+</CardGroup>
+
+## Retry decision matrix
+
+| Status code | Retry? | Strategy |
+|-------------|--------|----------|
+| `200` | No | Success |
+| `400` | No | Fix request and resubmit |
+| `401` | No | Check API key |
+| `404` | No | Check resource ID |
+| `409` | Maybe | Check idempotency; may be success |
+| `429` | Yes | Use `Retry-After` header |
+| `500` | Yes | Exponential backoff |
+| `502` | Yes | Exponential backoff |
+| `503` | Yes | Use `Retry-After` if present |
+| `504` | Yes | Exponential backoff |
+
+<Warning>
+  Never retry `400 Bad Request` errors automatically. These indicate a problem with your request that must be fixed before resubmitting.
+</Warning>
+
+<Tip>
+  For payment operations, a `409 Conflict` with an idempotency key often means the original request succeeded. Check the response body for the transaction ID before retrying.
+</Tip>

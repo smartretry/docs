@@ -1,0 +1,256 @@
+---
+title: Health endpoints
+description: Check API availability and system status.
+---
+
+SmartRetry provides health check endpoints to monitor API availability. Use these endpoints for uptime monitoring, load balancer health checks, and integration testing.
+
+## Endpoints
+
+| Endpoint | Purpose |
+|----------|---------|
+| `GET /health/` | Basic health check — returns `200` if the API is running |
+| `GET /health/ready` | Readiness check — returns `200` if the API can process requests |
+| `GET /health/live` | Liveness check — returns `200` if the API process is alive |
+
+<Note>
+  Health endpoints do not require authentication. They are designed for infrastructure monitoring.
+</Note>
+
+## Basic health check
+
+Returns `200 OK` if the API service is running.
+
+<RequestExample>
+
+```bash cURL
+curl --request GET \
+  --url https://api.smartretry.com/health/
+```
+
+```python Python
+import requests
+
+response = requests.get("https://api.smartretry.com/health/")
+print(response.status_code)  # 200
+print(response.json())
+```
+
+```javascript Node.js
+const response = await fetch("https://api.smartretry.com/health/");
+const data = await response.json();
+console.log(response.status);  // 200
+console.log(data);
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "status": "healthy",
+  "timestamp": "2026-04-01T14:22:13Z"
+}
+```
+
+```json 503
+{
+  "status": "unhealthy",
+  "timestamp": "2026-04-01T14:22:13Z",
+  "message": "Service temporarily unavailable"
+}
+```
+
+</ResponseExample>
+
+## Readiness check
+
+Returns `200 OK` when the API is ready to accept and process requests. This endpoint verifies that all dependencies (database, cache, downstream services) are available.
+
+Use this endpoint for:
+- Kubernetes readiness probes
+- Load balancer health checks
+- Pre-deployment verification
+
+<RequestExample>
+
+```bash cURL
+curl --request GET \
+  --url https://api.smartretry.com/health/ready
+```
+
+```python Python
+import requests
+
+response = requests.get("https://api.smartretry.com/health/ready")
+
+if response.status_code == 200:
+    print("API is ready to accept requests")
+else:
+    print("API is not ready:", response.json())
+```
+
+```javascript Node.js
+const response = await fetch("https://api.smartretry.com/health/ready");
+
+if (response.ok) {
+  console.log("API is ready to accept requests");
+} else {
+  const data = await response.json();
+  console.log("API is not ready:", data);
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "status": "ready",
+  "timestamp": "2026-04-01T14:22:13Z",
+  "checks": {
+    "database": "ok",
+    "cache": "ok",
+    "payment_providers": "ok"
+  }
+}
+```
+
+```json 503
+{
+  "status": "not_ready",
+  "timestamp": "2026-04-01T14:22:13Z",
+  "checks": {
+    "database": "ok",
+    "cache": "degraded",
+    "payment_providers": "ok"
+  },
+  "message": "One or more dependencies are not available"
+}
+```
+
+</ResponseExample>
+
+## Liveness check
+
+Returns `200 OK` if the API process is running. This is a minimal check that doesn't verify dependencies.
+
+Use this endpoint for:
+- Kubernetes liveness probes
+- Basic uptime monitoring
+- Restart triggers
+
+<RequestExample>
+
+```bash cURL
+curl --request GET \
+  --url https://api.smartretry.com/health/live
+```
+
+```python Python
+import requests
+
+response = requests.get("https://api.smartretry.com/health/live")
+print("API is alive" if response.status_code == 200 else "API is down")
+```
+
+```javascript Node.js
+const response = await fetch("https://api.smartretry.com/health/live");
+console.log(response.ok ? "API is alive" : "API is down");
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "status": "alive",
+  "timestamp": "2026-04-01T14:22:13Z"
+}
+```
+
+</ResponseExample>
+
+## Using health checks
+
+### Kubernetes probes
+
+Configure Kubernetes liveness and readiness probes to automatically restart unhealthy pods and route traffic only to ready instances:
+
+```yaml
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+    - name: app
+      livenessProbe:
+        httpGet:
+          path: /health/live
+          port: 443
+          scheme: HTTPS
+          host: api.smartretry.com
+        initialDelaySeconds: 10
+        periodSeconds: 30
+      readinessProbe:
+        httpGet:
+          path: /health/ready
+          port: 443
+          scheme: HTTPS
+          host: api.smartretry.com
+        initialDelaySeconds: 5
+        periodSeconds: 10
+```
+
+### Uptime monitoring
+
+Add health endpoints to your monitoring service (Datadog, New Relic, Pingdom, etc.) to receive alerts when SmartRetry is unavailable:
+
+```python
+# Example: Simple uptime monitor
+import requests
+import time
+
+def check_health():
+    try:
+        response = requests.get(
+            "https://api.smartretry.com/health/ready",
+            timeout=5
+        )
+        return response.status_code == 200
+    except requests.RequestException:
+        return False
+
+while True:
+    if not check_health():
+        send_alert("SmartRetry API is not ready")
+    time.sleep(60)
+```
+
+### Pre-request validation
+
+Check API readiness before sending payment requests to fail fast:
+
+```python
+import requests
+
+def process_payment(payment_data):
+    # Check readiness first
+    health = requests.get("https://api.smartretry.com/health/ready", timeout=2)
+    if health.status_code != 200:
+        raise Exception("SmartRetry API is not available")
+
+    # Proceed with payment
+    response = requests.post(
+        "https://api.smartretry.com/v1/payments/sale/ABC123",
+        headers={"x-api-key": "YOUR_API_KEY"},
+        json=payment_data
+    )
+    return response.json()
+```
+
+<Tip>
+  For production monitoring, also subscribe to the [SmartRetry status page](https://status.smartretry.com) for incident notifications and scheduled maintenance alerts.
+</Tip>

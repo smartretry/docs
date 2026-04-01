@@ -1,0 +1,167 @@
+---
+title: Postman collection
+description: Import the SmartRetry API collection into Postman for quick testing and exploration.
+---
+
+Use our Postman collection to explore the SmartRetry API without writing code. The collection includes all endpoints with example requests and environment variables for easy configuration.
+
+## Download the collection
+
+<CardGroup cols={2}>
+  <Card title="Postman Collection" icon="download" href="https://www.postman.com/smartretry/workspace/smartretry-api">
+    Open in Postman workspace or download the collection JSON.
+  </Card>
+  <Card title="Environment Template" icon="gear" href="https://www.postman.com/smartretry/workspace/smartretry-api">
+    Pre-configured environment with sandbox and production variables.
+  </Card>
+</CardGroup>
+
+## Quick start
+
+<Steps>
+
+<Step title="Import the collection">
+  Click the **Run in Postman** button above, or download the JSON and import it via **File > Import** in Postman.
+</Step>
+
+<Step title="Set up your environment">
+  Create a new environment with these variables:
+
+  | Variable | Description | Example |
+  |----------|-------------|---------|
+  | `base_url` | API base URL | `https://api.smartretry.com` |
+  | `api_key` | Your API key | `sk_test_...` |
+  | `terminal_id` | Your terminal ID | `ABC123` |
+
+</Step>
+
+<Step title="Send your first request">
+  Open the **Payments > Sale** request, verify the environment is selected, and click **Send**.
+</Step>
+
+</Steps>
+
+## Collection structure
+
+The collection mirrors the API reference structure:
+
+```
+SmartRetry API
+├── Payments
+│   ├── Sale
+│   ├── Pre-authorization
+│   ├── Capture
+│   ├── Refund
+│   ├── Void
+│   └── Transaction Status
+├── Recurring
+│   ├── Initialize
+│   ├── Charge
+│   ├── Status
+│   ├── Update
+│   └── Cancel
+├── Future Transactions
+│   ├── Charge
+│   ├── Status
+│   ├── Update
+│   └── Cancel
+└── Health
+    ├── Basic Health
+    ├── Readiness
+    └── Liveness
+```
+
+## Environment variables
+
+The collection uses variables for easy switching between sandbox and production:
+
+| Variable | Sandbox | Production |
+|----------|---------|------------|
+| `base_url` | `https://api.smartretry.com` | `https://api.smartretry.com` |
+| `api_key` | `sk_test_...` | `sk_live_...` |
+| `terminal_id` | Your sandbox terminal | Your production terminal |
+
+<Warning>
+  Never commit your production API key to version control. Use Postman's environment feature to keep credentials separate from the collection.
+</Warning>
+
+## Pre-request scripts
+
+The collection includes pre-request scripts that automatically:
+
+- Generate unique `Idempotency-Key` headers for POST requests
+- Set timestamps for request logging
+- Populate `merchant_transaction_id` with unique values
+
+## Test scripts
+
+Each request includes test scripts that:
+
+- Validate response status codes
+- Extract and save `transaction_id` for use in subsequent requests
+- Check for required response fields
+
+Example test script:
+
+```javascript
+pm.test("Status code is 200", function () {
+    pm.response.to.have.status(200);
+});
+
+pm.test("Response has transaction_id", function () {
+    var jsonData = pm.response.json();
+    pm.expect(jsonData).to.have.property("transaction_id");
+
+    // Save for subsequent requests
+    pm.environment.set("last_transaction_id", jsonData.transaction_id);
+});
+```
+
+## Request chaining
+
+The collection supports request chaining for multi-step flows:
+
+### Pre-auth → Capture flow
+
+1. Run **Pre-authorization** — saves `transaction_id` and `order_id` to environment
+2. Run **Capture** — automatically uses saved IDs
+
+### Recurring flow
+
+1. Run **Recurring > Initialize** — saves `recurring_id` to environment
+2. Run **Recurring > Charge** — uses saved `recurring_id`
+3. Run **Recurring > Status** — checks series state
+
+## Importing via URL
+
+Import directly from URL in Postman:
+
+```
+https://api.smartretry.com/postman/collection.json
+```
+
+Or use the Postman CLI:
+
+```bash
+postman collection run https://api.smartretry.com/postman/collection.json \
+  --environment your-environment.json
+```
+
+## Insomnia
+
+Prefer Insomnia? Import the same collection:
+
+1. Open Insomnia
+2. Go to **Application > Preferences > Data**
+3. Click **Import Data > From URL**
+4. Enter: `https://api.smartretry.com/postman/collection.json`
+
+<Tip>
+  The collection is regularly updated when new endpoints are added. Re-import periodically to get the latest requests.
+</Tip>
+
+## Need help?
+
+- Check the [API reference](/api-reference/overview) for endpoint details
+- Review [authentication](/authentication) for API key setup
+- [Contact support](https://www.smartretry.com/contact) for collection issues

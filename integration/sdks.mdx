@@ -1,0 +1,309 @@
+---
+title: SDKs and libraries
+description: Official and community libraries for integrating with SmartRetry.
+---
+
+SmartRetry provides official SDKs and supports community libraries to simplify integration in your preferred language.
+
+## Official SDKs
+
+<CardGroup cols={2}>
+  <Card title="Python" icon="python" href="https://github.com/smartretry/smartretry-python">
+    Official Python SDK with full API coverage, type hints, and async support.
+  </Card>
+  <Card title="Node.js" icon="node-js" href="https://github.com/smartretry/smartretry-node">
+    Official Node.js SDK with TypeScript definitions and Promise-based API.
+  </Card>
+</CardGroup>
+
+## Installation
+
+<Tabs>
+  <Tab title="Python">
+    Install the SmartRetry Python SDK using pip:
+
+    ```bash
+    pip install smartretry
+    ```
+
+    Or with Poetry:
+
+    ```bash
+    poetry add smartretry
+    ```
+
+    **Requirements:** Python 3.8+
+  </Tab>
+  <Tab title="Node.js">
+    Install the SmartRetry Node.js SDK using npm:
+
+    ```bash
+    npm install @smartretry/sdk
+    ```
+
+    Or with Yarn:
+
+    ```bash
+    yarn add @smartretry/sdk
+    ```
+
+    **Requirements:** Node.js 18+
+  </Tab>
+</Tabs>
+
+## Quick start
+
+<Tabs>
+  <Tab title="Python">
+    ```python
+    from smartretry import SmartRetry
+
+    # Initialize the client
+    client = SmartRetry(
+        api_key="YOUR_API_KEY",
+        environment="sandbox"  # or "production"
+    )
+
+    # Create a sale
+    result = client.payments.sale(
+        terminal_id="ABC123",
+        amount=49.99,
+        currency="USD",
+        merchant_transaction_id="order-123",
+        order={
+            "payment_instrument": {
+                "card_number": "4111111111111111",
+                "expiry_month": 12,
+                "expiry_year": 2027,
+                "payment_method": "cards"
+            },
+            "payer": {
+                "first_name": "Jane",
+                "last_name": "Doe",
+                "email": "jane@example.com"
+            }
+        },
+        idempotency_key="order-123"
+    )
+
+    print(f"Transaction ID: {result.transaction_id}")
+    print(f"Accepted: {result.accepted}")
+    ```
+  </Tab>
+  <Tab title="Node.js">
+    ```javascript
+    import { SmartRetry } from '@smartretry/sdk';
+
+    // Initialize the client
+    const client = new SmartRetry({
+      apiKey: 'YOUR_API_KEY',
+      environment: 'sandbox'  // or 'production'
+    });
+
+    // Create a sale
+    const result = await client.payments.sale({
+      terminalId: 'ABC123',
+      amount: 49.99,
+      currency: 'USD',
+      merchantTransactionId: 'order-123',
+      order: {
+        paymentInstrument: {
+          cardNumber: '4111111111111111',
+          expiryMonth: 12,
+          expiryYear: 2027,
+          paymentMethod: 'cards'
+        },
+        payer: {
+          firstName: 'Jane',
+          lastName: 'Doe',
+          email: 'jane@example.com'
+        }
+      },
+      idempotencyKey: 'order-123'
+    });
+
+    console.log(`Transaction ID: ${result.transactionId}`);
+    console.log(`Accepted: ${result.accepted}`);
+    ```
+  </Tab>
+</Tabs>
+
+## SDK features
+
+Both official SDKs include:
+
+| Feature | Description |
+|---------|-------------|
+| Full API coverage | All endpoints from payments to recurring to future transactions |
+| Type safety | Full type hints (Python) and TypeScript definitions (Node.js) |
+| Automatic retries | Built-in exponential backoff for rate limits and transient errors |
+| Idempotency | Automatic idempotency key generation and handling |
+| Error handling | Typed exceptions with detailed error information |
+| Webhook verification | Helper methods to verify webhook signatures |
+| Async support | Native async/await patterns |
+
+## Error handling
+
+<Tabs>
+  <Tab title="Python">
+    ```python
+    from smartretry import SmartRetry
+    from smartretry.exceptions import (
+        SmartRetryError,
+        ValidationError,
+        AuthenticationError,
+        RateLimitError,
+        APIError
+    )
+
+    client = SmartRetry(api_key="YOUR_API_KEY")
+
+    try:
+        result = client.payments.sale(...)
+    except ValidationError as e:
+        print(f"Invalid request: {e.detail}")
+        print(f"Field: {e.reason_code}")
+    except AuthenticationError:
+        print("Invalid API key")
+    except RateLimitError as e:
+        print(f"Rate limited. Retry after {e.retry_after} seconds")
+    except APIError as e:
+        print(f"API error: {e.status_code} - {e.detail}")
+    except SmartRetryError as e:
+        print(f"Unexpected error: {e}")
+    ```
+  </Tab>
+  <Tab title="Node.js">
+    ```javascript
+    import { SmartRetry } from '@smartretry/sdk';
+    import {
+      SmartRetryError,
+      ValidationError,
+      AuthenticationError,
+      RateLimitError,
+      APIError
+    } from '@smartretry/sdk/errors';
+
+    const client = new SmartRetry({ apiKey: 'YOUR_API_KEY' });
+
+    try {
+      const result = await client.payments.sale({ ... });
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        console.log(`Invalid request: ${error.detail}`);
+        console.log(`Field: ${error.reasonCode}`);
+      } else if (error instanceof AuthenticationError) {
+        console.log('Invalid API key');
+      } else if (error instanceof RateLimitError) {
+        console.log(`Rate limited. Retry after ${error.retryAfter} seconds`);
+      } else if (error instanceof APIError) {
+        console.log(`API error: ${error.statusCode} - ${error.detail}`);
+      } else if (error instanceof SmartRetryError) {
+        console.log(`Unexpected error: ${error.message}`);
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Webhook verification
+
+<Tabs>
+  <Tab title="Python">
+    ```python
+    from smartretry import SmartRetry
+    from flask import Flask, request
+
+    app = Flask(__name__)
+    client = SmartRetry(api_key="YOUR_API_KEY")
+
+    @app.route("/webhooks", methods=["POST"])
+    def handle_webhook():
+        payload = request.data
+        signature = request.headers.get("X-SmartRetry-Signature")
+
+        try:
+            event = client.webhooks.verify(
+                payload=payload,
+                signature=signature,
+                secret="YOUR_WEBHOOK_SECRET"
+            )
+
+            if event.type == "transaction.approved":
+                handle_approval(event.data)
+            elif event.type == "transaction.declined":
+                handle_decline(event.data)
+
+            return "", 200
+        except client.webhooks.SignatureVerificationError:
+            return "Invalid signature", 400
+    ```
+  </Tab>
+  <Tab title="Node.js">
+    ```javascript
+    import { SmartRetry } from '@smartretry/sdk';
+    import express from 'express';
+
+    const app = express();
+    const client = new SmartRetry({ apiKey: 'YOUR_API_KEY' });
+
+    app.post('/webhooks', express.raw({ type: 'application/json' }), (req, res) => {
+      const payload = req.body;
+      const signature = req.headers['x-smartretry-signature'];
+
+      try {
+        const event = client.webhooks.verify({
+          payload,
+          signature,
+          secret: 'YOUR_WEBHOOK_SECRET'
+        });
+
+        if (event.type === 'transaction.approved') {
+          handleApproval(event.data);
+        } else if (event.type === 'transaction.declined') {
+          handleDecline(event.data);
+        }
+
+        res.sendStatus(200);
+      } catch (error) {
+        if (error instanceof client.webhooks.SignatureVerificationError) {
+          res.status(400).send('Invalid signature');
+        } else {
+          throw error;
+        }
+      }
+    });
+    ```
+  </Tab>
+</Tabs>
+
+## Direct API access
+
+If you prefer not to use an SDK, you can call the REST API directly using any HTTP client. See the [REST API documentation](/integration/rest-api) and individual endpoint pages for request/response formats.
+
+All API endpoints include code examples in cURL, Python (`requests`), and Node.js (`fetch`).
+
+<Tip>
+  Even when using direct HTTP calls, we recommend implementing the retry logic and error handling patterns shown in the [rate limiting guide](/api-reference/rate-limiting).
+</Tip>
+
+## Community libraries
+
+The following community-maintained libraries are available but not officially supported:
+
+| Language | Library | Maintainer |
+|----------|---------|------------|
+| Ruby | `smartretry-ruby` | Community |
+| PHP | `smartretry-php` | Community |
+| Go | `go-smartretry` | Community |
+| Java | `smartretry-java` | Community |
+
+<Warning>
+  Community libraries are not maintained by SmartRetry. Review the code and check for recent updates before using in production.
+</Warning>
+
+## Need help?
+
+- Check the [API reference](/api-reference/overview) for endpoint details
+- Review [error codes](/api-reference/errors) for troubleshooting
+- Contact [support@smartretry.com](mailto:support@smartretry.com) for SDK issues

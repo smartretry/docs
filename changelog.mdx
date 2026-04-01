@@ -1,0 +1,97 @@
+---
+title: Changelog
+description: API updates, new features, and breaking changes.
+---
+
+This page documents changes to the SmartRetry API. Subscribe to our [status page](https://status.smartretry.com) for real-time updates.
+
+## Versioning policy
+
+The SmartRetry API uses date-based versioning. The current version is **2026-04-01**.
+
+- **Non-breaking changes** (new fields, new endpoints) are added without a version bump
+- **Breaking changes** require a new API version with a deprecation period
+- **Deprecated versions** are supported for 12 months after deprecation
+
+<Note>
+  Breaking changes are rare. We design the API to be additive — new features won't break existing integrations.
+</Note>
+
+---
+
+## 2026
+
+### April 2026
+
+**2026-04-01**
+
+- Added multi-language code examples (Python, Node.js) to all API reference pages
+- New [webhooks documentation](/integration/webhooks) with signature verification examples
+- New [transaction reconciliation guide](/integration/reconciliation)
+- New [dashboard guide](/integration/dashboard)
+- Added [health endpoints documentation](/api-reference/health)
+- Added [rate limiting guide](/api-reference/rate-limiting) with exponential backoff examples
+- New [glossary](/glossary) for payment terminology
+
+### March 2026
+
+**2026-03-15**
+
+- Added `Idempotency-Key` header support for all POST endpoints
+- New [idempotency documentation](/api-reference/idempotency) explaining replay behavior
+- Added `X-Idempotency-Replayed` response header
+
+**2026-03-01**
+
+- Introduced future transactions API for managing scheduled recurring payments
+- New endpoints: [charge](/api-reference/future-transactions/charge), [status](/api-reference/future-transactions/status), [update](/api-reference/future-transactions/update), [cancel](/api-reference/future-transactions/cancel)
+
+### February 2026
+
+**2026-02-15**
+
+- Added `card_profile` object to transaction status responses
+- New fields: `issuer.name`, `brand.name`, `category`, `cardType`
+- BIN lookup data now included automatically
+
+**2026-02-01**
+
+- Changed amount representation from minor units to major currency units
+- **Migration:** Divide existing amounts by 100 (e.g., `4999` → `49.99`)
+- Added support for zero-decimal currencies (JPY, KRW) and three-decimal currencies (KWD, BHD)
+
+### January 2026
+
+**2026-01-15**
+
+- New recurring billing endpoints: [init](/api-reference/recurring/init), [charge](/api-reference/recurring/charge), [status](/api-reference/recurring/status), [update](/api-reference/recurring/update), [cancel](/api-reference/recurring/cancel)
+- Three management modes: `merchant`, `our_platform`, `payment_provider`
+
+**2026-01-01**
+
+- Initial public release of SmartRetry API v1
+- Core payment endpoints: sale, pre-auth, capture, refund, void, status
+- Authentication via `x-api-key` header
+- Sandbox environment available
+
+---
+
+## Deprecation notices
+
+| Feature | Deprecated | End of support | Migration |
+|---------|------------|----------------|-----------|
+| *None currently* | — | — | — |
+
+---
+
+## Upcoming changes
+
+We announce planned changes here before release:
+
+- **Q2 2026:** Webhook delivery receipts — confirm delivery status via API
+- **Q2 2026:** Bulk transaction export endpoint
+- **Q3 2026:** Additional payment methods (ACH, SEPA)
+
+<Tip>
+  Join our [developer mailing list](https://www.smartretry.com/developers) to receive changelog updates and early access to new features.
+</Tip>
