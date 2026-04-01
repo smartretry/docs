@@ -11,6 +11,8 @@ Updates configuration for an active recurring series. You can change the billing
   Scheduling fields (`recurring_date_type`, `time_interval`) can only be updated on series where `managed_by` is `our_platform`. Attempting to update these fields on a `merchant`- or `payment_provider`-managed series returns an error.
 </Note>
 
+<RequestExample>
+
 ```bash cURL
 curl --request PUT \
   --url https://api.smartretry.com/v1/payments/recurring/update/ABC123 \
@@ -22,6 +24,48 @@ curl --request PUT \
     "number_of_payments": 24
   }'
 ```
+
+```python Python
+import requests
+
+response = requests.put(
+    "https://api.smartretry.com/v1/payments/recurring/update/ABC123",
+    headers={
+        "Content-Type": "application/json",
+        "x-api-key": "YOUR_API_KEY"
+    },
+    json={
+        "recurring_id": "RC9F4A2B",
+        "amount": 24.99,
+        "number_of_payments": 24
+    }
+)
+
+print(response.json())
+```
+
+```javascript Node.js
+const response = await fetch(
+  "https://api.smartretry.com/v1/payments/recurring/update/ABC123",
+  {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": "YOUR_API_KEY"
+    },
+    body: JSON.stringify({
+      recurring_id: "RC9F4A2B",
+      amount: 24.99,
+      number_of_payments: 24
+    })
+  }
+);
+
+const data = await response.json();
+console.log(data);
+```
+
+</RequestExample>
 
 ## Path parameters
 

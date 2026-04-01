@@ -15,6 +15,8 @@ Cancels a single upcoming payment within a recurring series. The rest of the bil
   Safe retries for this POST endpoint use the `Idempotency-Key` header. Reuse the same key only when retrying the exact same request body. See [Idempotency](/api-reference/idempotency).
 </Note>
 
+<RequestExample>
+
 ```bash cURL
 curl --request POST \
   --url https://api.smartretry.com/v1/payments/recurring/future-transactions/cancel/ABC123 \
@@ -26,6 +28,48 @@ curl --request POST \
     "recurring_id": "RC9F4A2B"
   }'
 ```
+
+```python Python
+import requests
+
+response = requests.post(
+    "https://api.smartretry.com/v1/payments/recurring/future-transactions/cancel/ABC123",
+    headers={
+        "Content-Type": "application/json",
+        "x-api-key": "YOUR_API_KEY",
+        "Idempotency-Key": "future-cancel-20260401-001"
+    },
+    json={
+        "future_transaction_id": "FT3D8E1C",
+        "recurring_id": "RC9F4A2B"
+    }
+)
+
+print(response.json())
+```
+
+```javascript Node.js
+const response = await fetch(
+  "https://api.smartretry.com/v1/payments/recurring/future-transactions/cancel/ABC123",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": "YOUR_API_KEY",
+      "Idempotency-Key": "future-cancel-20260401-001"
+    },
+    body: JSON.stringify({
+      future_transaction_id: "FT3D8E1C",
+      recurring_id: "RC9F4A2B"
+    })
+  }
+);
+
+const data = await response.json();
+console.log(data);
+```
+
+</RequestExample>
 
 ## Path parameters
 

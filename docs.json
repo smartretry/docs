@@ -21,10 +21,24 @@
     },
     "links": [
       {
-        "label": "Status Page",
+        "label": "Status",
         "href": "https://status.smartretry.com/"
+      },
+      {
+        "label": "Contact",
+        "href": "https://www.smartretry.com/contact"
       }
     ]
+  },
+  "footer": {
+    "socials": {
+      "website": "https://www.smartretry.com/",
+      "linkedin": "https://www.linkedin.com/company/smartretry/",
+      "facebook": "https://www.facebook.com/smartretry",
+      "youtube": "https://www.youtube.com/@SmartRetry",
+      "instagram": "https://www.instagram.com/smartretry/",
+      "x": "https://x.com/smartretry"
+    }
   },
   "navigation": {
     "tabs": [
@@ -53,17 +67,18 @@
             "group": "Integration",
             "pages": [
               "integration/rest-api",
+              "integration/sdks",
+              "integration/postman",
+              "integration/webhooks",
               "integration/terminals",
               "integration/payment-methods",
               "integration/sandbox"
             ]
           },
           {
-            "group": "FAQ",
+            "group": "Release Notes",
             "pages": [
-              "faq/general",
-              "faq/integration",
-              "faq/troubleshooting"
+              "changelog"
             ]
           }
         ]
@@ -76,7 +91,9 @@
             "pages": [
               "api-reference/overview",
               "api-reference/idempotency",
-              "api-reference/errors"
+              "api-reference/rate-limiting",
+              "api-reference/errors",
+              "api-reference/health"
             ]
           },
           {

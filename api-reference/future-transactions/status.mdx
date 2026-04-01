@@ -7,11 +7,42 @@ description: Retrieve the details and current status of a single scheduled futur
 
 Returns the details of a specific future transaction — its scheduled date, amount, currency, and current processing status. Use this endpoint to check the state of an individual upcoming payment within a recurring series.
 
+<RequestExample>
+
 ```bash cURL
 curl --request GET \
   --url 'https://api.smartretry.com/v1/payments/recurring/future-transactions/status/ABC123?future_transaction_id=FT3D8E1C' \
   --header 'x-api-key: YOUR_API_KEY'
 ```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.smartretry.com/v1/payments/recurring/future-transactions/status/ABC123",
+    headers={"x-api-key": "YOUR_API_KEY"},
+    params={"future_transaction_id": "FT3D8E1C"}
+)
+
+print(response.json())
+```
+
+```javascript Node.js
+const response = await fetch(
+  "https://api.smartretry.com/v1/payments/recurring/future-transactions/status/ABC123?future_transaction_id=FT3D8E1C",
+  {
+    method: "GET",
+    headers: {
+      "x-api-key": "YOUR_API_KEY"
+    }
+  }
+);
+
+const data = await response.json();
+console.log(data);
+```
+
+</RequestExample>
 
 ## Path parameters
 
