@@ -1,0 +1,73 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# Dependencies
+node_modules
+
+# Build outputs
+dist
+build
+.next
+out
+.esbuild
+.serverless
+
+# Testing
+coverage
+
+# Environment variables
+.env*
+
+# Debug logs
+*.log
+.pnpm-debug.log*
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# IDEs and editors
+.DS_Store
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# ESLint
+.eslintcache
+
+# Certificates and secrets
+*.pem
+certificates
+
+# Deployment platforms
+.vercel
+.open-next
+.sst
+
+# Third-party services
+.env.sentry-build-plugin
+.clerk
+
+# Database
+*.sql
+
+# Generated code (e.g., Prisma client) - typically created during CI/CD
+src/generated
+prisma/generated/client
+
+# Development files
+described_schemas.md
+
+# Mock files
+src/app/api/**/mock_*.json
+
+# Claude Code
+CLAUDE.md
+.claude/prompts
+
+# Storybook
+*storybook.log
+storybook-static
+
+.npmrc
