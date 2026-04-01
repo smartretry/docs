@@ -9,6 +9,10 @@ Capture settles a pre-authorization and moves the reserved funds to your account
   The capture amount must not exceed the originally authorized amount. If you omit `amount`, the full authorized amount is captured.
 </Note>
 
+<Note>
+  Safe retries for this POST endpoint use the `Idempotency-Key` header. Reuse the same key only when retrying the exact same request body. See [Idempotency](/api-reference/idempotency).
+</Note>
+
 <RequestExample>
 
 ```bash cURL
@@ -16,6 +20,7 @@ curl --request POST \
   --url https://api.smartretry.com/v1/payments/capture/ABC123 \
   --header 'x-api-key: YOUR_API_KEY' \
   --header 'Content-Type: application/json' \
+  --header 'Idempotency-Key: capture-20260331-001' \
   --data '{
     "transaction_reference_id": "TX8A3F2C",
     "order_reference_id": "OR7B9E1D",

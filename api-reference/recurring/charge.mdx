@@ -11,11 +11,16 @@ Triggers an immediate charge against an existing recurring series. Use this endp
   This endpoint only applies to series where `managed_by` is `merchant`. For `our_platform`-managed series, SmartRetry schedules and processes charges automatically. Calling this endpoint on a platform-managed series returns an error.
 </Note>
 
+<Note>
+  Safe retries for this POST endpoint use the `Idempotency-Key` header. Reuse the same key only when retrying the exact same request body. See [Idempotency](/api-reference/idempotency).
+</Note>
+
 ```bash cURL
 curl --request POST \
   --url https://api.smartretry.com/v1/payments/recurring/charge/ABC123 \
   --header 'Content-Type: application/json' \
   --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Idempotency-Key: recurring-charge-20260401-001' \
   --data '{
     "recurring_id": "RC9F4A2B",
     "amount": 19.99,
@@ -68,4 +73,3 @@ curl --request POST \
   "accepted": true
 }
 ```
-

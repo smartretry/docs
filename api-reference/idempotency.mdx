@@ -1,0 +1,121 @@
+---
+title: Idempotency
+description: Safe retry behavior for POST payment requests using the Idempotency-Key header.
+---
+
+Use idempotency to safely retry a POST payment request when your client is unsure whether the first attempt completed. SmartRetry uses the `Idempotency-Key` request header to detect duplicate retries and replay the original result instead of creating a second operation.
+
+## Supported endpoints
+
+Idempotency currently applies only to `POST` endpoints under `/v1/payments/*`, including payment, recurring, and future-transaction POST operations.
+
+- `POST` requests: supported
+- `GET` requests: ignored
+- `PUT` requests: ignored
+
+<Warning>
+  Reusing an `Idempotency-Key` on a `PUT` or `GET` request has no effect today. Only `POST /v1/payments/*` participates in idempotent replay.
+</Warning>
+
+## Request header
+
+Send an `Idempotency-Key` header with any POST request you may need to retry.
+
+| Header | Type | Required | Rules |
+|---|---|---|---|
+| `Idempotency-Key` | string | No | Maximum 255 characters. Allowed characters: letters, numbers, underscore, and hyphen. |
+
+Use a new key for each new operation. Reuse the same key only when retrying the exact same request body.
+
+## How it works
+
+1. Send a POST request with an `Idempotency-Key`.
+2. If the request completes with a non-`5xx` response, SmartRetry stores the original HTTP status and response body for 24 hours.
+3. If you retry with the same key and the same request body during that window, SmartRetry returns the original status and body instead of creating a second operation.
+4. If you retry with the same key but a different request body, SmartRetry returns `409 Conflict`.
+
+<Note>
+  Replay preserves the original HTTP status. A repeated request can replay a prior `200`, `400`, `403`, `404`, or other cached non-`5xx` response. `5xx` responses are not cached.
+</Note>
+
+## Response headers
+
+When a keyed POST request is stored or replayed from cache, SmartRetry returns these headers:
+
+| Header | Type | Description |
+|---|---|---|
+| `Idempotency-Key` | string | The key that scoped the request. |
+| `Idempotency-Replayed` | string | `false` on the first cached response, `true` when SmartRetry replays a stored response. |
+| `Idempotency-Expires` | string | ISO 8601 timestamp showing when the cached response expires. |
+
+## Errors
+
+| Status | Reason code | When it happens |
+|---|---|---|
+| `400` | `INVALID_IDEMPOTENCY_KEY` | The header is too long or contains unsupported characters. |
+| `409` | `IDEMPOTENCY_CONFLICT` | The same key was reused with a different request body. |
+| `503` | `RESOURCE_LOCKED` | Another request with the same key is still in flight and SmartRetry could not obtain the cached result before the wait timeout. |
+
+<Tip>
+  If a duplicate request arrives while the original request is still running, SmartRetry waits briefly for the original result before returning `503 Resource Locked`. The current maximum wait is 10 seconds.
+</Tip>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl --request POST \
+  --url https://api.smartretry.com/v1/payments/sale/ABC123 \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Idempotency-Key: sale-order-20260401-001' \
+  --data '{
+    "merchant_transaction_id": "order-20260401-001",
+    "amount": 49.99,
+    "currency": "USD",
+    "order": {
+      "payment_instrument": {
+        "card_number": "4111111111111111",
+        "expiry_month": 12,
+        "expiry_year": 2027,
+        "payment_method": "cards"
+      },
+      "payer": {
+        "first_name": "Jane",
+        "last_name": "Doe",
+        "email": "jane.doe@example.com"
+      }
+    }
+  }'
+```
+
+```json First response
+{
+  "transaction_id": "TX8A3F2C",
+  "order_id": "OR7B9E1D",
+  "merchant_transaction_id": "order-20260401-001",
+  "accepted": true
+}
+```
+
+```http Response headers
+Idempotency-Key: sale-order-20260401-001
+Idempotency-Replayed: false
+Idempotency-Expires: 2026-04-02T08:00:00.000Z
+```
+
+```http Replay headers
+Idempotency-Key: sale-order-20260401-001
+Idempotency-Replayed: true
+Idempotency-Expires: 2026-04-02T08:00:00.000Z
+```
+
+</CodeGroup>
+
+## Best practices
+
+- Generate a fresh `Idempotency-Key` for every new POST operation.
+- Reuse the same key only when retrying the exact same request after a timeout, disconnect, or ambiguous client failure.
+- Keep `merchant_transaction_id` as your own business reference for reconciliation, not as the retry mechanism.
+- Log the `Idempotency-Key` with your outbound request and SmartRetry response to simplify incident tracing.

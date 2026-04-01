@@ -42,6 +42,7 @@ curl --request POST \
   --url https://api.smartretry.com/v1/payments/sale/ABC123 \
   --header 'Content-Type: application/json' \
   --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Idempotency-Key: sale-order-001' \
   --data '{
     "merchant_transaction_id": "txn_001",
     "amount": 19.99,
@@ -57,6 +58,7 @@ response = requests.post(
     headers={
         "Content-Type": "application/json",
         "x-api-key": "YOUR_API_KEY",
+        "Idempotency-Key": "sale-order-001",
     },
     json={
         "merchant_transaction_id": "txn_001",
@@ -74,6 +76,7 @@ const response = await fetch(
     headers: {
       "Content-Type": "application/json",
       "x-api-key": "YOUR_API_KEY",
+      "Idempotency-Key": "sale-order-001",
     },
     body: JSON.stringify({
       merchant_transaction_id: "txn_001",
@@ -120,12 +123,20 @@ Supported currencies: USD, EUR, GBP, JPY, KWD, CNY, AUD, CAD, CHF, SEK, NOK, DKK
 
 `merchant_transaction_id` is your own unique identifier for each transaction. Include it on every request.
 
-- **Idempotency** — if you retry a request with the same `merchant_transaction_id`, the API returns the original result rather than creating a duplicate charge.
 - **Reconciliation** — use this ID to match SmartRetry transactions back to orders in your system.
+- **Correlation** — log it in your application so you can trace a SmartRetry transaction back to the originating cart, invoice, or subscription event.
 
 <Tip>
-  Generate a UUID or a stable, order-scoped ID for each transaction. Reusing the same ID for genuinely different transactions returns a `409 Conflict` error.
+  Generate a UUID or a stable, order-scoped ID for each transaction so your internal records remain easy to reconcile.
 </Tip>
+
+## Idempotency
+
+Use the `Idempotency-Key` header on `POST /v1/payments/*` requests when you need safe retries. If you resend the same POST request with the same key and the same body, SmartRetry replays the original non-`5xx` response for 24 hours instead of creating a second operation.
+
+If you reuse the same key with a different request body, SmartRetry returns `409 Conflict` with reason code `IDEMPOTENCY_CONFLICT`.
+
+See [Idempotency](/api-reference/idempotency) for the full behavior, supported methods, response headers, and retry guidance.
 
 ## Response format
 

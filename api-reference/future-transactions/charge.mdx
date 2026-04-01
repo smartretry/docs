@@ -11,11 +11,16 @@ Processes a future transaction right away, before its scheduled date. Use this e
   This endpoint executes the payment before its scheduled date. Once processed, the transaction moves to `completed` status and will not be charged again on its original scheduled date.
 </Warning>
 
+<Note>
+  Safe retries for this POST endpoint use the `Idempotency-Key` header. Reuse the same key only when retrying the exact same request body. See [Idempotency](/api-reference/idempotency).
+</Note>
+
 ```bash cURL
 curl --request POST \
   --url https://api.smartretry.com/v1/payments/recurring/future-transactions/charge/ABC123 \
   --header 'Content-Type: application/json' \
   --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Idempotency-Key: future-charge-20260401-001' \
   --data '{
     "future_transaction_id": "FT3D8E1C",
     "recurring_id": "RC9F4A2B"

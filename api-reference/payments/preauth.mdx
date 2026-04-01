@@ -9,6 +9,10 @@ A pre-authorization places a hold on the customer's funds without completing the
   Use pre-authorization when the final charge amount may differ from the initial estimate — for example, hotel stays, car rentals, or orders with variable shipping costs.
 </Tip>
 
+<Note>
+  Safe retries for this POST endpoint use the `Idempotency-Key` header. Reuse the same key only when retrying the exact same request body. See [Idempotency](/api-reference/idempotency).
+</Note>
+
 <RequestExample>
 
 ```bash cURL
@@ -16,6 +20,7 @@ curl --request POST \
   --url https://api.smartretry.com/v1/payments/preauth/ABC123 \
   --header 'x-api-key: YOUR_API_KEY' \
   --header 'Content-Type: application/json' \
+  --header 'Idempotency-Key: preauth-20260331-001' \
   --data '{
     "merchant_transaction_id": "preauth-20260331-001",
     "amount": 49.99,

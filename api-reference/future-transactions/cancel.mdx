@@ -11,11 +11,16 @@ Cancels a single upcoming payment within a recurring series. The rest of the bil
   This cancels only the specified future transaction. To stop all future payments and end the entire series, use the [recurring cancel endpoint](/api-reference/recurring/cancel) instead.
 </Note>
 
+<Note>
+  Safe retries for this POST endpoint use the `Idempotency-Key` header. Reuse the same key only when retrying the exact same request body. See [Idempotency](/api-reference/idempotency).
+</Note>
+
 ```bash cURL
 curl --request POST \
   --url https://api.smartretry.com/v1/payments/recurring/future-transactions/cancel/ABC123 \
   --header 'Content-Type: application/json' \
   --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Idempotency-Key: future-cancel-20260401-001' \
   --data '{
     "future_transaction_id": "FT3D8E1C",
     "recurring_id": "RC9F4A2B"

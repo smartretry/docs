@@ -50,9 +50,10 @@ All error responses share this shape:
 | `401` | Unauthorized | The `x-api-key` header is missing or the key is invalid. |
 | `403` | Forbidden | The API key is valid but does not have access to the requested terminal. |
 | `404` | Not Found | The transaction, recurring plan, or terminal ID does not exist. |
-| `409` | Conflict | A transaction with the same `merchant_transaction_id` already exists and cannot be duplicated. |
+| `409` | Conflict | The request conflicts with existing state. For idempotency, this happens when the same `Idempotency-Key` is reused with a different request body. |
 | `422` | Unprocessable Entity | The request is structurally valid but was rejected by business logic — for example, attempting to capture an already-captured pre-auth. |
 | `429` | Too Many Requests | Your integration has exceeded the rate limit. Back off and retry after the period indicated in the `Retry-After` response header. |
+| `503` | Service Unavailable | The API could not complete the request right now. For idempotency, this can happen when another request with the same key is still in flight and the replay wait timed out. |
 | `500` | Internal Server Error | An unexpected error occurred on the SmartRetry side. If this persists, check [status.smartretry.com](https://status.smartretry.com) and contact support. |
 
 ## Reason codes
@@ -62,7 +63,9 @@ All error responses share this shape:
 | `INVALID_API_KEY` | 401 | The `x-api-key` header is missing, malformed, or the key has been revoked. |
 | `TERMINAL_NOT_FOUND` | 403 / 404 | The `terminal_friendly_id` in the path does not match any terminal your key can access. |
 | `TRANSACTION_NOT_FOUND` | 404 | No transaction with the given ID exists on this terminal. |
-| `DUPLICATE_TRANSACTION_ID` | 409 | A transaction with this `merchant_transaction_id` was already submitted. Idempotent replay returns the original result; a new charge with the same ID is rejected. |
+| `INVALID_IDEMPOTENCY_KEY` | 400 | The `Idempotency-Key` header is malformed, too long, or contains unsupported characters. |
+| `IDEMPOTENCY_CONFLICT` | 409 | The `Idempotency-Key` value was reused with a different request body. Reuse the same key only for an exact retry of the original POST request. |
+| `RESOURCE_LOCKED` | 503 | Another request using the same `Idempotency-Key` is still in flight and SmartRetry could not obtain the cached result before the wait timeout. |
 | `INVALID_AMOUNT` | 400 | The `amount` value is missing, zero, negative, or not a valid number in major currency units. |
 | `INVALID_CURRENCY` | 400 | The `currency` value is not a supported ISO 4217 currency code. |
 | `INVALID_CARD_NUMBER` | 400 | The card number failed the Luhn check or is not a recognised card format. |
@@ -127,6 +130,30 @@ All error responses share this shape:
 }
 ```
 
+```json 409 Conflict
+{
+  "type": "https://docs.smartretry.com/api-reference/errors#idempotency-conflict",
+  "title": "Conflict",
+  "status": 409,
+  "detail": "The Idempotency-Key was already used with a different request body.",
+  "reason_code": "IDEMPOTENCY_CONFLICT",
+  "context": {
+    "idempotency_key": "sale-order-20260401-001"
+  }
+}
+```
+
+```json 503 Service Unavailable
+{
+  "type": "https://docs.smartretry.com/api-reference/errors#resource-locked",
+  "title": "Service Unavailable",
+  "status": 503,
+  "detail": "Another request with the same Idempotency-Key is still being processed. Retry shortly.",
+  "reason_code": "RESOURCE_LOCKED",
+  "context": {}
+}
+```
+
 </CodeGroup>
 
 ## Handling errors in production
@@ -139,13 +166,14 @@ All error responses share this shape:
 
 - `500 Internal Server Error` — retry with exponential backoff. Check [status.smartretry.com](https://status.smartretry.com) if errors persist beyond a few minutes.
 - `429 Too Many Requests` — wait for the number of seconds in the `Retry-After` response header before retrying. Do not retry immediately.
+- `503 Service Unavailable` — if the reason code is `RESOURCE_LOCKED`, retry the same POST request shortly with the same `Idempotency-Key`.
 
 **Non-retryable errors**
 
 - `400 Bad Request` — fix the request before retrying. Check the `context.field` value to identify which field is invalid.
 - `401 Unauthorized` — verify your API key is correct and present in the `x-api-key` header.
 - `403 Forbidden` — the key is valid but not authorized for this terminal. Check you are using the right `terminal_friendly_id`.
-- `409 Conflict` — use a different `merchant_transaction_id` for each new transaction. If you are retrying an existing transaction, use the original ID to retrieve the idempotent result via the status endpoint.
+- `409 Conflict` — if the reason code is `IDEMPOTENCY_CONFLICT`, do not retry with the same key and a different body. Generate a new `Idempotency-Key` for a new operation.
 
 **Declined transactions**
 
