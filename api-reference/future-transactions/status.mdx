@@ -44,7 +44,7 @@ curl --request GET \
 </ResponseField>
 
 <ResponseField name="amount" type="integer">
-  Amount to be charged in minor currency units.
+  Amount to be charged in major currency units (e.g., `19.99`).
 </ResponseField>
 
 <ResponseField name="currency" type="string">
@@ -79,7 +79,7 @@ curl --request GET \
   "recurring_id": "RC9F4A2B",
   "scheduled_date": "2026-05-01",
   "sequence_number": 2,
-  "amount": 1999,
+  "amount": 19.99,
   "currency": "USD",
   "status": "pending"
 }

@@ -18,7 +18,7 @@ curl --request PUT \
   --header 'x-api-key: YOUR_API_KEY' \
   --data '{
     "recurring_id": "RC9F4A2B",
-    "amount": 2499,
+    "amount": 24.99,
     "number_of_payments": 24
   }'
 ```
@@ -36,7 +36,7 @@ curl --request PUT \
 </ParamField>
 
 <ParamField body="amount" type="integer">
-  New default charge amount for future payments in this series, in minor currency units. Does not affect charges that have already been processed.
+  New default charge amount for future payments in this series, in major currency units (e.g., `24.99` for $24.99). Does not affect charges that have already been processed.
 </ParamField>
 
 <ParamField body="first_payment_date" type="string">

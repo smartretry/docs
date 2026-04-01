@@ -178,13 +178,14 @@ curl --request GET \
   "payer": {
     "first_name": "Jane",
     "last_name": "Smith",
-    "email": "jane.smith@example.com"
+    "email_username": "jane.smith",
+    "email_domain": "example.com"
   },
   "future_transactions": [
     {
       "future_transaction_id": "FT3D8E1C",
       "scheduled_date": "2026-05-01",
-      "amount": 1999,
+      "amount": 19.99,
       "currency": "USD",
       "status": "pending"
     }
@@ -193,7 +194,7 @@ curl --request GET \
     {
       "transaction_id": "TX8A3F2C",
       "order_id": "OR7B9E1D",
-      "amount": 1999,
+      "amount": 19.99,
       "currency": "USD",
       "accepted": true
     }

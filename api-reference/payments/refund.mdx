@@ -16,7 +16,7 @@ curl --request POST \
     "transaction_reference_id": "TX8A3F2C",
     "order_reference_id": "OR7B9E1D",
     "merchant_transaction_id": "refund-20260331-001",
-    "amount": 2500
+    "amount": 25.00
   }'
 ```
 
@@ -61,12 +61,12 @@ curl --request POST \
   The `order_id` associated with the transaction you want to refund. Exactly 8 characters.
 </ParamField>
 
-<ParamField body="merchant_transaction_id" type="string" required>
+<ParamField body="merchant_transaction_id" type="string">
   Your unique identifier for this refund transaction. Must be different from the `merchant_transaction_id` of the original transaction.
 </ParamField>
 
-<ParamField body="amount" type="integer">
-  Amount to refund in minor currency units. If omitted, the full transaction amount is refunded. Partial refunds are supported — you can issue multiple partial refunds as long as the total does not exceed the original transaction amount.
+<ParamField body="amount" type="number">
+  Amount to refund in major currency units (e.g., `25.00` for $25.00). If omitted, the full transaction amount is refunded. Partial refunds are supported — you can issue multiple partial refunds as long as the total does not exceed the original transaction amount.
 </ParamField>
 
 <ParamField body="currency" type="string">

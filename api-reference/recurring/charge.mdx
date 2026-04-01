@@ -18,7 +18,7 @@ curl --request POST \
   --header 'x-api-key: YOUR_API_KEY' \
   --data '{
     "recurring_id": "RC9F4A2B",
-    "amount": 1999,
+    "amount": 19.99,
     "currency": "USD"
   }'
 ```
@@ -35,8 +35,8 @@ curl --request POST \
   The 8-character identifier of the recurring series to charge.
 </ParamField>
 
-<ParamField body="amount" type="integer">
-  Override the default series amount for this charge only, in minor currency units. If omitted, the amount set during initialization is used.
+<ParamField body="amount" type="number">
+  Override the default series amount for this charge only, in major currency units (e.g., `19.99` for $19.99). If omitted, the amount set during initialization is used.
 </ParamField>
 
 <ParamField body="currency" type="string">
@@ -69,6 +69,3 @@ curl --request POST \
 }
 ```
 
-<Tip>
-  Use a stable, predictable `merchant_transaction_id` for each billing cycle — for example, `sub-{subscription_id}-{billing_period}`. This makes it easy to reconcile charges and safely retry failed requests without risk of double-charging.
-</Tip>

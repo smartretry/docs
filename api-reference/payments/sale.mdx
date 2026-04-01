@@ -14,7 +14,7 @@ curl --request POST \
   --header 'Content-Type: application/json' \
   --data '{
     "merchant_transaction_id": "order-20260331-001",
-    "amount": 4999,
+    "amount": 49.99,
     "currency": "USD",
     "order": {
       "merchant_order_id": "my-order-20260331-001",
@@ -73,8 +73,8 @@ curl --request POST \
   Your unique identifier for this transaction. Use this to correlate SmartRetry transactions with your own records. Maximum 100 characters.
 </ParamField>
 
-<ParamField body="amount" type="integer" required>
-  Amount to charge in minor currency units (e.g., cents). Minimum `1`, maximum `999999999`.
+<ParamField body="amount" type="number" required>
+  Amount to charge in major currency units (e.g., `49.99` for $49.99). Minimum `1`, maximum `999999999`.
 </ParamField>
 
 <ParamField body="currency" type="string" required>

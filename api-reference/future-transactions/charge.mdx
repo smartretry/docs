@@ -38,8 +38,8 @@ curl --request POST \
   The 8-character identifier of the recurring series this future transaction belongs to.
 </ParamField>
 
-<ParamField body="amount" type="integer">
-  Override the scheduled amount for this charge only, in minor currency units. Minimum `1`, maximum `999999999`. If omitted, the amount defined on the future transaction is used.
+<ParamField body="amount" type="number">
+  Override the scheduled amount for this charge only, in major currency units (e.g., `19.99` for $19.99). Minimum `1`, maximum `999999999`. If omitted, the amount defined on the future transaction is used.
 </ParamField>
 
 ## Response

@@ -21,7 +21,7 @@ curl --request GET \
 {
   "transaction_id": "TX8A3F2C",
   "type": "sale",
-  "amount": 4999,
+  "amount": 49.99,
   "currency": "USD",
   "authorization_code": "AUTH042",
   "arn": "74491803522700123456789",
@@ -91,8 +91,8 @@ curl --request GET \
   The transaction type. One of: `sale`, `preauth`, `capture`, `refund`, `void`, `recurring_init`, `recurring`, `payout`.
 </ResponseField>
 
-<ResponseField name="amount" type="integer" required>
-  Transaction amount in minor currency units (e.g., `4999` = $49.99).
+<ResponseField name="amount" type="number" required>
+  Transaction amount in major currency units (e.g., `49.99`).
 </ResponseField>
 
 <ResponseField name="currency" type="string" required>

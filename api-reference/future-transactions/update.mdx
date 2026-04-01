@@ -19,7 +19,7 @@ curl --request PUT \
   --data '{
     "future_transaction_id": "FT3D8E1C",
     "recurring_id": "RC9F4A2B",
-    "amount": 2499,
+    "amount": 24.99,
     "scheduled_date": "2026-05-15"
   }'
 ```
@@ -40,8 +40,8 @@ curl --request PUT \
   The 8-character identifier of the recurring series this future transaction belongs to.
 </ParamField>
 
-<ParamField body="amount" type="integer">
-  Override the charge amount for this specific occurrence only, in minor currency units. Does not affect the default series amount or other future transactions.
+<ParamField body="amount" type="number">
+  Override the charge amount for this specific occurrence only, in major currency units (e.g., `24.99` for $24.99). Does not affect the default series amount or other future transactions.
 </ParamField>
 
 <ParamField body="scheduled_date" type="string">

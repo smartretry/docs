@@ -17,7 +17,7 @@ curl --request POST \
   --header 'Content-Type: application/json' \
   --header 'x-api-key: YOUR_API_KEY' \
   --data '{
-    "amount": 1999,
+    "amount": 19.99,
     "currency": "USD",
     "recurring": {
       "managed_by": "our_platform",
@@ -48,8 +48,8 @@ curl --request POST \
 
 ## Request body
 
-<ParamField body="amount" type="integer" required>
-  Charge amount in minor currency units (e.g., `1999` = $19.99 USD). Must be a positive integer.
+<ParamField body="amount" type="number" required>
+  Charge amount in major currency units (e.g., `19.99` for $19.99). Minimum `1`, maximum `999999999`.
 </ParamField>
 
 <ParamField body="currency" type="string" required>

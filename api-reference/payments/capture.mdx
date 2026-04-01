@@ -20,7 +20,7 @@ curl --request POST \
     "transaction_reference_id": "TX8A3F2C",
     "order_reference_id": "OR7B9E1D",
     "merchant_transaction_id": "capture-20260331-001",
-    "amount": 4999
+    "amount": 49.99
   }'
 ```
 
@@ -69,8 +69,8 @@ curl --request POST \
   Your unique identifier for this capture transaction. Must be different from the `merchant_transaction_id` used in the pre-authorization.
 </ParamField>
 
-<ParamField body="amount" type="integer">
-  Amount to capture in minor currency units. If omitted, the full authorized amount is captured. If provided, must be less than or equal to the authorized amount.
+<ParamField body="amount" type="number">
+  Amount to capture in major currency units (e.g., `49.99` for $49.99). If omitted, the full authorized amount is captured. If provided, must be less than or equal to the authorized amount.
 </ParamField>
 
 <ParamField body="description" type="string">
