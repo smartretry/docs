@@ -1,0 +1,202 @@
+---
+title: Recurring status
+description: Retrieve the current state of a recurring billing series, including schedule details, payment history, and upcoming transactions.
+---
+
+`GET /v1/payments/recurring/status/{terminal_friendly_id}`
+
+Returns the full state of a recurring series — its schedule configuration, payment instrument, payer details, completed transaction history, and upcoming scheduled payments.
+
+```bash cURL
+curl --request GET \
+  --url 'https://api.smartretry.com/v1/payments/recurring/status/ABC123?recurring_id=RC9F4A2B' \
+  --header 'x-api-key: YOUR_API_KEY'
+```
+
+## Path parameters
+
+<ParamField path="terminal_friendly_id" type="string" required>
+  Your 6-character terminal identifier.
+</ParamField>
+
+## Query parameters
+
+<ParamField query="recurring_id" type="string" required>
+  The 8-character identifier of the recurring series to look up.
+</ParamField>
+
+## Response
+
+<ResponseField name="recurring_id" type="string">
+  Unique identifier of the recurring series (8 characters).
+</ResponseField>
+
+<ResponseField name="order_id" type="string">
+  Order identifier associated with the series (8 characters).
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Top-level series status. One of `active`, `paused`, `cancelled`, or `completed`.
+</ResponseField>
+
+<ResponseField name="recurring" type="object">
+  Detailed schedule configuration for the series.
+
+  <Expandable title="properties">
+    <ResponseField name="status" type="string">
+      Series status. One of `active`, `paused`, `cancelled`, or `completed`.
+    </ResponseField>
+
+    <ResponseField name="managed_by" type="string">
+      Who controls billing. One of `merchant`, `our_platform`, or `payment_provider`.
+    </ResponseField>
+
+    <ResponseField name="first_payment_date" type="string">
+      Date of the first scheduled payment (`YYYY-MM-DD`).
+    </ResponseField>
+
+    <ResponseField name="recurring_date_type" type="string">
+      Billing frequency. One of `daily`, `weekly`, `monthly`, or `yearly`.
+    </ResponseField>
+
+    <ResponseField name="time_interval" type="integer">
+      Interval multiplier applied to `recurring_date_type`.
+    </ResponseField>
+
+    <ResponseField name="number_of_payments" type="integer">
+      Total number of payments configured for this series. Absent if the agreement is open-ended.
+    </ResponseField>
+
+    <ResponseField name="cancellation_date" type="string">
+      Date on which the agreement automatically ends (`YYYY-MM-DD`).
+    </ResponseField>
+
+    <ResponseField name="completed_payments" type="integer">
+      Number of payments that have been successfully processed. Minimum: `0`.
+    </ResponseField>
+
+    <ResponseField name="remaining_payments" type="integer">
+      Number of payments remaining before the series completes. Minimum: `0`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="payment_instrument" type="object">
+  Stored payment instrument associated with this series.
+
+  <Expandable title="properties">
+    <ResponseField name="token" type="string">
+      88-character stored payment token for this instrument.
+    </ResponseField>
+
+    <ResponseField name="payment_method" type="string">
+      Payment method type (e.g., `cards`, `digital_wallets`).
+    </ResponseField>
+
+    <ResponseField name="card_cardholder_name" type="string">
+      Name on the card.
+    </ResponseField>
+
+    <ResponseField name="card_card_last_four_digit" type="string">
+      Last four digits of the card number.
+    </ResponseField>
+
+    <ResponseField name="card_bin" type="string">
+      Bank identification number (first six digits of the card).
+    </ResponseField>
+
+    <ResponseField name="expiration_date" type="string">
+      Card expiry date in ISO 8601 format.
+    </ResponseField>
+
+    <ResponseField name="card_profile" type="object">
+      Enriched card metadata.
+
+      <Expandable title="properties">
+        <ResponseField name="fingerprint" type="string">
+          Unique fingerprint for this card across your account.
+        </ResponseField>
+
+        <ResponseField name="issuer.name" type="string">
+          Name of the card-issuing bank.
+        </ResponseField>
+
+        <ResponseField name="brand.name" type="string">
+          Card network brand (e.g., Visa, Mastercard).
+        </ResponseField>
+
+        <ResponseField name="category" type="string">
+          Card category (e.g., consumer, corporate, prepaid).
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="payer" type="object">
+  Identity information for the payer on this series.
+</ResponseField>
+
+<ResponseField name="future_transactions" type="array">
+  List of upcoming scheduled payments in this series. Each entry describes a planned charge that has not yet been processed.
+</ResponseField>
+
+<ResponseField name="completed_transactions" type="array">
+  List of transactions that have already been processed as part of this series, in chronological order.
+</ResponseField>
+
+```json Example response
+{
+  "recurring_id": "RC9F4A2B",
+  "order_id": "OR7B9E1D",
+  "status": "active",
+  "recurring": {
+    "status": "active",
+    "managed_by": "our_platform",
+    "first_payment_date": "2026-04-01",
+    "recurring_date_type": "monthly",
+    "time_interval": 1,
+    "number_of_payments": 12,
+    "cancellation_date": null,
+    "completed_payments": 1,
+    "remaining_payments": 11
+  },
+  "payment_instrument": {
+    "token": "tok_88chartoken...",
+    "payment_method": "cards",
+    "card_cardholder_name": "Jane Smith",
+    "card_card_last_four_digit": "1111",
+    "card_bin": "411111",
+    "expiration_date": "2028-12-31T00:00:00Z",
+    "card_profile": {
+      "fingerprint": "fp_abc123...",
+      "issuer.name": "Chase",
+      "brand.name": "Visa",
+      "category": "consumer"
+    }
+  },
+  "payer": {
+    "first_name": "Jane",
+    "last_name": "Smith",
+    "email": "jane.smith@example.com"
+  },
+  "future_transactions": [
+    {
+      "future_transaction_id": "FT3D8E1C",
+      "scheduled_date": "2026-05-01",
+      "amount": 1999,
+      "currency": "USD",
+      "status": "pending"
+    }
+  ],
+  "completed_transactions": [
+    {
+      "transaction_id": "TX8A3F2C",
+      "order_id": "OR7B9E1D",
+      "amount": 1999,
+      "currency": "USD",
+      "accepted": true
+    }
+  ]
+}
+```

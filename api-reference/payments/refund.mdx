@@ -1,0 +1,96 @@
+---
+title: Refund
+description: Return funds to a customer for a completed sale or capture.
+---
+
+A refund returns funds to the customer's payment instrument for a previously completed sale or capture. You can issue a full refund or a partial refund by specifying an `amount`.
+
+<RequestExample>
+
+```bash cURL
+curl --request POST \
+  --url https://api.smartretry.com/v1/payments/refund/ABC123 \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "transaction_reference_id": "TX8A3F2C",
+    "order_reference_id": "OR7B9E1D",
+    "merchant_transaction_id": "refund-20260331-001",
+    "amount": 2500
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "transaction_id": "TX2E6G8H",
+  "order_id": "OR7B9E1D",
+  "merchant_transaction_id": "refund-20260331-001",
+  "accepted": true
+}
+```
+
+```json 400
+{
+  "type": "https://api.smartretry.com/errors/validation",
+  "title": "Bad Request",
+  "status": 400,
+  "detail": "transaction_reference_id does not refer to a refundable transaction",
+  "reason_code": "INVALID_TRANSACTION_REFERENCE"
+}
+```
+
+</ResponseExample>
+
+## Path parameters
+
+<ParamField path="terminal_friendly_id" type="string" required>
+  Your terminal identifier. Exactly 6 characters.
+</ParamField>
+
+## Request body
+
+<ParamField body="transaction_reference_id" type="string" required>
+  The `transaction_id` of the sale or capture you want to refund. Exactly 8 characters.
+</ParamField>
+
+<ParamField body="order_reference_id" type="string" required>
+  The `order_id` associated with the transaction you want to refund. Exactly 8 characters.
+</ParamField>
+
+<ParamField body="merchant_transaction_id" type="string" required>
+  Your unique identifier for this refund transaction. Must be different from the `merchant_transaction_id` of the original transaction.
+</ParamField>
+
+<ParamField body="amount" type="integer">
+  Amount to refund in minor currency units. If omitted, the full transaction amount is refunded. Partial refunds are supported — you can issue multiple partial refunds as long as the total does not exceed the original transaction amount.
+</ParamField>
+
+## Response
+
+<ResponseField name="transaction_id" type="string" required>
+  SmartRetry's unique identifier for this refund transaction. Exactly 8 characters.
+</ResponseField>
+
+<ResponseField name="order_id" type="string" required>
+  The order identifier, matching the `order_id` from the original transaction.
+</ResponseField>
+
+<ResponseField name="merchant_transaction_id" type="string" required>
+  The `merchant_transaction_id` you provided in the request, echoed back for confirmation.
+</ResponseField>
+
+<ResponseField name="accepted" type="boolean" required>
+  `true` if the refund was accepted for processing. Poll the [status endpoint](/api-reference/payments/status) using the returned `transaction_id` to confirm the refund outcome.
+</ResponseField>
+
+<Tip>
+  To refund only part of a transaction, provide an `amount` less than the original transaction total. You can issue multiple partial refunds against the same transaction.
+</Tip>
+
+<Warning>
+  You cannot refund a pre-authorization that has not yet been captured. Use the [void](/api-reference/payments/void) endpoint to cancel a pre-authorization before capture.
+</Warning>

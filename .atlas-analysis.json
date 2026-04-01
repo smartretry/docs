@@ -1,0 +1,125 @@
+{
+  "projectType": "api-service",
+  "projectName": "SmartRetry",
+  "projectDescription": "An intelligent payment optimization engine that automatically recovers declined transactions by analyzing decline reasons and rerouting through the best acquirer, 3DS configuration, and card parameters.",
+  "theme": "luma",
+  "primaryColor": "#fc34a4",
+  "lightColor": "#f094d4",
+  "darkColor": null,
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "authentication"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/how-it-works",
+              "concepts/transaction-types",
+              "concepts/transaction-statuses",
+              "concepts/decline-codes",
+              "concepts/recurring-payments"
+            ]
+          },
+          {
+            "group": "Integration",
+            "pages": [
+              "integration/rest-api",
+              "integration/terminals",
+              "integration/payment-methods",
+              "integration/sandbox"
+            ]
+          },
+          {
+            "group": "FAQ",
+            "pages": [
+              "faq/general",
+              "faq/integration",
+              "faq/troubleshooting"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api-reference/overview",
+              "api-reference/errors"
+            ]
+          },
+          {
+            "group": "Payments",
+            "pages": [
+              "api-reference/payments/sale",
+              "api-reference/payments/preauth",
+              "api-reference/payments/capture",
+              "api-reference/payments/refund",
+              "api-reference/payments/void",
+              "api-reference/payments/status"
+            ]
+          },
+          {
+            "group": "Recurring",
+            "pages": [
+              "api-reference/recurring/init",
+              "api-reference/recurring/status",
+              "api-reference/recurring/charge",
+              "api-reference/recurring/update",
+              "api-reference/recurring/cancel"
+            ]
+          },
+          {
+            "group": "Future Transactions",
+            "pages": [
+              "api-reference/future-transactions/status",
+              "api-reference/future-transactions/update",
+              "api-reference/future-transactions/charge",
+              "api-reference/future-transactions/cancel"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Intelligent retry engine that rebuilds failed transactions with optimized parameters",
+    "Multi-acquirer dynamic routing based on real-time performance signals",
+    "3DS optimization with ECI prediction and PSD2 exemption handling",
+    "Recurring payment management with platform-managed or merchant-managed scheduling",
+    "Pre-auth, capture, refund, and void transaction lifecycle support",
+    "BIN intelligence and issuer-side behavioral analytics",
+    "Performance-based pricing — charges only on successfully recovered transactions",
+    "Sandbox environment for safe integration testing"
+  ],
+  "publicApiSurface": [
+    "POST /v1/payments/sale/{terminal_friendly_id}",
+    "POST /v1/payments/preauth/{terminal_friendly_id}",
+    "POST /v1/payments/capture/{terminal_friendly_id}",
+    "POST /v1/payments/refund/{terminal_friendly_id}",
+    "POST /v1/payments/void/{terminal_friendly_id}",
+    "GET /v1/payments/status/{terminal_friendly_id}/{transaction_id}",
+    "POST /v1/payments/recurring/init/{terminal_friendly_id}",
+    "GET /v1/payments/recurring/status/{terminal_friendly_id}",
+    "POST /v1/payments/recurring/charge/{terminal_friendly_id}",
+    "PUT /v1/payments/recurring/update/{terminal_friendly_id}",
+    "POST /v1/payments/recurring/cancel/{terminal_friendly_id}",
+    "GET /v1/payments/recurring/future-transactions/status/{terminal_friendly_id}",
+    "PUT /v1/payments/recurring/future-transactions/update/{terminal_friendly_id}",
+    "POST /v1/payments/recurring/future-transactions/charge/{terminal_friendly_id}",
+    "POST /v1/payments/recurring/future-transactions/cancel/{terminal_friendly_id}",
+    "GET /health/",
+    "GET /health/ready",
+    "GET /health/live"
+  ]
+}

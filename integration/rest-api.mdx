@@ -1,0 +1,196 @@
+---
+title: REST API
+description: How to integrate with the SmartRetry REST API.
+---
+
+The SmartRetry REST API accepts JSON over HTTPS. All requests are scoped to a terminal — a 6-character alphanumeric ID that identifies your merchant configuration.
+
+## Base URL
+
+```
+https://api.smartretry.com
+```
+
+## Authentication
+
+Every request must include your API key in the `x-api-key` header.
+
+```bash
+x-api-key: YOUR_API_KEY
+```
+
+<Warning>
+  Keep your API key secret. Never expose it in client-side code or public repositories.
+</Warning>
+
+## Request format
+
+Set `Content-Type: application/json` on all requests and send a JSON body.
+
+```bash
+Content-Type: application/json
+```
+
+### Amount format
+
+Pass `amount` in the **smallest unit of the currency** — for example, cents for USD. Do not use decimals.
+
+| Amount value | Currency | Represents |
+|---|---|---|
+| `4999` | `USD` | $49.99 |
+| `1000` | `EUR` | €10.00 |
+| `500` | `JPY` | ¥500 |
+
+### merchant_transaction_id
+
+`merchant_transaction_id` is your unique identifier for each transaction. SmartRetry uses it for **idempotency** — if you retry a failed request with the same `merchant_transaction_id`, SmartRetry will not create a duplicate transaction. Use a UUID or a unique reference from your own system.
+
+### Token-based payments
+
+When SmartRetry processes a transaction, it can return a `token` — an 88-character stored payment token that represents the card. On future charges for the same customer, you can pass this `token` instead of sending raw card data again. This simplifies repeat billing and reduces PCI scope.
+
+### Payer fingerprint
+
+SmartRetry generates a `payer_fingerprint` — an 88-character identifier that represents a card profile or payer address. You can store this and include it in future requests for the same customer to help SmartRetry recognize repeat payers and apply optimized retry logic more quickly.
+
+## Making a sale
+
+All payment endpoints include the `terminal_friendly_id` as a path parameter at the end of the URL. See [Terminals](/integration/terminals) for details.
+
+### Example request
+
+<CodeGroup>
+
+```bash cURL
+curl --request POST \
+  --url https://api.smartretry.com/v1/payments/sale/TERM01 \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --data '{
+    "merchant_transaction_id": "txn-a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "amount": 4999,
+    "currency": "USD",
+    "payment_instrument": {
+      "card_number": "4111111111111111",
+      "expiry_month": 12,
+      "expiry_year": 2027,
+      "payment_method": "cards"
+    },
+    "cvv": "123",
+    "payer": {
+      "first_name": "Jane",
+      "last_name": "Smith",
+      "email": "jane.smith@example.com"
+    }
+  }'
+```
+
+```javascript Node.js
+const response = await fetch('https://api.smartretry.com/v1/payments/sale/TERM01', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'x-api-key': 'YOUR_API_KEY',
+  },
+  body: JSON.stringify({
+    merchant_transaction_id: 'txn-a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+    amount: 4999,
+    currency: 'USD',
+    payment_instrument: {
+      card_number: '4111111111111111',
+      expiry_month: 12,
+      expiry_year: 2027,
+      payment_method: 'cards',
+    },
+    cvv: '123',
+    payer: {
+      first_name: 'Jane',
+      last_name: 'Smith',
+      email: 'jane.smith@example.com',
+    },
+  }),
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api.smartretry.com/v1/payments/sale/TERM01',
+    headers={
+        'Content-Type': 'application/json',
+        'x-api-key': 'YOUR_API_KEY',
+    },
+    json={
+        'merchant_transaction_id': 'txn-a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+        'amount': 4999,
+        'currency': 'USD',
+        'payment_instrument': {
+            'card_number': '4111111111111111',
+            'expiry_month': 12,
+            'expiry_year': 2027,
+            'payment_method': 'cards',
+        },
+        'cvv': '123',
+        'payer': {
+            'first_name': 'Jane',
+            'last_name': 'Smith',
+            'email': 'jane.smith@example.com',
+        },
+    },
+)
+
+data = response.json()
+```
+
+</CodeGroup>
+
+### Example response
+
+```json
+{
+  "transaction_id": "TX8A3F2C",
+  "order_id": "OR7B9E1D",
+  "merchant_transaction_id": "txn-a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "accepted": true
+}
+```
+
+## Response format
+
+All responses return JSON. Successful payment responses include an `accepted` boolean, the `transaction_id` and `order_id` assigned by SmartRetry, and your original `merchant_transaction_id` for reconciliation. A `200 OK` with `"accepted": false` means the transaction was declined — not an error. Use the [status endpoint](/api-reference/payments/status) to get the full transaction outcome.
+
+## Error format
+
+When a request fails, SmartRetry returns a JSON error object using the [RFC 7807 Problem Details](https://datatracker.ietf.org/doc/html/rfc7807) format.
+
+```json
+{
+  "type": "https://api.smartretry.com/errors/invalid-request",
+  "title": "Invalid request",
+  "status": 400,
+  "detail": "The field 'amount' must be a positive integer.",
+  "reason_code": "INVALID_AMOUNT"
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `type` | string | URI identifying the error type |
+| `title` | string | Short, human-readable summary |
+| `status` | number | HTTP status code |
+| `detail` | string | Detailed explanation of the error |
+| `reason_code` | string | Machine-readable code for programmatic handling |
+
+## Best practices
+
+<Note>
+  SmartRetry applies rate limits per API key. If you receive a `429 Too Many Requests` response, implement exponential backoff before retrying.
+</Note>
+
+- Always use a unique `merchant_transaction_id` per transaction to ensure idempotency.
+- Store the `token` and `payer_fingerprint` from successful responses to speed up future requests for returning customers.
+- Validate `amount` and `currency` on your side before sending — `amount` must be a positive integer in the smallest currency unit.
+- Use the [sandbox environment](/integration/sandbox) to test your integration before going live.

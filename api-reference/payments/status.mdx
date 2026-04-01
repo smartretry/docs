@@ -1,0 +1,236 @@
+---
+title: Transaction status
+description: Retrieve the current status and details of any transaction.
+---
+
+Fetch the full details and current status of any transaction by its `transaction_id`. Use this endpoint to confirm whether a payment was approved, to monitor retry attempts, or to display order history to your customers.
+
+<RequestExample>
+
+```bash cURL
+curl --request GET \
+  --url https://api.smartretry.com/v1/payments/status/ABC123/TX8A3F2C \
+  --header 'x-api-key: YOUR_API_KEY'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "transaction_id": "TX8A3F2C",
+  "type": "sale",
+  "amount": 4999,
+  "currency": "USD",
+  "authorization_code": "AUTH042",
+  "arn": "74491803522700123456789",
+  "attempt_number": 1,
+  "created_at": "2026-03-31T14:22:10Z",
+  "updated_at": "2026-03-31T14:22:13Z",
+  "status": {
+    "status": "APPROVED",
+    "reasonCode": null,
+    "name": "Approved",
+    "description": "The transaction was approved by the issuer.",
+    "domain": "AUTH"
+  },
+  "order": {
+    "order_id": "OR7B9E1D",
+    "merchant_order_id": "order-20260331-001",
+    "provider_order_id": "prov-88271",
+    "description": "Order #20260331-001",
+    "payer": {
+      "first_name": "Jane",
+      "last_name": "Doe",
+      "email": "jane.doe@example.com"
+    },
+    "payment_instrument": {
+      "last_four": "1111",
+      "bin": "411111",
+      "brand": "Visa",
+      "issuer": "Example Bank"
+    }
+  }
+}
+```
+
+```json 400
+{
+  "type": "https://api.smartretry.com/errors/validation",
+  "title": "Bad Request",
+  "status": 400,
+  "detail": "transaction_id not found",
+  "reason_code": "TRANSACTION_NOT_FOUND"
+}
+```
+
+</ResponseExample>
+
+## Path parameters
+
+<ParamField path="terminal_friendly_id" type="string" required>
+  Your terminal identifier. Exactly 6 characters.
+</ParamField>
+
+<ParamField path="transaction_id" type="string" required>
+  The SmartRetry transaction ID to look up. Exactly 8 characters. This is the `transaction_id` returned by the [sale](/api-reference/payments/sale), [pre-auth](/api-reference/payments/preauth), [capture](/api-reference/payments/capture), [refund](/api-reference/payments/refund), or [void](/api-reference/payments/void) response.
+</ParamField>
+
+## Response
+
+<ResponseField name="transaction_id" type="string" required>
+  SmartRetry's unique identifier for this transaction. Exactly 8 characters.
+</ResponseField>
+
+<ResponseField name="type" type="string" required>
+  The transaction type. One of: `sale`, `preauth`, `capture`, `refund`, `void`, `recurring_init`, `recurring`, `payout`.
+</ResponseField>
+
+<ResponseField name="amount" type="integer" required>
+  Transaction amount in minor currency units (e.g., `4999` = $49.99).
+</ResponseField>
+
+<ResponseField name="currency" type="string" required>
+  Three-letter [ISO 4217](https://en.wikipedia.org/wiki/ISO_4217) currency code.
+</ResponseField>
+
+<ResponseField name="authorization_code" type="string">
+  Authorization code assigned by the acquirer upon approval.
+</ResponseField>
+
+<ResponseField name="arn" type="string">
+  Acquirer Reference Number (ARN). Use this when communicating with your acquiring bank about a specific transaction.
+</ResponseField>
+
+<ResponseField name="attempt_number" type="integer">
+  The retry attempt number for this transaction. `1` means the first attempt; higher values indicate SmartRetry has automatically retried the transaction.
+</ResponseField>
+
+<ResponseField name="created_at" type="string" required>
+  ISO 8601 timestamp of when the transaction was created.
+</ResponseField>
+
+<ResponseField name="updated_at" type="string" required>
+  ISO 8601 timestamp of when the transaction was last updated.
+</ResponseField>
+
+<ResponseField name="status" type="object" required>
+  The current status of the transaction.
+
+  <Expandable title="properties" defaultOpen={true}>
+    <ResponseField name="status" type="string" required>
+      The high-level status code. See [Status values](#status-values) below.
+    </ResponseField>
+
+    <ResponseField name="reasonCode" type="string">
+      A machine-readable code providing specific detail about a decline or error. `null` for approved transactions.
+    </ResponseField>
+
+    <ResponseField name="name" type="string">
+      A short, human-readable name for the current status (e.g., `"Approved"`, `"Insufficient Funds"`).
+    </ResponseField>
+
+    <ResponseField name="description" type="string">
+      A full human-readable explanation of the status, suitable for logging or internal tooling. Do not display raw `reasonCode` values to end customers.
+    </ResponseField>
+
+    <ResponseField name="domain" type="string">
+      The system domain responsible for the status outcome. See [Status domains](#status-domains) below.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="order" type="object" required>
+  Details about the order associated with this transaction.
+
+  <Expandable title="properties">
+    <ResponseField name="order_id" type="string">
+      SmartRetry's unique order identifier. Exactly 8 characters.
+    </ResponseField>
+
+    <ResponseField name="merchant_order_id" type="string">
+      Your own order reference, as submitted with the original transaction.
+    </ResponseField>
+
+    <ResponseField name="provider_order_id" type="string">
+      The downstream payment provider's order reference.
+    </ResponseField>
+
+    <ResponseField name="description" type="string">
+      The order description provided at transaction time.
+    </ResponseField>
+
+    <ResponseField name="payer" type="object">
+      Identity details for the payer associated with this order.
+
+      <Expandable title="properties">
+        <ResponseField name="first_name" type="string">
+          Payer's first name.
+        </ResponseField>
+
+        <ResponseField name="last_name" type="string">
+          Payer's last name.
+        </ResponseField>
+
+        <ResponseField name="email" type="string">
+          Payer's email address.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="payment_instrument" type="object">
+      Tokenized summary of the payment instrument used. Full card numbers are never returned.
+
+      <Expandable title="properties">
+        <ResponseField name="last_four" type="string">
+          Last four digits of the card number.
+        </ResponseField>
+
+        <ResponseField name="bin" type="string">
+          Bank Identification Number (first six digits of the card). Used to identify the issuing bank and card product.
+        </ResponseField>
+
+        <ResponseField name="brand" type="string">
+          Card network brand (e.g., `Visa`, `Mastercard`, `Amex`).
+        </ResponseField>
+
+        <ResponseField name="issuer" type="string">
+          Name of the card-issuing bank or institution.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Status values
+
+The `status.status` field indicates the current state of the transaction:
+
+| Value | Description |
+|---|---|
+| `APPROVED` | The transaction was approved by the issuer and funds have been reserved or captured. |
+| `PROCESSING` | The transaction is still being processed. Poll again shortly. |
+| `DECLINED` | The transaction was declined. Check `status.reasonCode` for the specific reason. |
+| `ERROR` | An unexpected error occurred during processing. |
+| `CANCELLED` | The transaction was cancelled (e.g., by a void). |
+| `UNKNOWN` | The status could not be determined. Contact support if this persists. |
+
+## Status domains
+
+The `status.domain` field identifies which system was responsible for the status outcome:
+
+| Domain | Description |
+|---|---|
+| `SYSTEM` | An internal SmartRetry system error. |
+| `VALIDATION` | The request failed validation (e.g., missing or malformed fields). |
+| `RISK` | The transaction was blocked or flagged by a risk or fraud rule. |
+| `ROUTING` | The transaction could not be routed to an available processor. |
+| `AUTH` | The issuer approved or declined the authorization. |
+| `PROCESSOR` | The acquiring processor returned a result. |
+| `PAYMENT_METHOD` | The issue is specific to the payment method (e.g., unsupported card type). |
+| `PAYER_ACCOUNT` | The issue is related to the payer's account (e.g., card expired, account closed). |
+
+<Tip>
+  Use `status.domain` alongside `status.reasonCode` to build targeted retry logic or to surface the right error message to your customers — for example, prompting a payer to update their card details when `domain` is `PAYER_ACCOUNT`.
+</Tip>

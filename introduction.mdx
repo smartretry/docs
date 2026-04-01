@@ -1,0 +1,35 @@
+---
+title: Introduction
+description: What SmartRetry is and how it helps you recover declined payments.
+---
+
+SmartRetry is an intelligent payment optimization engine that automatically recovers declined transactions. When a payment fails, SmartRetry analyzes the decline reason in real time — examining issuer signals, routing conditions, 3DS responses, and card parameters — then rebuilds the transaction and routes it through the best available path. The result is more approvals without any changes to your checkout or payment providers.
+
+Every year, billions of dollars in legitimate revenue is lost to payment declines. Up to 45% of customers abandon their purchase after a single failed payment, and 20–30% of declined card transactions are recoverable with the right retry strategy. SmartRetry exists to close that gap — recovering revenue that should have been yours.
+
+## Key capabilities
+
+<CardGroup cols={2}>
+  <Card title="Intelligent retry" icon="rotate">
+    SmartRetry rebuilds each failed transaction from the ground up. It optimizes 3DS settings, card parameters, AVS tuning, and ECI levels based on the specific decline reason — not a generic retry schedule.
+  </Card>
+  <Card title="Multi-acquirer routing" icon="route">
+    Route transactions dynamically across your connected acquirers and PSPs based on real-time performance data, region, MCC, and card type. SmartRetry picks the best path for each transaction.
+  </Card>
+  <Card title="Recurring payments" icon="calendar-check">
+    Built-in retry logic for subscription billing and recurring charges. Manage renewal attempts with intelligent scheduling to maximize recovery on soft declines.
+  </Card>
+  <Card title="Analytics & reporting" icon="chart-bar">
+    Track retry outcomes, approval rates, and acquirer performance. SmartRetry continuously learns from your transaction data to improve recovery rates over time.
+  </Card>
+</CardGroup>
+
+## What SmartRetry is not
+
+SmartRetry is **not a payment processor**. It does not replace your existing PSPs or acquirers — it sits on top of them. You keep your current payment infrastructure exactly as it is. SmartRetry adds an optimization layer that intercepts declined transactions and applies intelligent recovery logic before they become lost revenue.
+
+This means there are no checkout changes, no provider migrations, and no disruption to your existing payment flow. Integration typically takes two to five business days via REST API, SDK, or a ready-made plugin for WooCommerce, Magento, or PrestaShop.
+
+<Note>
+  SmartRetry uses performance-based pricing: you only pay for successfully recovered transactions. If a payment isn't approved, you don't pay.
+</Note>

@@ -1,0 +1,104 @@
+---
+title: Quick Start
+description: Make your first payment request with SmartRetry in minutes.
+---
+
+This guide walks you through making your first API request with SmartRetry. You'll send a sale transaction and handle the response — all in a few minutes.
+
+<Steps>
+  <Step title="Get your API key and terminal ID">
+    [Contact SmartRetry](https://www.smartretry.com/contact) to receive your credentials. You'll get:
+
+    - **API key** — passed in the `x-api-key` header on every request
+    - **Terminal ID** (`terminal_friendly_id`) — a 6-character identifier for your merchant terminal, used as a path parameter on every payment endpoint
+
+    <Note>
+      Keep both values secure. Your API key authenticates all requests, and your terminal ID identifies the merchant configuration SmartRetry uses for routing and optimization.
+    </Note>
+  </Step>
+
+  <Step title="Send your first sale request">
+    Use the `POST /v1/payments/sale/{terminal_friendly_id}` endpoint to charge a card. Replace `ABC123` with your terminal ID and `YOUR_API_KEY` with your API key.
+
+    The `amount` field is in minor units (cents). The example below represents $49.99 USD.
+
+    <CodeGroup>
+
+    ```bash cURL
+    curl -X POST https://api.smartretry.com/v1/payments/sale/ABC123 \
+      -H "x-api-key: YOUR_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "merchant_transaction_id": "order-10042",
+        "amount": 4999,
+        "currency": "USD",
+        "payment_instrument": {
+          "card_number": "4111111111111111",
+          "expiry_month": 12,
+          "expiry_year": 2027,
+          "payment_method": "cards"
+        },
+        "payer": {
+          "first_name": "Jane",
+          "last_name": "Smith",
+          "email": "jane.smith@example.com"
+        }
+      }'
+    ```
+
+    ```json Request body
+    {
+      "merchant_transaction_id": "order-10042",
+      "amount": 4999,
+      "currency": "USD",
+      "payment_instrument": {
+        "card_number": "4111111111111111",
+        "expiry_month": 12,
+        "expiry_year": 2027,
+        "payment_method": "cards"
+      },
+      "payer": {
+        "first_name": "Jane",
+        "last_name": "Smith",
+        "email": "jane.smith@example.com"
+      }
+    }
+    ```
+
+    </CodeGroup>
+  </Step>
+
+  <Step title="Handle the response">
+    A successful request returns HTTP `200` with a JSON body. Check the `accepted` field to confirm the transaction was approved.
+
+    ```json Success response
+    {
+      "transaction_id": "TX8A3F2C",
+      "order_id": "OR7B9E1D",
+      "merchant_transaction_id": "order-10042",
+      "accepted": true
+    }
+    ```
+
+    | Field | Description |
+    | --- | --- |
+    | `transaction_id` | SmartRetry's unique identifier for this transaction |
+    | `order_id` | SmartRetry's order reference |
+    | `merchant_transaction_id` | The ID you provided in the request |
+    | `accepted` | `true` if the transaction was approved, `false` otherwise |
+
+    <Tip>
+      Store both `transaction_id` and `order_id` in your system. You'll need them to perform follow-up operations like capture, refund, or void.
+    </Tip>
+  </Step>
+
+  <Step title="Test in the sandbox">
+    Before going live, use the SmartRetry sandbox environment to test your integration end to end — including API calls, response handling, and error scenarios — without processing real payments.
+
+    The sandbox replicates the full production flow. Contact [SmartRetry](https://www.smartretry.com/contact) to request sandbox credentials if you don't already have them.
+
+    <Warning>
+      Never use real card numbers in the sandbox. Use test card values provided by SmartRetry during onboarding.
+    </Warning>
+  </Step>
+</Steps>

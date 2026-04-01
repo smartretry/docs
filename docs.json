@@ -1,0 +1,115 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "luma",
+  "name": "SmartRetry",
+  "colors": {
+    "primary": "#fc34a4",
+    "light": "#f094d4"
+  },
+  "contextual": {
+    "options": ["copy", "view", "chatgpt", "claude"]
+  },
+  "favicon": "https://media.brand.dev/1b200103-5fdf-46ac-a54d-386f1efa34dd.jpg",
+  "logo": {
+    "light": "https://media.brand.dev/d1c01a7a-60ad-4f7b-bea4-22753c1eb5eb.svg",
+    "dark": "https://media.brand.dev/d1c01a7a-60ad-4f7b-bea4-22753c1eb5eb.svg"
+  },
+  "navbar": {
+    "primary": {
+      "type": "github",
+      "href": "https://github.com/smartretry"
+    },
+    "links": [
+      {
+        "label": "Status Page",
+        "href": "https://status.smartretry.com/"
+      }
+    ]
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "authentication"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/how-it-works",
+              "concepts/transaction-types",
+              "concepts/transaction-statuses",
+              "concepts/decline-codes",
+              "concepts/recurring-payments"
+            ]
+          },
+          {
+            "group": "Integration",
+            "pages": [
+              "integration/rest-api",
+              "integration/terminals",
+              "integration/payment-methods",
+              "integration/sandbox"
+            ]
+          },
+          {
+            "group": "FAQ",
+            "pages": [
+              "faq/general",
+              "faq/integration",
+              "faq/troubleshooting"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api-reference/overview",
+              "api-reference/errors"
+            ]
+          },
+          {
+            "group": "Payments",
+            "pages": [
+              "api-reference/payments/sale",
+              "api-reference/payments/preauth",
+              "api-reference/payments/capture",
+              "api-reference/payments/refund",
+              "api-reference/payments/void",
+              "api-reference/payments/status"
+            ]
+          },
+          {
+            "group": "Recurring",
+            "pages": [
+              "api-reference/recurring/init",
+              "api-reference/recurring/status",
+              "api-reference/recurring/charge",
+              "api-reference/recurring/update",
+              "api-reference/recurring/cancel"
+            ]
+          },
+          {
+            "group": "Future Transactions",
+            "pages": [
+              "api-reference/future-transactions/status",
+              "api-reference/future-transactions/update",
+              "api-reference/future-transactions/charge",
+              "api-reference/future-transactions/cancel"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

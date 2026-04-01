@@ -1,0 +1,82 @@
+---
+title: Future transaction status
+description: Retrieve the details and current status of a single scheduled future payment within a recurring series.
+---
+
+`GET /v1/payments/recurring/future-transactions/status/{terminal_friendly_id}`
+
+Returns the details of a specific future transaction — its scheduled date, amount, currency, and current processing status. Use this endpoint to check the state of an individual upcoming payment within a recurring series.
+
+```bash cURL
+curl --request GET \
+  --url 'https://api.smartretry.com/v1/payments/recurring/future-transactions/status/ABC123?future_transaction_id=FT3D8E1C&recurring_id=RC9F4A2B' \
+  --header 'x-api-key: YOUR_API_KEY'
+```
+
+## Path parameters
+
+<ParamField path="terminal_friendly_id" type="string" required>
+  Your 6-character terminal identifier.
+</ParamField>
+
+## Query parameters
+
+<ParamField query="future_transaction_id" type="string" required>
+  The 8-character identifier of the future transaction to look up.
+</ParamField>
+
+<ParamField query="recurring_id" type="string" required>
+  The 8-character identifier of the recurring series this future transaction belongs to.
+</ParamField>
+
+## Response
+
+<ResponseField name="future_transaction_id" type="string">
+  Unique identifier of this future transaction (8 characters).
+</ResponseField>
+
+<ResponseField name="recurring_id" type="string">
+  Identifier of the recurring series this transaction belongs to (8 characters).
+</ResponseField>
+
+<ResponseField name="scheduled_date" type="string">
+  The date this payment is scheduled to be processed, in `YYYY-MM-DD` format.
+</ResponseField>
+
+<ResponseField name="sequence_number" type="integer">
+  The position of this payment within the series (e.g., `2` means it is the second payment in the schedule).
+</ResponseField>
+
+<ResponseField name="amount" type="integer">
+  Amount to be charged in minor currency units.
+</ResponseField>
+
+<ResponseField name="currency" type="string">
+  ISO 4217 currency code for this payment.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current status of this future transaction. One of:
+
+  - `pending` — scheduled and waiting to be processed.
+  - `processing` — currently being executed.
+  - `completed` — successfully processed.
+  - `failed` — processing attempted but unsuccessful.
+  - `cancelled` — this specific occurrence was cancelled.
+</ResponseField>
+
+```json Example response
+{
+  "future_transaction_id": "FT3D8E1C",
+  "recurring_id": "RC9F4A2B",
+  "scheduled_date": "2026-05-01",
+  "sequence_number": 2,
+  "amount": 1999,
+  "currency": "USD",
+  "status": "pending"
+}
+```
+
+<Tip>
+  To see all upcoming payments for a series at once, use the [recurring status endpoint](/api-reference/recurring/status) — it includes the full `future_transactions` array in a single response.
+</Tip>

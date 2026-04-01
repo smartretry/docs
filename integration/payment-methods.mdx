@@ -1,0 +1,93 @@
+---
+title: Payment Methods
+description: Supported payment methods and how to specify them in requests.
+---
+
+SmartRetry supports a broad range of payment methods. You specify the payment method using the `payment_method` field inside the `payment_instrument` object in your request body.
+
+## Supported values
+
+| Value | Payment method | Examples |
+|---|---|---|
+| `cards` | Credit and debit cards | Visa, Mastercard, Amex, Discover |
+| `digital_wallets` | Mobile and digital wallets | Apple Pay, Google Pay, Samsung Pay |
+| `bnpl` | Buy Now Pay Later | Klarna, Afterpay, Affirm |
+| `online_banking` | Direct bank transfers / open banking | Faster Payments, SEPA Credit Transfer |
+| `rtp` | Real-Time Payments | FedNow, SEPA Instant, PIX |
+| `vouchers` | Prepaid vouchers | Paysafecard, Boleto voucher |
+| `cash` | Cash-based payment methods | PayCash, OXXOPay |
+| `direct_debit` | Direct debit schemes | ACH, SEPA Direct Debit, BACS |
+| `cryptocurrencies` | Crypto payments | Bitcoin, Ethereum, stablecoins |
+
+## Specifying a payment method
+
+Pass `payment_method` inside the `payment_instrument` object:
+
+```json
+{
+  "payment_instrument": {
+    "payment_method": "cards",
+    "card_number": "4111111111111111",
+    "expiry_month": 12,
+    "expiry_year": 2027,
+    "cvv": "123"
+  }
+}
+```
+
+## Card-specific fields
+
+When using `cards`, include the card details in `payment_instrument`:
+
+| Field | Required | Description |
+|---|---|---|
+| `card_number` | Yes | 13–19 digit primary account number (PAN) |
+| `expiry_month` | Yes | Card expiry month (1–12) |
+| `expiry_year` | Yes | Card expiry year (2024–2099) |
+| `cvv` | No | Card verification value — optional but recommended |
+
+<Note>
+  SmartRetry has access to card details and transaction data as part of the retry and optimization process. All sensitive data is encrypted in transit and at rest.
+</Note>
+
+## Token-based payments
+
+After a successful transaction, SmartRetry returns an 88-character `token` in the response. You can store this token and use it in place of raw card data for future charges from the same customer.
+
+Pass the token in the `payment_instrument` object:
+
+```json
+{
+  "payment_instrument": {
+    "payment_method": "cards",
+    "token": "a8f3k2m9xqv1p7r4t6y8u2i5o9e3w1q0a8f3k2m9xqv1p7r4t6y8u2i5o9e3w1q0a8f3k2m9x"
+  }
+}
+```
+
+This removes the need to re-transmit raw card data, simplifying repeat billing and reducing PCI scope.
+
+## Currency support
+
+SmartRetry supports 50+ currencies using ISO 4217 codes. Pass the currency code in the top-level `currency` field.
+
+<Info>
+  Supported currencies include: USD, EUR, GBP, JPY, KWD, CNY, AUD, CAD, CHF, SEK, NOK, DKK, RUB, ILS, INR, BRL, MXN, ZAR, SGD, HKD, NZD, AED, SAR, TRY, PLN, CZK, HUF, THB, PHP, MYR, BGN, RON, IDR, KRW, COP, UAH, VND, QAR, BHD, EGP, MAD, KES, UGX, NGN, OMR, ARS, CLP, JOD, PYG, RWF, and more.
+</Info>
+
+## Retry and recovery support
+
+SmartRetry's intelligent retry engine works by analyzing decline reasons and re-routing transactions through a different acquirer, 3DS configuration, or card parameter. Retry coverage varies by payment method:
+
+<CardGroup cols={2}>
+  <Card title="Best retry coverage" icon="rotate-right">
+    `cards` and `digital_wallets` receive the most comprehensive retry logic, including acquirer routing, ECI-level adjustments, and 3DS optimization.
+  </Card>
+  <Card title="Method-dependent" icon="circle-info">
+    `bnpl`, `online_banking`, `rtp`, `direct_debit`, and other methods are subject to the retry capabilities supported by the connected acquirer or provider.
+  </Card>
+</CardGroup>
+
+<Note>
+  SmartRetry only retries transactions that have a realistic chance of succeeding. Hard declines — such as stolen card or permanent do-not-honor responses — are not retried to avoid unnecessary processing.
+</Note>

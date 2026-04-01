@@ -1,0 +1,174 @@
+---
+title: Initialize recurring
+description: Create a new recurring billing agreement and process the first payment in the series.
+---
+
+`POST /v1/payments/recurring/init/{terminal_friendly_id}`
+
+Initializing a recurring agreement creates a billing series and processes the first payment. SmartRetry returns a `recurring_id` that identifies the series for all subsequent operations — store it alongside your subscription record.
+
+<Warning>
+  Once a recurring series is cancelled, it cannot be reactivated. Create a new agreement if you need to resume billing.
+</Warning>
+
+```bash cURL
+curl --request POST \
+  --url https://api.smartretry.com/v1/payments/recurring/init/ABC123 \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --data '{
+    "amount": 1999,
+    "currency": "USD",
+    "recurring": {
+      "managed_by": "our_platform",
+      "first_payment_date": "2026-04-01",
+      "recurring_date_type": "monthly",
+      "time_interval": 1,
+      "number_of_payments": 12
+    },
+    "payer": {
+      "first_name": "Jane",
+      "last_name": "Smith",
+      "email": "jane.smith@example.com"
+    },
+    "payment_instrument": {
+      "card_number": "4111111111111111",
+      "expiry_month": 12,
+      "expiry_year": 2028,
+      "payment_method": "cards"
+    }
+  }'
+```
+
+## Path parameters
+
+<ParamField path="terminal_friendly_id" type="string" required>
+  Your 6-character terminal identifier. Scopes the request to your merchant account configuration.
+</ParamField>
+
+## Request body
+
+<ParamField body="amount" type="integer" required>
+  Charge amount in minor currency units (e.g., `1999` = $19.99 USD). Must be a positive integer.
+</ParamField>
+
+<ParamField body="currency" type="string" required>
+  ISO 4217 currency code (e.g., `USD`, `EUR`, `GBP`).
+</ParamField>
+
+<ParamField body="recurring" type="object" required>
+  Configuration for the recurring billing series.
+
+  <Expandable title="properties">
+    <ParamField body="managed_by" type="string" required>
+      Who controls the billing schedule. One of `merchant`, `our_platform`, or `payment_provider`.
+
+      - `merchant` — you trigger each charge manually via the [charge endpoint](/api-reference/recurring/charge).
+      - `our_platform` — SmartRetry schedules and executes charges automatically.
+      - `payment_provider` — the underlying payment provider manages the schedule.
+    </ParamField>
+
+    <ParamField body="first_payment_date" type="string">
+      Date of the first scheduled payment in `YYYY-MM-DD` format. Required when `managed_by` is `our_platform`.
+    </ParamField>
+
+    <ParamField body="recurring_date_type" type="string">
+      Billing frequency. One of `daily`, `weekly`, `monthly`, or `yearly`. Required when `managed_by` is `our_platform`.
+    </ParamField>
+
+    <ParamField body="time_interval" type="integer">
+      Interval multiplier applied to `recurring_date_type`. Minimum value: `1`. For example, `time_interval: 2` with `recurring_date_type: monthly` schedules a charge every 2 months. Required when `managed_by` is `our_platform`.
+    </ParamField>
+
+    <ParamField body="number_of_payments" type="integer">
+      Total number of payments in the series. Minimum value: `1`. Omit to create an open-ended agreement with no payment limit.
+    </ParamField>
+
+    <ParamField body="cancellation_date" type="string">
+      Date on which the agreement automatically ends, in `YYYY-MM-DD` format. No charges are processed on or after this date.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="payment_instrument" type="object">
+  Card details for the payment. Mutually exclusive with `token`.
+
+  <Expandable title="properties">
+    <ParamField body="card_number" type="string">
+      Full card number (PAN).
+    </ParamField>
+
+    <ParamField body="expiry_month" type="integer">
+      Card expiry month (1–12).
+    </ParamField>
+
+    <ParamField body="expiry_year" type="integer">
+      Card expiry year (2024–2099).
+    </ParamField>
+
+    <ParamField body="payment_method" type="string">
+      Payment method type. One of: `cards`, `digital_wallets`, `bnpl`, `online_banking`, `rtp`, `vouchers`, `cash`, `direct_debit`, `cryptocurrencies`.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="payer" type="object">
+  Payer identity. Required unless you provide `payer_fingerprint`.
+
+  <Expandable title="properties">
+    <ParamField body="first_name" type="string" required>
+      Payer's first name.
+    </ParamField>
+
+    <ParamField body="last_name" type="string" required>
+      Payer's last name.
+    </ParamField>
+
+    <ParamField body="email" type="string" required>
+      Payer's email address.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="payer_fingerprint" type="string">
+  An 88-character stored payer fingerprint. Mutually exclusive with `payer` — provide one or the other, not both.
+</ParamField>
+
+<ParamField body="token" type="string">
+  An 88-character stored payment token. Use this instead of `payment_instrument` when charging a saved card.
+</ParamField>
+
+<ParamField body="cvv" type="string">
+  Card verification value. Optional, but may be required depending on your terminal configuration.
+</ParamField>
+
+## Response
+
+<ResponseField name="transaction_id" type="string">
+  Unique identifier for the initial transaction in this series (8 characters).
+</ResponseField>
+
+<ResponseField name="order_id" type="string">
+  Order identifier associated with the initial transaction (8 characters).
+</ResponseField>
+
+<ResponseField name="recurring_id" type="string">
+  Unique identifier for the recurring series (8 characters). Store this value — you need it for all subsequent recurring operations.
+</ResponseField>
+
+<ResponseField name="accepted" type="boolean">
+  `true` if the initial payment was authorized and the series was created. `false` if the payment was declined. A `200` response with `accepted: false` means the request was valid but the transaction did not go through.
+</ResponseField>
+
+```json Example response
+{
+  "transaction_id": "TX8A3F2C",
+  "order_id": "OR7B9E1D",
+  "recurring_id": "RC9F4A2B",
+  "accepted": true
+}
+```
+
+<Tip>
+  Store `recurring_id` in your database alongside your subscription record immediately after a successful response. You need it to charge, update, cancel, or query the series.
+</Tip>

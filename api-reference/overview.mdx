@@ -1,0 +1,175 @@
+---
+title: API Overview
+description: Overview of the SmartRetry Terminal API — endpoints, authentication, and request format.
+---
+
+The SmartRetry Terminal API is a REST API that lets you initiate payments, manage recurring billing, and monitor transaction health. All requests are scoped to a merchant terminal and authenticated with an API key.
+
+## Base URL
+
+```
+https://api.smartretry.com
+```
+
+All endpoints are versioned under `/v1/`.
+
+## Authentication
+
+Every request must include your API key in the `x-api-key` header.
+
+```bash
+x-api-key: YOUR_API_KEY
+```
+
+<Warning>
+  Keep your API key secret. Never expose it in client-side code, browser requests, or public repositories. If a key is compromised, contact support to rotate it immediately.
+</Warning>
+
+To obtain an API key, contact [SmartRetry](https://www.smartretry.com/contact). Each key is scoped to one or more terminals — requests to terminals your key cannot access return `403 Forbidden`.
+
+## Request format
+
+Send all request bodies as JSON with the `Content-Type: application/json` header.
+
+```bash
+Content-Type: application/json
+```
+
+<CodeGroup>
+
+```bash cURL
+curl --request POST \
+  --url https://api.smartretry.com/v1/payments/sale/ABC123 \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --data '{
+    "merchant_transaction_id": "txn_001",
+    "amount": 1999,
+    "currency": "USD"
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    "https://api.smartretry.com/v1/payments/sale/ABC123",
+    headers={
+        "Content-Type": "application/json",
+        "x-api-key": "YOUR_API_KEY",
+    },
+    json={
+        "merchant_transaction_id": "txn_001",
+        "amount": 1999,
+        "currency": "USD",
+    },
+)
+```
+
+```javascript Node.js
+const response = await fetch(
+  "https://api.smartretry.com/v1/payments/sale/ABC123",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": "YOUR_API_KEY",
+    },
+    body: JSON.stringify({
+      merchant_transaction_id: "txn_001",
+      amount: 1999,
+      currency: "USD",
+    }),
+  }
+);
+```
+
+</CodeGroup>
+
+## Terminal ID
+
+All payment and recurring endpoints include `{terminal_friendly_id}` as a path parameter. This 6-character alphanumeric string identifies your merchant terminal and scopes every operation to your account configuration.
+
+```
+POST /v1/payments/sale/{terminal_friendly_id}
+                        ^^^^^^^^^^^^^^^^
+                        e.g., ABC123
+```
+
+You receive your `terminal_friendly_id` when SmartRetry provisions your account. A single API key may have access to multiple terminals.
+
+## Amount format
+
+The `amount` field uses **minor currency units** (the smallest denomination for the currency). Do not send decimal values — always send an integer.
+
+| Currency | Minor unit | Example amount value | Represents |
+|----------|-----------|---------------------|------------|
+| USD | Cents (1/100) | `1000` | $10.00 |
+| GBP | Pence (1/100) | `1000` | £10.00 |
+| EUR | Cents (1/100) | `2550` | €25.50 |
+| JPY | None (no minor unit) | `1000` | ¥1,000 |
+| KWD | Fils (1/1000) | `1000` | KD 1.000 |
+
+<Note>
+  Some currencies have no minor units (e.g., JPY, KRW, UGX). For these, the integer value you send is the full amount in the currency's primary unit. Others like KWD have three decimal places, so `1000` equals KD 1.000, not KD 1000.
+</Note>
+
+Supported currencies: USD, EUR, GBP, JPY, KWD, CNY, AUD, CAD, CHF, SEK, NOK, DKK, RUB, ILS, INR, BRL, MXN, ZAR, SGD, HKD, NZD, AED, SAR, TRY, PLN, CZK, HUF, THB, PHP, MYR, BGN, RON, IDR, KRW, COP, UAH, VND, QAR, BHD, EGP, MAD, KES, UGX, NGN, OMR, ARS, CLP, JOD, PYG, RWF.
+
+## Transaction reference
+
+`merchant_transaction_id` is your own unique identifier for each transaction. Include it on every request.
+
+- **Idempotency** — if you retry a request with the same `merchant_transaction_id`, the API returns the original result rather than creating a duplicate charge.
+- **Reconciliation** — use this ID to match SmartRetry transactions back to orders in your system.
+
+<Tip>
+  Generate a UUID or a stable, order-scoped ID for each transaction. Reusing the same ID for genuinely different transactions returns a `409 Conflict` error.
+</Tip>
+
+## Response format
+
+Successful payment responses include an `accepted` boolean at the top level. Use this field — not only the HTTP status code — to determine whether the transaction was approved.
+
+```json
+{
+  "transaction_id": "TX8A3F2C",
+  "order_id": "OR7B9E1D",
+  "merchant_transaction_id": "txn_001",
+  "accepted": true
+}
+```
+
+A `200 OK` response with `"accepted": false` means the request was valid but the transaction was declined. Handle both cases in your integration.
+
+Errors follow a separate structure — see [Errors](/api-reference/errors).
+
+## Health endpoints
+
+Use the health endpoints to monitor API availability and readiness in your infrastructure checks or dashboards.
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /health/` | General health check. Returns `200` when the API is operational. |
+| `GET /health/ready` | Readiness check. Returns `200` when the API is ready to serve traffic. |
+| `GET /health/live` | Liveness check. Returns `200` when the API process is alive. |
+
+These endpoints do not require authentication.
+
+## Endpoint groups
+
+<CardGroup cols={3}>
+  <Card title="Payments" icon="credit-card" href="/api-reference/payments/sale">
+    One-time charges, pre-authorizations, captures, refunds, voids, and transaction status lookups.
+  </Card>
+  <Card title="Recurring" icon="calendar-check" href="/api-reference/recurring/init">
+    Initialize and manage subscription billing — init, charge, update, cancel, and status.
+  </Card>
+  <Card title="Future Transactions" icon="clock" href="/api-reference/future-transactions/status">
+    View, update, charge, or cancel scheduled future payments within a recurring plan.
+  </Card>
+</CardGroup>
+
+<Note>
+  Monitor API uptime and incidents at [status.smartretry.com](https://status.smartretry.com).
+</Note>

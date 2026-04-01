@@ -1,0 +1,81 @@
+---
+title: Update recurring
+description: Modify the schedule, amount, or end conditions of an existing recurring billing series.
+---
+
+`PUT /v1/payments/recurring/update/{terminal_friendly_id}`
+
+Updates configuration for an active recurring series. You can change the billing amount, frequency, total payment count, or cancellation date. Only fields you include in the request body are updated — omitted fields retain their current values.
+
+<Note>
+  Scheduling fields (`recurring_date_type`, `time_interval`) can only be updated on series where `managed_by` is `our_platform`. Attempting to update these fields on a `merchant`- or `payment_provider`-managed series returns an error.
+</Note>
+
+```bash cURL
+curl --request PUT \
+  --url https://api.smartretry.com/v1/payments/recurring/update/ABC123 \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --data '{
+    "recurring_id": "RC9F4A2B",
+    "amount": 2499,
+    "number_of_payments": 24
+  }'
+```
+
+## Path parameters
+
+<ParamField path="terminal_friendly_id" type="string" required>
+  Your 6-character terminal identifier.
+</ParamField>
+
+## Request body
+
+<ParamField body="recurring_id" type="string" required>
+  The 8-character identifier of the recurring series to update.
+</ParamField>
+
+<ParamField body="amount" type="integer">
+  New default charge amount for future payments in this series, in minor currency units. Does not affect charges that have already been processed.
+</ParamField>
+
+<ParamField body="currency" type="string">
+  New currency for future payments. Must be a valid ISO 4217 code.
+</ParamField>
+
+<ParamField body="recurring_date_type" type="string">
+  New billing frequency. One of `daily`, `weekly`, `monthly`, or `yearly`. Only supported when `managed_by` is `our_platform`.
+</ParamField>
+
+<ParamField body="time_interval" type="integer">
+  New interval multiplier. Minimum value: `1`. Only supported when `managed_by` is `our_platform`.
+</ParamField>
+
+<ParamField body="number_of_payments" type="integer">
+  New total payment count for the series. Minimum value: `1`. The count includes payments already completed — setting this to a value lower than `completed_payments` will immediately complete the series.
+</ParamField>
+
+<ParamField body="cancellation_date" type="string">
+  New end date for the agreement in `YYYY-MM-DD` format. No charges are processed on or after this date. Set to a past date to end the series immediately.
+</ParamField>
+
+## Response
+
+<ResponseField name="recurring_id" type="string">
+  The identifier of the updated recurring series (8 characters).
+</ResponseField>
+
+<ResponseField name="accepted" type="boolean">
+  `true` if the update was applied successfully.
+</ResponseField>
+
+```json Example response
+{
+  "recurring_id": "RC9F4A2B",
+  "accepted": true
+}
+```
+
+<Tip>
+  To preview how a schedule change affects upcoming payments before applying it, call the [status endpoint](/api-reference/recurring/status) first to review current `future_transactions`.
+</Tip>

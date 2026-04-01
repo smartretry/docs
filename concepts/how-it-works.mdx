@@ -1,0 +1,93 @@
+---
+title: How It Works
+description: How SmartRetry analyzes and recovers declined payment transactions.
+---
+
+Every failed payment is lost revenue — but not all failures are permanent. Research shows that **20–30% of declined card transactions can be successfully recovered** when retried with the right timing, routing, and transaction parameters. Yet most payment stacks treat every decline the same way: give up.
+
+SmartRetry was built to change that.
+
+## The problem with payment declines
+
+Over **$443 billion** in legitimate online revenue is lost every year to payment declines. Of customers who hit a payment failure at checkout, 45% abandon their purchase entirely — turning a temporary technical issue into a permanently lost sale.
+
+For subscription businesses, the stakes are even higher. A single failed renewal can trigger involuntary churn if there is no automated system to recover the charge.
+
+## Where SmartRetry fits
+
+SmartRetry operates as an **intelligence layer on top of your existing payment providers**. You keep your current PSPs and acquirers. You do not change your checkout flow. SmartRetry connects to your payment infrastructure via API, SDK, or pre-built connectors, and activates automatically when a transaction fails.
+
+```
+Customer checkout
+       │
+       ▼
+Your payment gateway
+       │
+       ▼
+Your PSP / acquirer  ──── decline ────▶  SmartRetry
+                                              │
+                                    Analyze → Rebuild → Route
+                                              │
+                                         Retry attempt
+```
+
+<Note>
+  SmartRetry does not replace your payment providers. It enhances what you already have.
+</Note>
+
+## The 3-step recovery process
+
+<Steps>
+  <Step title="Detect and analyze the decline">
+    When a transaction fails, SmartRetry immediately reads the decline code returned by the issuer. It identifies the root cause — whether that's a 3DS challenge failure, a CVV mismatch, a geo-routing mismatch, a card block, or a temporary account issue — and classifies whether the transaction is recoverable.
+  </Step>
+  <Step title="Rebuild the transaction">
+    SmartRetry does not simply re-submit the same request. It reconstructs the transaction with optimized parameters: adjusting 3DS settings, enriching card data, tuning AVS fields, applying the right ECI level, or modifying currency and billing details based on issuer behavior signals.
+  </Step>
+  <Step title="Route through the best acquirer">
+    The rebuilt transaction is routed to the acquirer most likely to approve it — based on real-time performance data, region, card type, MCC, and historical approval patterns. If the first retry fails, SmartRetry continues through fallback paths until the transaction is approved or all recovery options are exhausted.
+  </Step>
+</Steps>
+
+## The Arsenal
+
+SmartRetry's recovery capabilities come from a collection of proprietary optimization strategies called **the Arsenal**. Each failed transaction is analyzed in real time, and the most effective combination of tools is applied automatically.
+
+<CardGroup cols={2}>
+  <Card title="Smart Routing" icon="route">
+    Dynamically selects the acquirer or PSP most likely to approve a given transaction based on live performance data, region, and card type.
+  </Card>
+  <Card title="ECI Prediction" icon="shield-check">
+    Determines the optimal Electronic Commerce Indicator level to maximize issuer trust without triggering unnecessary 3DS friction.
+  </Card>
+  <Card title="CVV Optimization" icon="credit-card">
+    Applies intelligent CVV handling strategies to improve authorization rates on cards where CVV mismatches contributed to the decline.
+  </Card>
+  <Card title="3DS Exemptions" icon="lock-open">
+    Identifies transactions eligible for 3DS exemptions under PSD2 and regional regulations to reduce authentication friction.
+  </Card>
+  <Card title="BIN Intelligence" icon="database">
+    Uses detailed BIN-level data to tailor transaction parameters to the specific issuing bank's known preferences and behaviors.
+  </Card>
+  <Card title="AVS Tuning" icon="map-pin">
+    Adjusts Address Verification Service fields to align with issuer-specific tolerance thresholds and reduce false positives.
+  </Card>
+  <Card title="Behavioral Analytics" icon="chart-line">
+    Applies cardholder and transaction behavior signals to inform retry timing, routing decisions, and parameter selection.
+  </Card>
+  <Card title="Acquirer Failover" icon="arrows-rotate">
+    Automatically switches to an alternative acquirer when the primary route fails, without requiring manual intervention.
+  </Card>
+</CardGroup>
+
+## Progressive learning
+
+SmartRetry combines machine learning with rule-based logic. Every transaction — approved or declined — feeds back into the system. Over time, SmartRetry builds a detailed model of issuer behaviors, acquirer performance patterns, and optimal retry conditions for your specific transaction mix.
+
+This means **performance improves the longer you use it**. Early results are strong; results six months in are stronger.
+
+On average, SmartRetry users see a **5–25% improvement in approval rates**, depending on transaction type, region, and acquirer configuration.
+
+<Tip>
+  SmartRetry uses **performance-based pricing** — you are only charged for successfully recovered transactions. If a payment is not approved, you pay nothing.
+</Tip>

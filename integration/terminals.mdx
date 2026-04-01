@@ -1,0 +1,68 @@
+---
+title: Terminals
+description: Understanding terminals and how they scope your payment operations.
+---
+
+A **terminal** in SmartRetry is a merchant account configuration that represents a specific payment setup. Each terminal has a unique 6-character alphanumeric ID — the `terminal_friendly_id` — that appears in the path of every API request you make.
+
+<Info>
+  Your `terminal_friendly_id` is provided by SmartRetry during onboarding. Contact your account manager if you need to retrieve it.
+</Info>
+
+## Why terminals exist
+
+Terminals let SmartRetry apply the right routing logic, acquirer configuration, and retry strategy for a specific business context. A single API key can be associated with multiple terminals, each with its own settings.
+
+You might use separate terminals for:
+
+- **Different merchants** — if you operate as a payment facilitator or manage accounts on behalf of others
+- **Different brands** — for businesses with multiple storefronts or product lines
+- **Different business units** — to keep transaction data and reporting separate between departments
+- **Different acquirer configurations** — to route specific transaction types through specific acquirers
+
+## Terminal ID in API requests
+
+The `terminal_friendly_id` is a path parameter on every payment endpoint. Replace `{terminal_friendly_id}` in the URL with your 6-character ID.
+
+```
+POST https://api.smartretry.com/v1/payments/sale/{terminal_friendly_id}
+```
+
+### Example
+
+If your terminal ID is `TERM01`, your sale endpoint is:
+
+```bash
+curl --request POST \
+  --url https://api.smartretry.com/v1/payments/sale/TERM01 \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --data '{
+    "merchant_transaction_id": "txn-a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "amount": 2500,
+    "currency": "EUR",
+    "payment_instrument": {
+      "card_number": "5500005555555559",
+      "expiry_month": 8,
+      "expiry_year": 2026,
+      "payment_method": "cards"
+    },
+    "payer": {
+      "first_name": "Carlos",
+      "last_name": "Mendez",
+      "email": "carlos.mendez@example.com"
+    }
+  }'
+```
+
+## Multi-terminal setups
+
+If you process payments across multiple acquirers, brands, or regions, SmartRetry can provision multiple terminals under a single account. Each terminal can have its own acquirer connections and retry configuration.
+
+<Note>
+  When working with multiple payment providers, SmartRetry recommends keeping the integration on your side rather than routing through a single provider. Providers typically have an incentive to keep transactions within their own network, which can limit SmartRetry's ability to optimize across acquirers.
+</Note>
+
+## Getting your terminal ID
+
+SmartRetry provides your `terminal_friendly_id` during the onboarding process. If you need additional terminals — for example, to support a new brand or acquirer — contact your SmartRetry account manager.

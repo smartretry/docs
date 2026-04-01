@@ -1,0 +1,105 @@
+---
+title: Recurring Payments
+description: How recurring and subscription payments work in SmartRetry.
+---
+
+SmartRetry includes dedicated support for recurring payments — covering the full lifecycle from the initial credential capture through ongoing scheduled charges. SmartRetry applies specialized retry logic to recurring transactions, making it particularly effective at reducing involuntary churn caused by failed subscription renewals.
+
+## Overview
+
+A recurring payment series in SmartRetry begins with a `recurring_init` transaction, which charges the payer and stores their card credentials on file. All subsequent charges in the series use the `recurring` transaction type, referencing the stored credentials.
+
+SmartRetry supports three modes for managing who schedules and triggers each charge.
+
+## Management modes
+
+<Tabs>
+  <Tab title="Merchant-managed">
+    You control the schedule entirely. SmartRetry does not trigger charges automatically — you call the API for each charge when your own billing system determines one is due.
+
+    **How it works:**
+    - You initiate a `recurring_init` to store credentials.
+    - When a charge is due, your system sends a `recurring` transaction request via the API.
+    - SmartRetry processes the charge and applies its recovery logic if the transaction is declined.
+
+    **Best for:** Merchants with existing billing infrastructure who want to add SmartRetry's recovery capabilities without changing their scheduling logic.
+  </Tab>
+  <Tab title="Platform-managed">
+    SmartRetry schedules and executes charges automatically based on the frequency and parameters you configure when creating the series.
+
+    **How it works:**
+    - You create a recurring series with a start date, frequency, and number of payments.
+    - SmartRetry generates **future transactions** for each scheduled charge.
+    - On each due date, SmartRetry triggers the charge and applies its full retry logic automatically.
+
+    **Best for:** Subscription businesses that want hands-off recurring billing with built-in recovery on every renewal attempt.
+
+    <Tip>
+      Platform-managed recurring is the recommended mode for subscription businesses. Every renewal attempt automatically benefits from SmartRetry's full recovery logic — including retry scheduling, acquirer routing, and 3DS optimization — without any additional integration work.
+    </Tip>
+  </Tab>
+  <Tab title="Provider-managed">
+    Your payment provider handles the scheduling and execution of recurring charges. SmartRetry receives the transactions from the provider and applies recovery logic when charges fail.
+
+    **How it works:**
+    - Your payment provider initiates charges according to their own schedule.
+    - SmartRetry integrates with the provider to intercept declines and apply retry strategies.
+
+    **Best for:** Merchants whose payment provider natively manages recurring billing and where switching to platform-managed scheduling is not practical.
+  </Tab>
+</Tabs>
+
+## Recurring series lifecycle
+
+A recurring series moves through the following statuses over its lifetime:
+
+```
+active
+  ├──▶ paused ──▶ active (if resumed)
+  ├──▶ cancelled
+  └──▶ completed
+```
+
+| Status | Description |
+|---|---|
+| `active` | The series is running. Charges are processed according to the configured schedule. |
+| `paused` | The series is temporarily suspended. No new charges will be triggered until it is resumed. |
+| `cancelled` | The series has been permanently stopped. No further charges will occur. |
+| `completed` | All scheduled payments have been processed and the series has ended as configured. |
+
+<Warning>
+  Once a recurring series is cancelled, it cannot be reactivated. To restart recurring charges after cancellation, you must create a new recurring series.
+</Warning>
+
+## Future transactions
+
+In a platform-managed series, SmartRetry pre-creates **future transactions** for each upcoming scheduled charge. You can retrieve these to see what is planned and monitor their progress.
+
+| Status | Description |
+|---|---|
+| `pending` | The charge is scheduled but has not been triggered yet. |
+| `processing` | The charge has been initiated and is being submitted to the acquirer. |
+| `completed` | The charge was processed. Check the linked transaction status for the outcome. |
+| `failed` | The charge was attempted but could not be recovered after all retry attempts. |
+| `cancelled` | The scheduled charge was cancelled before it was triggered. |
+
+## Frequency configuration
+
+When creating a platform-managed recurring series, you configure the charge frequency using the `recurring_date_type` and `time_interval` fields.
+
+| `recurring_date_type` | Description |
+|---|---|
+| `daily` | Charge every day (or every N days using `time_interval`). |
+| `weekly` | Charge every week (or every N weeks). |
+| `monthly` | Charge every month (or every N months). |
+| `yearly` | Charge every year (or every N years). |
+
+The `time_interval` multiplier lets you express intervals like "every 2 weeks" or "every 3 months" without needing custom frequency values.
+
+## Key series fields
+
+| Field | Description |
+|---|---|
+| `first_payment_date` | The date of the first charge in the series. Determines the baseline for all subsequent scheduled charges. |
+| `number_of_payments` | The total number of charges to execute. When this count is reached, the series transitions to `completed`. Omit for open-ended series. |
+| `cancellation_date` | If set, the series will automatically cancel on this date regardless of how many payments have been processed. |

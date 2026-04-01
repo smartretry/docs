@@ -1,0 +1,59 @@
+---
+title: SmartRetry Documentation
+description: Recover lost revenue from declined payments with intelligent retry and routing.
+---
+
+SmartRetry is an intelligent payment optimization engine that automatically recovers declined transactions. Connect via REST API, SDK, or plugin, and SmartRetry will analyze each failed payment, rebuild the transaction with optimized parameters, and route it through the best available acquirer — without any checkout friction.
+
+<CardGroup cols={2}>
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Make your first API call and start recovering declined transactions in minutes.
+  </Card>
+  <Card title="Authentication" icon="key" href="/authentication">
+    Learn how to authenticate your API requests with your API key.
+  </Card>
+  <Card title="Core Concepts" icon="book" href="/concepts/how-it-works">
+    Understand how SmartRetry analyzes and recovers failed transactions.
+  </Card>
+  <Card title="API Reference" icon="code" href="/api-reference/overview">
+    Explore all endpoints — payments, recurring, and more.
+  </Card>
+</CardGroup>
+
+## Get started in 4 steps
+
+<Steps>
+  <Step title="Get your API key">
+    Contact [SmartRetry](https://www.smartretry.com/contact) to receive your API key and terminal ID. You'll use these to authenticate every request.
+  </Step>
+  <Step title="Configure your terminal">
+    Your terminal (`terminal_friendly_id`) represents your merchant account configuration. Pass it as a path parameter on every payment request.
+  </Step>
+  <Step title="Send your first transaction">
+    Use the [Sale endpoint](/api-reference/payments/sale) to charge a card, or [Pre-auth](/api-reference/payments/preauth) to authorize and capture later. Test in the [sandbox environment](/integration/sandbox) before going live.
+  </Step>
+  <Step title="Monitor and optimize">
+    View retry outcomes, approval rates, and acquirer performance in your dashboard. SmartRetry continuously learns from your data to improve recovery rates over time.
+  </Step>
+</Steps>
+
+## Key capabilities
+
+<CardGroup cols={2}>
+  <Card title="Intelligent Retry" icon="rotate" href="/concepts/how-it-works">
+    SmartRetry rebuilds failed transactions from the ground up — optimizing routing, 3DS settings, and card parameters to maximize approval chances.
+  </Card>
+  <Card title="Multi-Acquirer Routing" icon="route" href="/integration/terminals">
+    Route transactions dynamically across multiple acquirers based on real-time performance, region, card type, and MCC.
+  </Card>
+  <Card title="Recurring Payments" icon="calendar-check" href="/concepts/recurring-payments">
+    Manage subscription billing with platform-managed scheduling or trigger charges yourself — with built-in retry logic for renewals.
+  </Card>
+  <Card title="Transaction Lifecycle" icon="timeline" href="/concepts/transaction-types">
+    Full support for Sale, Pre-auth, Capture, Refund, and Void — giving you complete control over the payment lifecycle.
+  </Card>
+</CardGroup>
+
+<Note>
+  SmartRetry is not a payment processor — it works on top of your existing PSPs and acquirers. No checkout changes or provider replacements required.
+</Note>

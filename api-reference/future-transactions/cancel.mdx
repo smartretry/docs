@@ -1,0 +1,60 @@
+---
+title: Cancel future transaction
+description: Cancel a specific scheduled payment within a recurring series without affecting the rest of the schedule.
+---
+
+`POST /v1/payments/recurring/future-transactions/cancel/{terminal_friendly_id}`
+
+Cancels a single upcoming payment within a recurring series. The rest of the billing schedule continues as normal — only the targeted occurrence is skipped. Use this when you need to waive a specific payment, for example to honor a promotional credit or account adjustment.
+
+<Note>
+  This cancels only the specified future transaction. To stop all future payments and end the entire series, use the [recurring cancel endpoint](/api-reference/recurring/cancel) instead.
+</Note>
+
+```bash cURL
+curl --request POST \
+  --url https://api.smartretry.com/v1/payments/recurring/future-transactions/cancel/ABC123 \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --data '{
+    "future_transaction_id": "FT3D8E1C",
+    "recurring_id": "RC9F4A2B"
+  }'
+```
+
+## Path parameters
+
+<ParamField path="terminal_friendly_id" type="string" required>
+  Your 6-character terminal identifier.
+</ParamField>
+
+## Request body
+
+<ParamField body="future_transaction_id" type="string" required>
+  The 8-character identifier of the future transaction to cancel.
+</ParamField>
+
+<ParamField body="recurring_id" type="string" required>
+  The 8-character identifier of the recurring series this future transaction belongs to.
+</ParamField>
+
+## Response
+
+<ResponseField name="future_transaction_id" type="string">
+  The identifier of the cancelled future transaction (8 characters).
+</ResponseField>
+
+<ResponseField name="accepted" type="boolean">
+  `true` if the cancellation was accepted and the transaction has been marked as cancelled.
+</ResponseField>
+
+```json Example response
+{
+  "future_transaction_id": "FT3D8E1C",
+  "accepted": true
+}
+```
+
+<Note>
+  After cancellation, the transaction status changes to `cancelled`. You can confirm this by calling the [future transaction status endpoint](/api-reference/future-transactions/status).
+</Note>

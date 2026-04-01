@@ -1,0 +1,52 @@
+---
+title: Authentication
+description: How to authenticate your SmartRetry API requests.
+---
+
+SmartRetry uses API key authentication. Every request to the API must include your API key in the `x-api-key` HTTP header. Requests without a valid key are rejected with a `401 Unauthorized` response.
+
+## Get your API key
+
+SmartRetry provides your API key during onboarding. If you don't have one yet, [contact SmartRetry](https://www.smartretry.com/contact) to get started.
+
+Each API key is scoped to your account. Treat it as a password — it grants full access to your SmartRetry integration.
+
+## Include the key in every request
+
+Pass your API key in the `x-api-key` header on every API request:
+
+```bash cURL
+curl -X POST https://api.smartretry.com/v1/payments/sale/ABC123 \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ ... }'
+```
+
+There is no session-based authentication or OAuth flow. Every request is independently authenticated using the header value.
+
+## Failed authentication
+
+If your API key is missing or invalid, the API returns a `401` status with a JSON error body:
+
+```json 401 response
+{
+  "type": "https://smartretry.com/errors/unauthorized",
+  "title": "Unauthorized",
+  "status": 401,
+  "detail": "Invalid or missing API key.",
+  "reason_code": "INVALID_API_KEY"
+}
+```
+
+Check the `reason_code` field to diagnose the issue. `INVALID_API_KEY` means the key was not recognized or has been revoked.
+
+## Security best practices
+
+<Warning>
+  Never expose your API key in client-side code, browser JavaScript, or public repositories. Anyone with your key can make authenticated requests on your behalf.
+</Warning>
+
+- **Keep it server-side.** Only use your API key in server-to-server requests. Your backend should proxy payment requests to SmartRetry — never call the API directly from a frontend.
+- **Use environment variables.** Store your key in an environment variable (e.g., `SMARTRETRY_API_KEY`) rather than hardcoding it in your source code.
+- **Rotate if compromised.** If you suspect your key has been exposed, contact [SmartRetry](https://www.smartretry.com/contact) immediately to revoke it and issue a new one.
+- **Restrict access.** Limit which systems and team members have access to your production API key. Use sandbox credentials for development and testing.

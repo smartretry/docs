@@ -1,0 +1,70 @@
+---
+title: Charge future transaction
+description: Execute a scheduled future payment immediately, before its planned date.
+---
+
+`POST /v1/payments/recurring/future-transactions/charge/{terminal_friendly_id}`
+
+Processes a future transaction right away, before its scheduled date. Use this endpoint when you need to execute an upcoming payment early — for example, when a customer upgrades their plan mid-cycle and you want to collect the prorated amount immediately.
+
+<Warning>
+  This endpoint executes the payment before its scheduled date. Once processed, the transaction moves to `completed` status and will not be charged again on its original scheduled date.
+</Warning>
+
+```bash cURL
+curl --request POST \
+  --url https://api.smartretry.com/v1/payments/recurring/future-transactions/charge/ABC123 \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --data '{
+    "future_transaction_id": "FT3D8E1C",
+    "recurring_id": "RC9F4A2B",
+    "merchant_transaction_id": "sub-renewal-001"
+  }'
+```
+
+## Path parameters
+
+<ParamField path="terminal_friendly_id" type="string" required>
+  Your 6-character terminal identifier.
+</ParamField>
+
+## Request body
+
+<ParamField body="future_transaction_id" type="string" required>
+  The 8-character identifier of the future transaction to charge immediately.
+</ParamField>
+
+<ParamField body="recurring_id" type="string" required>
+  The 8-character identifier of the recurring series this future transaction belongs to.
+</ParamField>
+
+<ParamField body="merchant_transaction_id" type="string" required>
+  Your unique identifier for this charge event. Used for idempotency — retrying with the same value returns the original result without triggering a second charge.
+</ParamField>
+
+## Response
+
+<ResponseField name="transaction_id" type="string">
+  Unique identifier of the resulting transaction (8 characters).
+</ResponseField>
+
+<ResponseField name="future_transaction_id" type="string">
+  The identifier of the future transaction that was charged (8 characters).
+</ResponseField>
+
+<ResponseField name="accepted" type="boolean">
+  `true` if the charge was authorized. `false` if the transaction was declined. Always check this field — a `200` status does not guarantee the payment succeeded.
+</ResponseField>
+
+```json Example response
+{
+  "transaction_id": "TX8A3F2C",
+  "future_transaction_id": "FT3D8E1C",
+  "accepted": true
+}
+```
+
+<Tip>
+  Before charging early, use the [future transaction status endpoint](/api-reference/future-transactions/status) to confirm the transaction is still in `pending` status. Attempting to charge a transaction that is already `completed`, `processing`, or `cancelled` returns an error.
+</Tip>

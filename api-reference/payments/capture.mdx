@@ -1,0 +1,96 @@
+---
+title: Capture
+description: Settle a previously authorized pre-authorization.
+---
+
+Capture settles a pre-authorization and moves the reserved funds to your account. You must have a successful [pre-authorization](/api-reference/payments/preauth) before calling this endpoint.
+
+<Note>
+  The capture amount must not exceed the originally authorized amount. If you omit `amount`, the full authorized amount is captured.
+</Note>
+
+<RequestExample>
+
+```bash cURL
+curl --request POST \
+  --url https://api.smartretry.com/v1/payments/capture/ABC123 \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "transaction_reference_id": "TX8A3F2C",
+    "order_reference_id": "OR7B9E1D",
+    "merchant_transaction_id": "capture-20260331-001",
+    "amount": 4999
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "transaction_id": "TX9C4D1E",
+  "order_id": "OR7B9E1D",
+  "merchant_transaction_id": "capture-20260331-001",
+  "accepted": true
+}
+```
+
+```json 400
+{
+  "type": "https://api.smartretry.com/errors/validation",
+  "title": "Bad Request",
+  "status": 400,
+  "detail": "amount exceeds the authorized amount",
+  "reason_code": "AMOUNT_EXCEEDS_AUTHORIZED"
+}
+```
+
+</ResponseExample>
+
+## Path parameters
+
+<ParamField path="terminal_friendly_id" type="string" required>
+  Your terminal identifier. Exactly 6 characters.
+</ParamField>
+
+## Request body
+
+<ParamField body="transaction_reference_id" type="string" required>
+  The `transaction_id` returned by the original pre-authorization. Exactly 8 characters.
+</ParamField>
+
+<ParamField body="order_reference_id" type="string" required>
+  The `order_id` returned by the original pre-authorization. Exactly 8 characters.
+</ParamField>
+
+<ParamField body="merchant_transaction_id" type="string" required>
+  Your unique identifier for this capture transaction. Must be different from the `merchant_transaction_id` used in the pre-authorization.
+</ParamField>
+
+<ParamField body="amount" type="integer">
+  Amount to capture in minor currency units. If omitted, the full authorized amount is captured. If provided, must be less than or equal to the authorized amount.
+</ParamField>
+
+## Response
+
+<ResponseField name="transaction_id" type="string" required>
+  SmartRetry's unique identifier for this capture transaction. Exactly 8 characters.
+</ResponseField>
+
+<ResponseField name="order_id" type="string" required>
+  The order identifier, matching the `order_id` from the original pre-authorization.
+</ResponseField>
+
+<ResponseField name="merchant_transaction_id" type="string" required>
+  The `merchant_transaction_id` you provided in the request, echoed back for confirmation.
+</ResponseField>
+
+<ResponseField name="accepted" type="boolean" required>
+  `true` if the capture was accepted for processing. Poll the [status endpoint](/api-reference/payments/status) using the returned `transaction_id` to confirm settlement.
+</ResponseField>
+
+<Warning>
+  Each pre-authorization can only be captured once. Attempting to capture an already-captured or voided pre-authorization will return a `400` error.
+</Warning>

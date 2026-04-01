@@ -1,0 +1,60 @@
+---
+title: Cancel recurring
+description: Cancel an active recurring billing series and stop all future scheduled payments.
+---
+
+`POST /v1/payments/recurring/cancel/{terminal_friendly_id}`
+
+Cancels a recurring billing series. All future scheduled payments are halted immediately. Any payments that were already processing at the time of cancellation may still complete.
+
+<Warning>
+  Cancellation is permanent. Once a series is cancelled, it cannot be reactivated. If you need to resume billing for the same customer, create a new recurring agreement using the [init endpoint](/api-reference/recurring/init).
+</Warning>
+
+```bash cURL
+curl --request POST \
+  --url https://api.smartretry.com/v1/payments/recurring/cancel/ABC123 \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --data '{
+    "recurring_id": "RC9F4A2B",
+    "merchant_transaction_id": "sub-renewal-001"
+  }'
+```
+
+## Path parameters
+
+<ParamField path="terminal_friendly_id" type="string" required>
+  Your 6-character terminal identifier.
+</ParamField>
+
+## Request body
+
+<ParamField body="recurring_id" type="string" required>
+  The 8-character identifier of the recurring series to cancel.
+</ParamField>
+
+<ParamField body="merchant_transaction_id" type="string" required>
+  Your unique identifier for this cancellation event. Used for idempotency — retrying with the same value returns the original result without cancelling again or returning an error.
+</ParamField>
+
+## Response
+
+<ResponseField name="recurring_id" type="string">
+  The identifier of the cancelled series (8 characters).
+</ResponseField>
+
+<ResponseField name="accepted" type="boolean">
+  `true` if the cancellation was accepted and the series has been marked as cancelled.
+</ResponseField>
+
+```json Example response
+{
+  "recurring_id": "RC9F4A2B",
+  "accepted": true
+}
+```
+
+<Note>
+  After cancellation, calling the [status endpoint](/api-reference/recurring/status) for this `recurring_id` will return `status: cancelled`. Historical transactions remain accessible.
+</Note>

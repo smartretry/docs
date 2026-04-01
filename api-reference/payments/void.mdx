@@ -1,0 +1,87 @@
+---
+title: Void
+description: Cancel a pre-authorization before it is captured.
+---
+
+A void cancels a pre-authorization and releases the hold on the customer's funds. Use this endpoint when you need to cancel a reservation before calling [capture](/api-reference/payments/capture).
+
+<Warning>
+  You can only void a pre-authorization. To reverse a completed sale or capture, use the [refund](/api-reference/payments/refund) endpoint instead.
+</Warning>
+
+<RequestExample>
+
+```bash cURL
+curl --request POST \
+  --url https://api.smartretry.com/v1/payments/void/ABC123 \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "transaction_reference_id": "TX8A3F2C",
+    "order_reference_id": "OR7B9E1D",
+    "merchant_transaction_id": "void-20260331-001"
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "transaction_id": "TX5F1K2L",
+  "order_id": "OR7B9E1D",
+  "merchant_transaction_id": "void-20260331-001",
+  "accepted": true
+}
+```
+
+```json 400
+{
+  "type": "https://api.smartretry.com/errors/validation",
+  "title": "Bad Request",
+  "status": 400,
+  "detail": "transaction has already been captured and cannot be voided",
+  "reason_code": "TRANSACTION_ALREADY_CAPTURED"
+}
+```
+
+</ResponseExample>
+
+## Path parameters
+
+<ParamField path="terminal_friendly_id" type="string" required>
+  Your terminal identifier. Exactly 6 characters.
+</ParamField>
+
+## Request body
+
+<ParamField body="transaction_reference_id" type="string" required>
+  The `transaction_id` of the pre-authorization to void. Exactly 8 characters.
+</ParamField>
+
+<ParamField body="order_reference_id" type="string" required>
+  The `order_id` associated with the pre-authorization. Exactly 8 characters.
+</ParamField>
+
+<ParamField body="merchant_transaction_id" type="string" required>
+  Your unique identifier for this void transaction. Must be different from the `merchant_transaction_id` of the original pre-authorization.
+</ParamField>
+
+## Response
+
+<ResponseField name="transaction_id" type="string" required>
+  SmartRetry's unique identifier for this void transaction. Exactly 8 characters.
+</ResponseField>
+
+<ResponseField name="order_id" type="string" required>
+  The order identifier, matching the `order_id` from the original pre-authorization.
+</ResponseField>
+
+<ResponseField name="merchant_transaction_id" type="string" required>
+  The `merchant_transaction_id` you provided in the request, echoed back for confirmation.
+</ResponseField>
+
+<ResponseField name="accepted" type="boolean" required>
+  `true` if the void was accepted for processing. Poll the [status endpoint](/api-reference/payments/status) using the returned `transaction_id` to confirm the void outcome.
+</ResponseField>

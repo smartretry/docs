@@ -1,0 +1,156 @@
+---
+title: Errors
+description: HTTP error codes and reason codes returned by the SmartRetry API.
+---
+
+The SmartRetry API uses standard HTTP status codes and returns a consistent error body on every failure. Parse the `reason_code` field for programmatic error handling — it identifies the specific failure cause regardless of which endpoint you called.
+
+## Error response structure
+
+All error responses share this shape:
+
+<ResponseField name="type" type="string" required>
+  A URI reference that identifies the error type. Points to documentation for the specific problem category.
+</ResponseField>
+
+<ResponseField name="title" type="string" required>
+  A short, human-readable summary of the error. Does not change between occurrences of the same error type.
+</ResponseField>
+
+<ResponseField name="status" type="integer" required>
+  The HTTP status code for this response (e.g., `400`, `401`, `404`).
+</ResponseField>
+
+<ResponseField name="detail" type="string" required>
+  A detailed description of what went wrong in this specific request. Use this field for debugging and logging.
+</ResponseField>
+
+<ResponseField name="instance" type="string">
+  A URI that identifies this specific occurrence of the error. Include this in support requests when available.
+</ResponseField>
+
+<ResponseField name="reason_code" type="string" required>
+  A machine-readable code identifying the failure cause. Use this for programmatic error handling and branching logic.
+</ResponseField>
+
+<ResponseField name="context" type="object">
+  Additional structured data about the error, such as which field failed validation or the conflicting transaction ID. Contents vary by error type.
+
+  <Expandable title="properties">
+    Context is error-specific. Common keys include `field` (the request field that caused the error), `value` (the invalid value supplied), and `transaction_id` (the conflicting transaction on `409` errors).
+  </Expandable>
+</ResponseField>
+
+## HTTP status codes
+
+| Status | Name | When it occurs |
+|--------|------|----------------|
+| `200` | OK | Request succeeded. For payment responses, also check the `accepted` field — a `200` with `"accepted": false` means the transaction was declined. |
+| `400` | Bad Request | The request body or parameters failed validation. A required field is missing, a value is the wrong type, or a parameter is out of range. |
+| `401` | Unauthorized | The `x-api-key` header is missing or the key is invalid. |
+| `403` | Forbidden | The API key is valid but does not have access to the requested terminal. |
+| `404` | Not Found | The transaction, recurring plan, or terminal ID does not exist. |
+| `409` | Conflict | A transaction with the same `merchant_transaction_id` already exists and cannot be duplicated. |
+| `422` | Unprocessable Entity | The request is structurally valid but was rejected by business logic — for example, attempting to capture an already-captured pre-auth. |
+| `429` | Too Many Requests | Your integration has exceeded the rate limit. Back off and retry after the period indicated in the `Retry-After` response header. |
+| `500` | Internal Server Error | An unexpected error occurred on the SmartRetry side. If this persists, check [status.smartretry.com](https://status.smartretry.com) and contact support. |
+
+## Reason codes
+
+| Reason code | Status | Description |
+|-------------|--------|-------------|
+| `INVALID_API_KEY` | 401 | The `x-api-key` header is missing, malformed, or the key has been revoked. |
+| `TERMINAL_NOT_FOUND` | 403 / 404 | The `terminal_friendly_id` in the path does not match any terminal your key can access. |
+| `TRANSACTION_NOT_FOUND` | 404 | No transaction with the given ID exists on this terminal. |
+| `DUPLICATE_TRANSACTION_ID` | 409 | A transaction with this `merchant_transaction_id` was already submitted. Idempotent replay returns the original result; a new charge with the same ID is rejected. |
+| `INVALID_AMOUNT` | 400 | The `amount` value is missing, zero, negative, or not an integer. |
+| `INVALID_CURRENCY` | 400 | The `currency` value is not a supported ISO 4217 currency code. |
+| `INVALID_CARD_NUMBER` | 400 | The card number failed the Luhn check or is not a recognised card format. |
+| `INVALID_EXPIRY` | 400 | The card expiry date is missing, in the wrong format, or in the past. |
+| `MISSING_REQUIRED_FIELD` | 400 | A field required by this endpoint was not included in the request body. The `context` object identifies the missing field. |
+| `RATE_LIMIT_EXCEEDED` | 429 | Too many requests in a short window. Honour the `Retry-After` header before retrying. |
+| `RECURRING_NOT_FOUND` | 404 | No recurring plan with the given terminal and reference exists. |
+
+## Example error responses
+
+<CodeGroup>
+
+```json 401 Unauthorized
+{
+  "type": "https://docs.smartretry.com/api-reference/errors#invalid-api-key",
+  "title": "Unauthorized",
+  "status": 401,
+  "detail": "The x-api-key header is missing or the provided key is invalid.",
+  "reason_code": "INVALID_API_KEY",
+  "context": {}
+}
+```
+
+```json 400 Bad Request
+{
+  "type": "https://docs.smartretry.com/api-reference/errors#missing-required-field",
+  "title": "Bad Request",
+  "status": 400,
+  "detail": "The 'amount' field is required and must be a positive integer.",
+  "reason_code": "MISSING_REQUIRED_FIELD",
+  "context": {
+    "field": "amount"
+  }
+}
+```
+
+```json 404 Not Found
+{
+  "type": "https://docs.smartretry.com/api-reference/errors#transaction-not-found",
+  "title": "Not Found",
+  "status": 404,
+  "detail": "No transaction with ID 'txn_001' was found on terminal 'ABC123'.",
+  "instance": "/v1/payments/status/ABC123/txn_001",
+  "reason_code": "TRANSACTION_NOT_FOUND",
+  "context": {
+    "terminal_friendly_id": "ABC123",
+    "transaction_id": "txn_001"
+  }
+}
+```
+
+```json 429 Too Many Requests
+{
+  "type": "https://docs.smartretry.com/api-reference/errors#rate-limit-exceeded",
+  "title": "Too Many Requests",
+  "status": 429,
+  "detail": "You have exceeded the request rate limit. Please wait before retrying.",
+  "reason_code": "RATE_LIMIT_EXCEEDED",
+  "context": {
+    "retry_after_seconds": 30
+  }
+}
+```
+
+</CodeGroup>
+
+## Handling errors in production
+
+<Note>
+  Always branch on `reason_code`, not on `detail` or `title`. The human-readable fields may change; `reason_code` values are stable across API versions.
+</Note>
+
+**Retryable errors**
+
+- `500 Internal Server Error` — retry with exponential backoff. Check [status.smartretry.com](https://status.smartretry.com) if errors persist beyond a few minutes.
+- `429 Too Many Requests` — wait for the number of seconds in the `Retry-After` response header before retrying. Do not retry immediately.
+
+**Non-retryable errors**
+
+- `400 Bad Request` — fix the request before retrying. Check the `context.field` value to identify which field is invalid.
+- `401 Unauthorized` — verify your API key is correct and present in the `x-api-key` header.
+- `403 Forbidden` — the key is valid but not authorized for this terminal. Check you are using the right `terminal_friendly_id`.
+- `409 Conflict` — use a different `merchant_transaction_id` for each new transaction. If you are retrying an existing transaction, use the original ID to retrieve the idempotent result via the status endpoint.
+
+**Declined transactions**
+
+A declined transaction returns `200 OK` with `"accepted": false` in the response body — this is not an error response. Do not confuse payment declines with API errors. Log the transaction status and handle the decline according to your retry strategy.
+
+<Tip>
+  Log the full error response body for every non-`2xx` status, including `instance` when present. This makes it significantly faster to diagnose issues with SmartRetry support.
+</Tip>

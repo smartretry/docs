@@ -1,0 +1,89 @@
+---
+title: Transaction Statuses
+description: All possible transaction status values and what they mean.
+---
+
+Every transaction in SmartRetry carries a `status` object that tells you exactly where a payment stands and why. This page covers all top-level statuses, the status object structure, status domains, and the additional status models used for recurring series and future transactions.
+
+<Note>
+  SmartRetry tracks each retry attempt individually with its own status. Your PSP typically shows only the final result of the last attempt. Use SmartRetry's transaction logs to see the full retry history for any payment.
+</Note>
+
+## Top-level statuses
+
+| Status | Description |
+|---|---|
+| `APPROVED` | The transaction was authorized and completed successfully. |
+| `PROCESSING` | The transaction has been submitted and is awaiting a response from the acquirer or issuer. |
+| `DECLINED` | The issuer or processor refused the transaction. A `reasonCode` and `domain` are provided to explain why. |
+| `ERROR` | A technical or system-level failure occurred that prevented the transaction from reaching the issuer. |
+| `CANCELLED` | The transaction was cancelled before processing completed — either by the merchant, the payer, or an automated void. |
+| `UNKNOWN` | The transaction outcome could not be determined. This may occur due to a network timeout or missing response from the processor. |
+
+<Warning>
+  Treat `UNKNOWN` status as unresolved. Do not assume the transaction succeeded or failed. Query the transaction again or contact support to confirm the final state before taking any action.
+</Warning>
+
+## The status object
+
+When you retrieve a transaction, the `status` field returns a structured object — not a plain string. The full structure is:
+
+```json
+{
+  "status": "DECLINED",
+  "reasonCode": "INSUFFICIENT_FUNDS",
+  "name": "Insufficient Funds",
+  "description": "The payer's account does not have enough funds to cover this transaction.",
+  "domain": "PAYER_ACCOUNT"
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `status` | `string` | The top-level outcome: `APPROVED`, `PROCESSING`, `DECLINED`, `ERROR`, `CANCELLED`, or `UNKNOWN`. |
+| `reasonCode` | `string` | A machine-readable code identifying the specific reason for the status, particularly for declines and errors. |
+| `name` | `string` | A human-readable name for the status outcome. |
+| `description` | `string` | A plain-language description of what the status means in context. |
+| `domain` | `string` | The functional area responsible for the status. See the domain table below. |
+
+## Status domains
+
+The `domain` field tells you which part of the payment chain produced the status. This helps you pinpoint the root cause of a decline or error without parsing the `reasonCode` alone.
+
+| Domain | Description |
+|---|---|
+| `SYSTEM` | A SmartRetry platform-level issue, such as a configuration error or an internal processing failure. |
+| `VALIDATION` | The transaction request failed input validation — for example, a missing required field or an invalid parameter format. |
+| `RISK` | The transaction was blocked by a fraud or risk rule, either within SmartRetry or at the acquirer level. |
+| `ROUTING` | The failure occurred during acquirer selection or transaction routing — for example, no available route matched the transaction parameters. |
+| `AUTH` | The authorization attempt failed at the card network or acquirer level — such as a 3DS challenge failure or network-level rejection. |
+| `PROCESSOR` | The acquiring bank or payment processor declined the transaction on their end. |
+| `PAYMENT_METHOD` | The issue is with the payment instrument itself — for example, an expired card, an invalid card number, or an unsupported card type. |
+| `PAYER_ACCOUNT` | The decline originates from the payer's account at the issuing bank — for example, insufficient funds, a spending limit, or an account restriction. |
+
+## Recurring series statuses
+
+When you create a recurring payment series, the series itself carries its own lifecycle status separate from the individual transaction statuses.
+
+| Status | Description |
+|---|---|
+| `active` | The series is running and scheduled charges are being processed as configured. |
+| `paused` | The series has been temporarily suspended. No new charges will be triggered until it is resumed. |
+| `cancelled` | The series has been permanently stopped. No further charges will be made. |
+| `completed` | All scheduled payments in the series have been processed and the series has ended naturally. |
+
+<Warning>
+  A cancelled recurring series cannot be reactivated. To resume recurring charges after cancellation, you must create a new series.
+</Warning>
+
+## Future transaction statuses
+
+In a platform-managed recurring series, SmartRetry schedules upcoming charges as **future transactions**. Each future transaction has its own status reflecting where it is in the schedule.
+
+| Status | Description |
+|---|---|
+| `pending` | The charge is scheduled but has not been triggered yet. |
+| `processing` | The charge has been initiated and is currently being submitted to the acquirer. |
+| `completed` | The charge was processed — check the individual transaction status for the outcome (approved, declined, etc.). |
+| `failed` | The charge was attempted but could not be completed, including after all retry attempts. |
+| `cancelled` | The scheduled charge was cancelled before it was triggered. |

@@ -1,0 +1,211 @@
+---
+title: Pre-authorization
+description: Reserve funds on a payment instrument without capturing immediately.
+---
+
+A pre-authorization places a hold on the customer's funds without completing the charge. After a successful pre-auth, call [capture](/api-reference/payments/capture) to settle the payment, or [void](/api-reference/payments/void) to release the hold.
+
+<Tip>
+  Use pre-authorization when the final charge amount may differ from the initial estimate — for example, hotel stays, car rentals, or orders with variable shipping costs.
+</Tip>
+
+<RequestExample>
+
+```bash cURL
+curl --request POST \
+  --url https://api.smartretry.com/v1/payments/preauth/ABC123 \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "merchant_transaction_id": "preauth-20260331-001",
+    "amount": 4999,
+    "currency": "USD",
+    "payment_instrument": {
+      "card_number": "4111111111111111",
+      "expiry_month": 12,
+      "expiry_year": 2027,
+      "payment_method": "cards",
+      "card_cardholder_name": "Jane Doe"
+    },
+    "cvv": "123",
+    "payer": {
+      "first_name": "Jane",
+      "last_name": "Doe",
+      "email": "jane.doe@example.com"
+    },
+    "description": "Hotel reservation #20260331-001"
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "transaction_id": "TX8A3F2C",
+  "order_id": "OR7B9E1D",
+  "merchant_transaction_id": "preauth-20260331-001",
+  "accepted": true
+}
+```
+
+```json 400
+{
+  "type": "https://api.smartretry.com/errors/validation",
+  "title": "Bad Request",
+  "status": 400,
+  "detail": "currency is required",
+  "reason_code": "MISSING_FIELD"
+}
+```
+
+</ResponseExample>
+
+## Path parameters
+
+<ParamField path="terminal_friendly_id" type="string" required>
+  Your terminal identifier. Exactly 6 characters.
+</ParamField>
+
+## Request body
+
+The pre-authorization request body is identical to the [sale](/api-reference/payments/sale) request body.
+
+<ParamField body="merchant_transaction_id" type="string" required>
+  Your unique identifier for this pre-authorization. Use this to correlate SmartRetry transactions with your own records.
+</ParamField>
+
+<ParamField body="amount" type="integer" required>
+  Amount to hold in minor currency units (e.g., cents). Minimum `1`, maximum `999999999`.
+</ParamField>
+
+<ParamField body="currency" type="string" required>
+  Three-letter [ISO 4217](https://en.wikipedia.org/wiki/ISO_4217) currency code (e.g., `USD`, `EUR`, `GBP`).
+</ParamField>
+
+<ParamField body="payment_instrument" type="object">
+  Card or payment method details. Required when not using `token`.
+
+  <Expandable title="properties">
+    <ParamField body="card_number" type="string" required>
+      Primary account number (PAN). Between 13 and 19 digits.
+    </ParamField>
+
+    <ParamField body="expiry_month" type="integer" required>
+      Card expiry month. Integer between `1` and `12`.
+    </ParamField>
+
+    <ParamField body="expiry_year" type="integer" required>
+      Card expiry year. Integer between `2024` and `2099`.
+    </ParamField>
+
+    <ParamField body="payment_method" type="string" required>
+      Payment method type. One of: `cards`, `digital_wallets`, `bnpl`, `online_banking`, `rtp`, `vouchers`, `cash`, `direct_debit`, `cryptocurrencies`.
+    </ParamField>
+
+    <ParamField body="card_cardholder_name" type="string">
+      Name as it appears on the card. Maximum 100 characters.
+    </ParamField>
+
+    <ParamField body="card_profile.fingerprint" type="string">
+      Stored card profile fingerprint. Exactly 88 characters.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="token" type="string">
+  Stored payment token (88 characters). Use this instead of `payment_instrument.card_number` for repeat customers.
+</ParamField>
+
+<ParamField body="cvv" type="string">
+  Card verification value (CVV/CVC). Optional but recommended for card-not-present transactions.
+
+  <Warning>The CVV is never stored by SmartRetry and cannot be used in tokenized or retry flows.</Warning>
+</ParamField>
+
+<ParamField body="payer" type="object">
+  Payer identity details. Mutually exclusive with `payer_fingerprint`.
+
+  <Expandable title="properties">
+    <ParamField body="first_name" type="string" required>
+      Payer's first name. Maximum 50 characters.
+    </ParamField>
+
+    <ParamField body="last_name" type="string" required>
+      Payer's last name. Maximum 50 characters.
+    </ParamField>
+
+    <ParamField body="email" type="string" required>
+      Payer's email address. Maximum 254 characters.
+    </ParamField>
+
+    <ParamField body="friendly_id" type="string">
+      SmartRetry payer ID. Exactly 8 characters. Provide this to link the transaction to an existing payer profile.
+    </ParamField>
+
+    <ParamField body="phone_number" type="string">
+      Payer's phone number in [E.164](https://en.wikipedia.org/wiki/E.164) format (e.g., `+12125551234`).
+    </ParamField>
+
+    <ParamField body="address" type="object">
+      Payer's billing address.
+
+      <Expandable title="properties">
+        <ParamField body="address_1" type="string">
+          Primary street address.
+        </ParamField>
+
+        <ParamField body="address_2" type="string">
+          Apartment, suite, or unit number.
+        </ParamField>
+
+        <ParamField body="city_name" type="string">
+          City name.
+        </ParamField>
+
+        <ParamField body="postal_code" type="string">
+          Postal or ZIP code.
+        </ParamField>
+
+        <ParamField body="state_code" type="string">
+          State or province code in [ISO 3166-2](https://en.wikipedia.org/wiki/ISO_3166-2) format (e.g., `US-CA`).
+        </ParamField>
+
+        <ParamField body="country_code" type="string">
+          Two-letter country code in [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) format (e.g., `US`).
+        </ParamField>
+      </Expandable>
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="payer_fingerprint" type="string">
+  SmartRetry payer fingerprint (88 characters). Mutually exclusive with the `payer` object. Use this to reference a payer you've previously registered without resending their full details.
+</ParamField>
+
+<ParamField body="description" type="string">
+  Human-readable description of the order or purchase.
+</ParamField>
+
+## Response
+
+<ResponseField name="transaction_id" type="string" required>
+  SmartRetry's unique identifier for this pre-authorization. Exactly 8 characters. Pass this as `transaction_reference_id` in a subsequent [capture](/api-reference/payments/capture) or [void](/api-reference/payments/void) request.
+</ResponseField>
+
+<ResponseField name="order_id" type="string" required>
+  SmartRetry's unique identifier for the order. Exactly 8 characters. Pass this as `order_reference_id` in a subsequent capture or void request.
+</ResponseField>
+
+<ResponseField name="merchant_transaction_id" type="string" required>
+  The `merchant_transaction_id` you provided in the request, echoed back for confirmation.
+</ResponseField>
+
+<ResponseField name="accepted" type="boolean" required>
+  `true` if the pre-authorization was accepted for processing. Poll the [status endpoint](/api-reference/payments/status) to confirm the issuer's authorization decision.
+</ResponseField>
+
+<Note>
+  Save the `transaction_id` and `order_id` from this response. You will need both to capture or void the pre-authorization.
+</Note>

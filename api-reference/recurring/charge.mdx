@@ -1,0 +1,84 @@
+---
+title: Charge recurring
+description: Manually trigger a charge against an active merchant-managed recurring series.
+---
+
+`POST /v1/payments/recurring/charge/{terminal_friendly_id}`
+
+Triggers an immediate charge against an existing recurring series. Use this endpoint when `managed_by` is `merchant` — you control when each payment fires rather than relying on a platform-managed schedule.
+
+<Note>
+  This endpoint only applies to series where `managed_by` is `merchant`. For `our_platform`-managed series, SmartRetry schedules and processes charges automatically. Calling this endpoint on a platform-managed series returns an error.
+</Note>
+
+```bash cURL
+curl --request POST \
+  --url https://api.smartretry.com/v1/payments/recurring/charge/ABC123 \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --data '{
+    "recurring_id": "RC9F4A2B",
+    "merchant_transaction_id": "sub-renewal-001",
+    "amount": 1999,
+    "currency": "USD"
+  }'
+```
+
+## Path parameters
+
+<ParamField path="terminal_friendly_id" type="string" required>
+  Your 6-character terminal identifier.
+</ParamField>
+
+## Request body
+
+<ParamField body="recurring_id" type="string" required>
+  The 8-character identifier of the recurring series to charge.
+</ParamField>
+
+<ParamField body="merchant_transaction_id" type="string" required>
+  Your unique identifier for this specific charge. Used for idempotency — if you retry with the same value, the API returns the original result rather than creating a duplicate charge.
+</ParamField>
+
+<ParamField body="amount" type="integer">
+  Override the default series amount for this charge only, in minor currency units. If omitted, the amount set during initialization is used.
+</ParamField>
+
+<ParamField body="currency" type="string">
+  Override the default series currency for this charge only. Must be a valid ISO 4217 code. If omitted, the currency set during initialization is used.
+</ParamField>
+
+<ParamField body="cvv" type="string">
+  Card verification value for this charge. Optional, but may be required depending on your terminal configuration.
+</ParamField>
+
+## Response
+
+<ResponseField name="transaction_id" type="string">
+  Unique identifier for this transaction (8 characters).
+</ResponseField>
+
+<ResponseField name="order_id" type="string">
+  Order identifier for this transaction (8 characters).
+</ResponseField>
+
+<ResponseField name="merchant_transaction_id" type="string">
+  The `merchant_transaction_id` you provided in the request, echoed back for confirmation.
+</ResponseField>
+
+<ResponseField name="accepted" type="boolean">
+  `true` if the charge was authorized. `false` if the transaction was declined. Always check this field — a `200` status does not guarantee the payment succeeded.
+</ResponseField>
+
+```json Example response
+{
+  "transaction_id": "TX8A3F2C",
+  "order_id": "OR7B9E1D",
+  "merchant_transaction_id": "sub-renewal-001",
+  "accepted": true
+}
+```
+
+<Tip>
+  Use a stable, predictable `merchant_transaction_id` for each billing cycle — for example, `sub-{subscription_id}-{billing_period}`. This makes it easy to reconcile charges and safely retry failed requests without risk of double-charging.
+</Tip>
