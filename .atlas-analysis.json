@@ -117,9 +117,6 @@
     "GET /v1/payments/recurring/future-transactions/status/{terminal_friendly_id}",
     "PUT /v1/payments/recurring/future-transactions/update/{terminal_friendly_id}",
     "POST /v1/payments/recurring/future-transactions/charge/{terminal_friendly_id}",
-    "POST /v1/payments/recurring/future-transactions/cancel/{terminal_friendly_id}",
-    "GET /health/",
-    "GET /health/ready",
-    "GET /health/live"
+    "POST /v1/payments/recurring/future-transactions/cancel/{terminal_friendly_id}"
   ]
 }

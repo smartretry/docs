@@ -9,10 +9,10 @@
   "contextual": {
     "options": ["copy", "view", "chatgpt", "claude"]
   },
-  "favicon": "https://media.brand.dev/1b200103-5fdf-46ac-a54d-386f1efa34dd.jpg",
+  "favicon": "/favicon.svg",
   "logo": {
-    "light": "https://media.brand.dev/d1c01a7a-60ad-4f7b-bea4-22753c1eb5eb.svg",
-    "dark": "https://media.brand.dev/d1c01a7a-60ad-4f7b-bea4-22753c1eb5eb.svg"
+    "light": "/images/logo.svg",
+    "dark": "/images/logo.svg"
   },
   "navbar": {
     "primary": {
