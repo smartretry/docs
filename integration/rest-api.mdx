@@ -33,12 +33,12 @@ Content-Type: application/json
 
 ### Amount format
 
-Pass `amount` in the **smallest unit of the currency** — for example, cents for USD. Do not use decimals.
+Pass `amount` in **major currency units** using standard decimal notation.
 
 | Amount value | Currency | Represents |
 |---|---|---|
-| `4999` | `USD` | $49.99 |
-| `1000` | `EUR` | €10.00 |
+| `49.99` | `USD` | $49.99 |
+| `10.00` | `EUR` | €10.00 |
 | `500` | `JPY` | ¥500 |
 
 ### merchant_transaction_id
@@ -68,7 +68,7 @@ curl --request POST \
   --header 'x-api-key: YOUR_API_KEY' \
   --data '{
     "merchant_transaction_id": "txn-a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-    "amount": 4999,
+    "amount": 49.99,
     "currency": "USD",
     "payment_instrument": {
       "card_number": "4111111111111111",
@@ -94,7 +94,7 @@ const response = await fetch('https://api.smartretry.com/v1/payments/sale/TERM01
   },
   body: JSON.stringify({
     merchant_transaction_id: 'txn-a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-    amount: 4999,
+    amount: 49.99,
     currency: 'USD',
     payment_instrument: {
       card_number: '4111111111111111',
@@ -125,7 +125,7 @@ response = requests.post(
     },
     json={
         'merchant_transaction_id': 'txn-a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-        'amount': 4999,
+        'amount': 49.99,
         'currency': 'USD',
         'payment_instrument': {
             'card_number': '4111111111111111',
@@ -171,7 +171,7 @@ When a request fails, SmartRetry returns a JSON error object using the [RFC 7807
   "type": "https://api.smartretry.com/errors/invalid-request",
   "title": "Invalid request",
   "status": 400,
-  "detail": "The field 'amount' must be a positive integer.",
+  "detail": "The field 'amount' must be a positive number in major currency units.",
   "reason_code": "INVALID_AMOUNT"
 }
 ```
@@ -192,5 +192,5 @@ When a request fails, SmartRetry returns a JSON error object using the [RFC 7807
 
 - Always use a unique `merchant_transaction_id` per transaction to ensure idempotency.
 - Store the `token` and `payer_fingerprint` from successful responses to speed up future requests for returning customers.
-- Validate `amount` and `currency` on your side before sending — `amount` must be a positive integer in the smallest currency unit.
+- Validate `amount` and `currency` on your side before sending — `amount` must be a positive number in major currency units.
 - Use the [sandbox environment](/integration/sandbox) to test your integration before going live.

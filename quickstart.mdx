@@ -20,7 +20,7 @@ This guide walks you through making your first API request with SmartRetry. You'
   <Step title="Send your first sale request">
     Use the `POST /v1/payments/sale/{terminal_friendly_id}` endpoint to charge a card. Replace `ABC123` with your terminal ID and `YOUR_API_KEY` with your API key.
 
-    The `amount` field is in minor units (cents). The example below represents $49.99 USD.
+    The `amount` field uses major currency units. The example below charges `$49.99` USD.
 
     <CodeGroup>
 
@@ -30,7 +30,7 @@ This guide walks you through making your first API request with SmartRetry. You'
       -H "Content-Type: application/json" \
       -d '{
         "merchant_transaction_id": "order-10042",
-        "amount": 4999,
+        "amount": 49.99,
         "currency": "USD",
         "payment_instrument": {
           "card_number": "4111111111111111",
@@ -49,7 +49,7 @@ This guide walks you through making your first API request with SmartRetry. You'
     ```json Request body
     {
       "merchant_transaction_id": "order-10042",
-      "amount": 4999,
+      "amount": 49.99,
       "currency": "USD",
       "payment_instrument": {
         "card_number": "4111111111111111",

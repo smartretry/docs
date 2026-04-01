@@ -63,7 +63,7 @@ All error responses share this shape:
 | `TERMINAL_NOT_FOUND` | 403 / 404 | The `terminal_friendly_id` in the path does not match any terminal your key can access. |
 | `TRANSACTION_NOT_FOUND` | 404 | No transaction with the given ID exists on this terminal. |
 | `DUPLICATE_TRANSACTION_ID` | 409 | A transaction with this `merchant_transaction_id` was already submitted. Idempotent replay returns the original result; a new charge with the same ID is rejected. |
-| `INVALID_AMOUNT` | 400 | The `amount` value is missing, zero, negative, or not an integer. |
+| `INVALID_AMOUNT` | 400 | The `amount` value is missing, zero, negative, or not a valid number in major currency units. |
 | `INVALID_CURRENCY` | 400 | The `currency` value is not a supported ISO 4217 currency code. |
 | `INVALID_CARD_NUMBER` | 400 | The card number failed the Luhn check or is not a recognised card format. |
 | `INVALID_EXPIRY` | 400 | The card expiry date is missing, in the wrong format, or in the past. |
@@ -91,7 +91,7 @@ All error responses share this shape:
   "type": "https://docs.smartretry.com/api-reference/errors#missing-required-field",
   "title": "Bad Request",
   "status": 400,
-  "detail": "The 'amount' field is required and must be a positive integer.",
+  "detail": "The 'amount' field is required and must be a positive number in major currency units.",
   "reason_code": "MISSING_REQUIRED_FIELD",
   "context": {
     "field": "amount"
