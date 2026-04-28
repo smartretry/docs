@@ -123,14 +123,14 @@ The collection supports request chaining for multi-step flows:
 
 ### Pre-auth → Capture flow
 
-1. Run **Pre-authorization** — saves `transaction_id` and `order_id` to environment
-2. Run **Capture** — automatically uses saved IDs
+1. Run **Pre-authorization** - saves `transaction_id` and `order_id` to environment
+2. Run **Capture** - automatically uses saved IDs
 
 ### Recurring flow
 
-1. Run **Recurring > Initialize** — saves `recurring_id` to environment
-2. Run **Recurring > Charge** — uses saved `recurring_id`
-3. Run **Recurring > Status** — checks series state
+1. Run **Recurring > Initialize** - saves `recurring_id` to environment
+2. Run **Recurring > Charge** - uses saved `recurring_id`
+3. Run **Recurring > Status** - checks series state
 
 ## Importing via URL
 

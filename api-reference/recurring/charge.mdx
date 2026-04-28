@@ -5,7 +5,7 @@ description: Manually trigger a charge against an active merchant-managed recurr
 
 `POST /v1/payments/recurring/charge/{terminal_friendly_id}`
 
-Triggers an immediate charge against an existing recurring series. Use this endpoint when `managed_by` is `merchant` — you control when each payment fires rather than relying on a platform-managed schedule.
+Triggers an immediate charge against an existing recurring series. Use this endpoint when `managed_by` is `merchant` - you control when each payment fires rather than relying on a platform-managed schedule.
 
 <Note>
   This endpoint only applies to series where `managed_by` is `merchant`. For `our_platform`-managed series, SmartRetry schedules and processes charges automatically. Calling this endpoint on a platform-managed series returns an error.
@@ -109,7 +109,7 @@ console.log(data);
 </ResponseField>
 
 <ResponseField name="accepted" type="boolean">
-  `true` if the charge was authorized. `false` if the transaction was declined. Always check this field — a `200` status does not guarantee the payment succeeded.
+  `true` if the charge was authorized. `false` if the transaction was declined. Always check this field - a `200` status does not guarantee the payment succeeded.
 </ResponseField>
 
 ```json Example response

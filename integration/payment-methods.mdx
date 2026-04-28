@@ -44,7 +44,7 @@ When using `cards`, include the card details in `payment_instrument`:
 | `card_number` | Yes | 13–19 digit primary account number (PAN) |
 | `expiry_month` | Yes | Card expiry month (1–12) |
 | `expiry_year` | Yes | Card expiry year (2024–2099) |
-| `cvv` | No | Card verification value — optional but recommended |
+| `cvv` | No | Card verification value - optional but recommended |
 
 <Note>
   SmartRetry has access to card details and transaction data as part of the retry and optimization process. All sensitive data is encrypted in transit and at rest.
@@ -89,5 +89,5 @@ SmartRetry's intelligent retry engine works by analyzing decline reasons and re-
 </CardGroup>
 
 <Note>
-  SmartRetry only retries transactions that have a realistic chance of succeeding. Hard declines — such as stolen card or permanent do-not-honor responses — are not retried to avoid unnecessary processing.
+  SmartRetry only retries transactions that have a realistic chance of succeeding. Hard declines - such as stolen card or permanent do-not-honor responses - are not retried to avoid unnecessary processing.
 </Note>

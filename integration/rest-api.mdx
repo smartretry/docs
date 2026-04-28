@@ -3,7 +3,7 @@ title: REST API
 description: How to integrate with the SmartRetry REST API.
 ---
 
-The SmartRetry REST API accepts JSON over HTTPS. All requests are scoped to a terminal — a 6-character alphanumeric ID that identifies your merchant configuration.
+The SmartRetry REST API accepts JSON over HTTPS. All requests are scoped to a terminal - a 6-character alphanumeric ID that identifies your merchant configuration.
 
 ## Base URL
 
@@ -55,11 +55,11 @@ See [Idempotency](/api-reference/idempotency) for the full contract and response
 
 ### Token-based payments
 
-When SmartRetry processes a transaction, it can return a `token` — an 88-character stored payment token that represents the card. On future charges for the same customer, you can pass this `token` instead of sending raw card data again. This simplifies repeat billing and reduces PCI scope.
+When SmartRetry processes a transaction, it can return a `token` - an 88-character stored payment token that represents the card. On future charges for the same customer, you can pass this `token` instead of sending raw card data again. This simplifies repeat billing and reduces PCI scope.
 
 ### Payer fingerprint
 
-SmartRetry generates a `payer_fingerprint` — an 88-character identifier that represents a card profile or payer address. You can store this and include it in future requests for the same customer to help SmartRetry recognize repeat payers and apply optimized retry logic more quickly.
+SmartRetry generates a `payer_fingerprint` - an 88-character identifier that represents a card profile or payer address. You can store this and include it in future requests for the same customer to help SmartRetry recognize repeat payers and apply optimized retry logic more quickly.
 
 ## Making a sale
 
@@ -171,7 +171,7 @@ data = response.json()
 
 ## Response format
 
-All responses return JSON. Successful payment responses include an `accepted` boolean, the `transaction_id` and `order_id` assigned by SmartRetry, and your original `merchant_transaction_id` for reconciliation. A `200 OK` with `"accepted": false` means the transaction was declined — not an error. Use the [status endpoint](/api-reference/payments/status) to get the full transaction outcome.
+All responses return JSON. Successful payment responses include an `accepted` boolean, the `transaction_id` and `order_id` assigned by SmartRetry, and your original `merchant_transaction_id` for reconciliation. A `200 OK` with `"accepted": false` means the transaction was declined - not an error. Use the [status endpoint](/api-reference/payments/status) to get the full transaction outcome.
 
 ## Error format
 
@@ -204,5 +204,5 @@ When a request fails, SmartRetry returns a JSON error object using the [RFC 7807
 - Always use a unique `merchant_transaction_id` per transaction so reconciliation back to your own system stays unambiguous.
 - Use a new `Idempotency-Key` for each new POST request, and reuse it only when retrying the exact same request body.
 - Store the `token` and `payer_fingerprint` from successful responses to speed up future requests for returning customers.
-- Validate `amount` and `currency` on your side before sending — `amount` must be a positive number in major currency units.
+- Validate `amount` and `currency` on your side before sending - `amount` must be a positive number in major currency units.
 - Use the [sandbox environment](/integration/sandbox) to test your integration before going live.

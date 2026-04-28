@@ -89,8 +89,8 @@ X-SmartRetry-Signature: t=1711979533,v1=5257a869e7ecebeda32affa62cdca3fa51cad7e7
 ```
 
 The signature header contains:
-- `t` — Unix timestamp of when the signature was generated
-- `v1` — HMAC-SHA256 signature of the payload
+- `t` - Unix timestamp of when the signature was generated
+- `v1` - HMAC-SHA256 signature of the payload
 
 ### Verification steps
 
@@ -180,15 +180,15 @@ After 7 failed attempts, the webhook is marked as failed. You can manually retry
 
 ## Best practices
 
-1. **Respond quickly** — Return a `2xx` response immediately and process the event asynchronously. If processing takes longer than 30 seconds, the request times out and triggers a retry.
+1. **Respond quickly** - Return a `2xx` response immediately and process the event asynchronously. If processing takes longer than 30 seconds, the request times out and triggers a retry.
 
-2. **Idempotent handlers** — Design your webhook handlers to safely process the same event multiple times. Use the `id` field as a deduplication key.
+2. **Idempotent handlers** - Design your webhook handlers to safely process the same event multiple times. Use the `id` field as a deduplication key.
 
-3. **Verify signatures** — Always validate the `X-SmartRetry-Signature` header before processing any webhook.
+3. **Verify signatures** - Always validate the `X-SmartRetry-Signature` header before processing any webhook.
 
-4. **Use HTTPS** — Webhook endpoints must use HTTPS. HTTP URLs are rejected.
+4. **Use HTTPS** - Webhook endpoints must use HTTPS. HTTP URLs are rejected.
 
-5. **Handle all event types** — Your handler should gracefully ignore event types it doesn't recognize, allowing for future expansion.
+5. **Handle all event types** - Your handler should gracefully ignore event types it doesn't recognize, allowing for future expansion.
 
 ## Testing webhooks
 

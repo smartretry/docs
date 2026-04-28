@@ -5,7 +5,7 @@ description: Cancel a specific scheduled payment within a recurring series witho
 
 `POST /v1/payments/recurring/future-transactions/cancel/{terminal_friendly_id}`
 
-Cancels a single upcoming payment within a recurring series. The rest of the billing schedule continues as normal — only the targeted occurrence is skipped. Use this when you need to waive a specific payment, for example to honor a promotional credit or account adjustment.
+Cancels a single upcoming payment within a recurring series. The rest of the billing schedule continues as normal - only the targeted occurrence is skipped. Use this when you need to waive a specific payment, for example to honor a promotional credit or account adjustment.
 
 <Note>
   This cancels only the specified future transaction. To stop all future payments and end the entire series, use the [recurring cancel endpoint](/api-reference/recurring/cancel) instead.

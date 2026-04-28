@@ -1,6 +1,6 @@
 ---
 title: API Overview
-description: Overview of the SmartRetry Terminal API — endpoints, authentication, and request format.
+description: Overview of the SmartRetry Terminal API - endpoints, authentication, and request format.
 ---
 
 The SmartRetry Terminal API is a REST API that lets you initiate payments, manage recurring billing, and monitor transaction health. All requests are scoped to a merchant terminal and authenticated with an API key.
@@ -25,7 +25,7 @@ x-api-key: YOUR_API_KEY
   Keep your API key secret. Never expose it in client-side code, browser requests, or public repositories. If a key is compromised, contact support to rotate it immediately.
 </Warning>
 
-To obtain an API key, contact [SmartRetry](https://www.smartretry.com/contact). Each key is scoped to one or more terminals — requests to terminals your key cannot access return `403 Forbidden`.
+To obtain an API key, contact [SmartRetry](https://www.smartretry.com/contact). Each key is scoped to one or more terminals - requests to terminals your key cannot access return `403 Forbidden`.
 
 ## Request format
 
@@ -103,7 +103,7 @@ You receive your `terminal_friendly_id` when SmartRetry provisions your account.
 
 ## Amount format
 
-The `amount` field uses **major currency units** in standard decimal notation (e.g., `10.00` for $10.00). Always send a number — never an integer representing cents.
+The `amount` field uses **major currency units** in standard decimal notation (e.g., `10.00` for $10.00). Always send a number - never an integer representing cents.
 
 | Currency | Decimal places | Example amount value | Represents |
 |----------|---------------|---------------------|------------|
@@ -114,7 +114,7 @@ The `amount` field uses **major currency units** in standard decimal notation (e
 | KWD | 3 | `1.000` | KD 1.000 |
 
 <Note>
-  Zero-decimal currencies (e.g., JPY, KRW, UGX) have no fractional units — send the whole amount as a number with no decimals (e.g., `1000` = ¥1,000). Three-decimal currencies like KWD use three decimal places (e.g., `1.000` = KD 1.000).
+  Zero-decimal currencies (e.g., JPY, KRW, UGX) have no fractional units - send the whole amount as a number with no decimals (e.g., `1000` = ¥1,000). Three-decimal currencies like KWD use three decimal places (e.g., `1.000` = KD 1.000).
 </Note>
 
 Supported currencies: USD, EUR, GBP, JPY, KWD, CNY, AUD, CAD, CHF, SEK, NOK, DKK, RUB, ILS, INR, BRL, MXN, ZAR, SGD, HKD, NZD, AED, SAR, TRY, PLN, CZK, HUF, THB, PHP, MYR, BGN, RON, IDR, KRW, COP, UAH, VND, QAR, BHD, EGP, MAD, KES, UGX, NGN, OMR, ARS, CLP, JOD, PYG, RWF.
@@ -123,8 +123,8 @@ Supported currencies: USD, EUR, GBP, JPY, KWD, CNY, AUD, CAD, CHF, SEK, NOK, DKK
 
 `merchant_transaction_id` is your own unique identifier for each transaction. Include it on every request.
 
-- **Reconciliation** — use this ID to match SmartRetry transactions back to orders in your system.
-- **Correlation** — log it in your application so you can trace a SmartRetry transaction back to the originating cart, invoice, or subscription event.
+- **Reconciliation** - use this ID to match SmartRetry transactions back to orders in your system.
+- **Correlation** - log it in your application so you can trace a SmartRetry transaction back to the originating cart, invoice, or subscription event.
 
 <Tip>
   Generate a UUID or a stable, order-scoped ID for each transaction so your internal records remain easy to reconcile.
@@ -140,7 +140,7 @@ See [Idempotency](/api-reference/idempotency) for the full behavior, supported m
 
 ## Response format
 
-Successful payment responses include an `accepted` boolean at the top level. Use this field — not only the HTTP status code — to determine whether the transaction was approved.
+Successful payment responses include an `accepted` boolean at the top level. Use this field - not only the HTTP status code - to determine whether the transaction was approved.
 
 ```json
 {
@@ -153,7 +153,7 @@ Successful payment responses include an `accepted` boolean at the top level. Use
 
 A `200 OK` response with `"accepted": false` means the request was valid but the transaction was declined. Handle both cases in your integration.
 
-Errors follow a separate structure — see [Errors](/api-reference/errors).
+Errors follow a separate structure - see [Errors](/api-reference/errors).
 
 ## Health endpoints
 
@@ -174,7 +174,7 @@ These endpoints do not require authentication.
     One-time charges, pre-authorizations, captures, refunds, voids, and transaction status lookups.
   </Card>
   <Card title="Recurring" icon="calendar-check" href="/api-reference/recurring/init">
-    Initialize and manage subscription billing — init, charge, update, cancel, and status.
+    Initialize and manage subscription billing - init, charge, update, cancel, and status.
   </Card>
   <Card title="Future Transactions" icon="clock" href="/api-reference/future-transactions/status">
     View, update, charge, or cancel scheduled future payments within a recurring plan.

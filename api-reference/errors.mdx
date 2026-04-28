@@ -3,7 +3,7 @@ title: Errors
 description: HTTP error codes and reason codes returned by the SmartRetry API.
 ---
 
-The SmartRetry API uses standard HTTP status codes and returns a consistent error body on every failure. Parse the `reason_code` field for programmatic error handling — it identifies the specific failure cause regardless of which endpoint you called.
+The SmartRetry API uses standard HTTP status codes and returns a consistent error body on every failure. Parse the `reason_code` field for programmatic error handling - it identifies the specific failure cause regardless of which endpoint you called.
 
 ## Error response structure
 
@@ -45,13 +45,13 @@ All error responses share this shape:
 
 | Status | Name | When it occurs |
 |--------|------|----------------|
-| `200` | OK | Request succeeded. For payment responses, also check the `accepted` field — a `200` with `"accepted": false` means the transaction was declined. |
+| `200` | OK | Request succeeded. For payment responses, also check the `accepted` field - a `200` with `"accepted": false` means the transaction was declined. |
 | `400` | Bad Request | The request body or parameters failed validation. A required field is missing, a value is the wrong type, or a parameter is out of range. |
 | `401` | Unauthorized | The `x-api-key` header is missing or the key is invalid. |
 | `403` | Forbidden | The API key is valid but does not have access to the requested terminal. |
 | `404` | Not Found | The transaction, recurring plan, or terminal ID does not exist. |
 | `409` | Conflict | The request conflicts with existing state. For idempotency, this happens when the same `Idempotency-Key` is reused with a different request body. |
-| `422` | Unprocessable Entity | The request is structurally valid but was rejected by business logic — for example, attempting to capture an already-captured pre-auth. |
+| `422` | Unprocessable Entity | The request is structurally valid but was rejected by business logic - for example, attempting to capture an already-captured pre-auth. |
 | `429` | Too Many Requests | Your integration has exceeded the rate limit. Back off and retry after the period indicated in the `Retry-After` response header. |
 | `503` | Service Unavailable | The API could not complete the request right now. For idempotency, this can happen when another request with the same key is still in flight and the replay wait timed out. |
 | `500` | Internal Server Error | An unexpected error occurred on the SmartRetry side. If this persists, check [status.smartretry.com](https://status.smartretry.com) and contact support. |
@@ -164,20 +164,20 @@ All error responses share this shape:
 
 **Retryable errors**
 
-- `500 Internal Server Error` — retry with exponential backoff. Check [status.smartretry.com](https://status.smartretry.com) if errors persist beyond a few minutes.
-- `429 Too Many Requests` — wait for the number of seconds in the `Retry-After` response header before retrying. Do not retry immediately.
-- `503 Service Unavailable` — if the reason code is `RESOURCE_LOCKED`, retry the same POST request shortly with the same `Idempotency-Key`.
+- `500 Internal Server Error` - retry with exponential backoff. Check [status.smartretry.com](https://status.smartretry.com) if errors persist beyond a few minutes.
+- `429 Too Many Requests` - wait for the number of seconds in the `Retry-After` response header before retrying. Do not retry immediately.
+- `503 Service Unavailable` - if the reason code is `RESOURCE_LOCKED`, retry the same POST request shortly with the same `Idempotency-Key`.
 
 **Non-retryable errors**
 
-- `400 Bad Request` — fix the request before retrying. Check the `context.field` value to identify which field is invalid.
-- `401 Unauthorized` — verify your API key is correct and present in the `x-api-key` header.
-- `403 Forbidden` — the key is valid but not authorized for this terminal. Check you are using the right `terminal_friendly_id`.
-- `409 Conflict` — if the reason code is `IDEMPOTENCY_CONFLICT`, do not retry with the same key and a different body. Generate a new `Idempotency-Key` for a new operation.
+- `400 Bad Request` - fix the request before retrying. Check the `context.field` value to identify which field is invalid.
+- `401 Unauthorized` - verify your API key is correct and present in the `x-api-key` header.
+- `403 Forbidden` - the key is valid but not authorized for this terminal. Check you are using the right `terminal_friendly_id`.
+- `409 Conflict` - if the reason code is `IDEMPOTENCY_CONFLICT`, do not retry with the same key and a different body. Generate a new `Idempotency-Key` for a new operation.
 
 **Declined transactions**
 
-A declined transaction returns `200 OK` with `"accepted": false` in the response body — this is not an error response. Do not confuse payment declines with API errors. Log the transaction status and handle the decline according to your retry strategy.
+A declined transaction returns `200 OK` with `"accepted": false` in the response body - this is not an error response. Do not confuse payment declines with API errors. Log the transaction status and handle the decline according to your retry strategy.
 
 <Tip>
   Log the full error response body for every non-`2xx` status, including `instance` when present. This makes it significantly faster to diagnose issues with SmartRetry support.

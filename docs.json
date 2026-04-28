@@ -1,7 +1,8 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "luma",
-  "name": "SmartRetry",
+  "name": "SmartRetry Documentation",
+  "description": "Official SmartRetry API documentation. Integrate intelligent retry and multi-acquirer routing to recover declined payments.",
   "colors": {
     "primary": "#fc34a4",
     "light": "#f094d4"

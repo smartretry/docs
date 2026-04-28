@@ -154,7 +154,7 @@ console.log(data);
     </ResponseField>
 
     <ResponseField name="reasonCode" type="string" required>
-      A machine-readable code in `{domain}.{reason}` format (e.g., `AUTH.APPROVED`, `RISK.DECLINED`). Always present — use this to build targeted retry logic or surface specific error messages.
+      A machine-readable code in `{domain}.{reason}` format (e.g., `AUTH.APPROVED`, `RISK.DECLINED`). Always present - use this to build targeted retry logic or surface specific error messages.
     </ResponseField>
 
     <ResponseField name="name" type="string">
@@ -328,5 +328,5 @@ The `status.domain` field identifies which system was responsible for the status
 | `PAYER_ACCOUNT` | The issue is related to the payer's account (e.g., card expired, account closed). |
 
 <Tip>
-  Use `status.domain` alongside `status.reasonCode` to build targeted retry logic or to surface the right error message to your customers — for example, prompting a payer to update their card details when `domain` is `PAYER_ACCOUNT`.
+  Use `status.domain` alongside `status.reasonCode` to build targeted retry logic or to surface the right error message to your customers - for example, prompting a payer to update their card details when `domain` is `PAYER_ACCOUNT`.
 </Tip>

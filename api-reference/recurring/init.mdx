@@ -5,7 +5,7 @@ description: Create a new recurring billing agreement and process the first paym
 
 `POST /v1/payments/recurring/init/{terminal_friendly_id}`
 
-Initializing a recurring agreement creates a billing series and processes the first payment. SmartRetry returns a `recurring_id` that identifies the series for all subsequent operations — store it alongside your subscription record.
+Initializing a recurring agreement creates a billing series and processes the first payment. SmartRetry returns a `recurring_id` that identifies the series for all subsequent operations - store it alongside your subscription record.
 
 <Warning>
   Once a recurring series is cancelled, it cannot be reactivated. Create a new agreement if you need to resume billing.
@@ -148,9 +148,9 @@ console.log(data);
     <ParamField body="managed_by" type="string" required>
       Who controls the billing schedule. One of `merchant`, `our_platform`, or `payment_provider`.
 
-      - `merchant` — you trigger each charge manually via the [charge endpoint](/api-reference/recurring/charge).
-      - `our_platform` — SmartRetry schedules and executes charges automatically.
-      - `payment_provider` — the underlying payment provider manages the schedule.
+      - `merchant` - you trigger each charge manually via the [charge endpoint](/api-reference/recurring/charge).
+      - `our_platform` - SmartRetry schedules and executes charges automatically.
+      - `payment_provider` - the underlying payment provider manages the schedule.
     </ParamField>
 
     <ParamField body="first_payment_date" type="string">
@@ -216,7 +216,7 @@ console.log(data);
 </ParamField>
 
 <ParamField body="payer_fingerprint" type="string">
-  An 88-character stored payer fingerprint. Mutually exclusive with `payer` — provide one or the other, not both.
+  An 88-character stored payer fingerprint. Mutually exclusive with `payer` - provide one or the other, not both.
 </ParamField>
 
 <ParamField body="token" type="string">
@@ -238,7 +238,7 @@ console.log(data);
 </ResponseField>
 
 <ResponseField name="recurring_id" type="string">
-  Unique identifier for the recurring series (8 characters). Store this value — you need it for all subsequent recurring operations.
+  Unique identifier for the recurring series (8 characters). Store this value - you need it for all subsequent recurring operations.
 </ResponseField>
 
 <ResponseField name="accepted" type="boolean">

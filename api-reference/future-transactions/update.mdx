@@ -5,7 +5,7 @@ description: Override the amount or reschedule a specific upcoming payment withi
 
 `PUT /v1/payments/recurring/future-transactions/update/{terminal_friendly_id}`
 
-Updates a single future transaction within a recurring series. You can override the charge amount for that specific occurrence, reschedule it to a different date, or both. Changes apply only to the targeted transaction — the rest of the series schedule is unaffected.
+Updates a single future transaction within a recurring series. You can override the charge amount for that specific occurrence, reschedule it to a different date, or both. Changes apply only to the targeted transaction - the rest of the series schedule is unaffected.
 
 <Note>
   To change the default amount or schedule for all future payments in a series, use the [recurring update endpoint](/api-reference/recurring/update) instead.
@@ -91,7 +91,7 @@ console.log(data);
 </ParamField>
 
 <ParamField body="scheduled_date" type="string">
-  Reschedule this occurrence to a new date in `YYYY-MM-DD` format. Must be a future date. Does not shift subsequent payments — only this specific occurrence is moved.
+  Reschedule this occurrence to a new date in `YYYY-MM-DD` format. Must be a future date. Does not shift subsequent payments - only this specific occurrence is moved.
 </ParamField>
 
 ## Response

@@ -3,7 +3,7 @@ title: Recurring Payments
 description: How recurring and subscription payments work in SmartRetry.
 ---
 
-SmartRetry includes dedicated support for recurring payments — covering the full lifecycle from the initial credential capture through ongoing scheduled charges. SmartRetry applies specialized retry logic to recurring transactions, making it particularly effective at reducing involuntary churn caused by failed subscription renewals.
+SmartRetry includes dedicated support for recurring payments - covering the full lifecycle from the initial credential capture through ongoing scheduled charges. SmartRetry applies specialized retry logic to recurring transactions, making it particularly effective at reducing involuntary churn caused by failed subscription renewals.
 
 ## Overview
 
@@ -15,7 +15,7 @@ SmartRetry supports three modes for managing who schedules and triggers each cha
 
 <Tabs>
   <Tab title="Merchant-managed">
-    You control the schedule entirely. SmartRetry does not trigger charges automatically — you call the API for each charge when your own billing system determines one is due.
+    You control the schedule entirely. SmartRetry does not trigger charges automatically - you call the API for each charge when your own billing system determines one is due.
 
     **How it works:**
     - You initiate a `recurring_init` to store credentials.
@@ -35,7 +35,7 @@ SmartRetry supports three modes for managing who schedules and triggers each cha
     **Best for:** Subscription businesses that want hands-off recurring billing with built-in recovery on every renewal attempt.
 
     <Tip>
-      Platform-managed recurring is the recommended mode for subscription businesses. Every renewal attempt automatically benefits from SmartRetry's full recovery logic — including retry scheduling, acquirer routing, and 3DS optimization — without any additional integration work.
+      Platform-managed recurring is the recommended mode for subscription businesses. Every renewal attempt automatically benefits from SmartRetry's full recovery logic - including retry scheduling, acquirer routing, and 3DS optimization - without any additional integration work.
     </Tip>
   </Tab>
   <Tab title="Provider-managed">

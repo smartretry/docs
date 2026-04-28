@@ -3,7 +3,7 @@ title: Transaction Types
 description: Understanding the payment transaction types supported by SmartRetry.
 ---
 
-SmartRetry supports the full range of payment transaction types. Understanding which type to use — and how they relate to each other — ensures your integration behaves as expected and that SmartRetry applies the right recovery logic when a transaction fails.
+SmartRetry supports the full range of payment transaction types. Understanding which type to use - and how they relate to each other - ensures your integration behaves as expected and that SmartRetry applies the right recovery logic when a transaction fails.
 
 ## Quick reference
 
@@ -40,13 +40,13 @@ Recurring Init
 
     **Use for:** Standard one-time purchases where the final amount is known at the time of checkout.
 
-    **SmartRetry behavior:** If a sale is declined, SmartRetry analyzes the decline code and applies the appropriate recovery strategy — adjusting routing, authentication, or card parameters before retrying.
+    **SmartRetry behavior:** If a sale is declined, SmartRetry analyzes the decline code and applies the appropriate recovery strategy - adjusting routing, authentication, or card parameters before retrying.
   </Accordion>
 
   <Accordion title="Pre-auth">
     A pre-authorization places a hold on funds in the payer's account without capturing them. The hold reserves the amount but does not complete the transfer.
 
-    **Use for:** Scenarios where the final charge amount may differ from the initial authorization — such as hotels, car rentals, or orders with variable fulfillment costs.
+    **Use for:** Scenarios where the final charge amount may differ from the initial authorization - such as hotels, car rentals, or orders with variable fulfillment costs.
 
     **SmartRetry behavior:** SmartRetry can recover failed pre-auth attempts using the same optimization strategies applied to sales.
 
@@ -76,7 +76,7 @@ Recurring Init
   </Accordion>
 
   <Accordion title="Void">
-    A void cancels an authorized or pending transaction before it settles. Unlike a refund, no funds are moved — the authorization hold is simply released.
+    A void cancels an authorized or pending transaction before it settles. Unlike a refund, no funds are moved - the authorization hold is simply released.
 
     **Use for:** Cancelling an order or pre-auth before the capture step, or reversing a sale that has not yet settled.
 
@@ -96,7 +96,7 @@ Recurring Init
 
     **Use for:** Subscription renewals, scheduled installments, and any automated charge following a successful recurring init.
 
-    **SmartRetry behavior:** SmartRetry applies dedicated retry logic for recurring charges — adjusting timing, acquirer routing, and authentication behavior to minimize involuntary churn on renewals.
+    **SmartRetry behavior:** SmartRetry applies dedicated retry logic for recurring charges - adjusting timing, acquirer routing, and authentication behavior to minimize involuntary churn on renewals.
 
     <Tip>
       Recurring transactions have some of the highest recovery rates in SmartRetry, since the underlying card is often valid and the decline is temporary.

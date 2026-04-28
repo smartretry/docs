@@ -11,7 +11,7 @@ To get sandbox credentials, contact SmartRetry or request access through your ac
 
 ## Authenticating in the sandbox
 
-Authentication works the same way as production — pass your API key in the `x-api-key` header. Your sandbox key is separate from your production key; make sure you are using the correct one for each environment.
+Authentication works the same way as production - pass your API key in the `x-api-key` header. Your sandbox key is separate from your production key; make sure you are using the correct one for each environment.
 
 ```bash
 x-api-key: YOUR_SANDBOX_API_KEY
@@ -41,7 +41,7 @@ The sandbox replicates the full production flow. Use it to verify:
 </CardGroup>
 
 <Tip>
-  Test both success paths and failure paths. Simulate declines to confirm your integration handles retry events, error codes, and fallback flows correctly — not just happy-path approvals.
+  Test both success paths and failure paths. Simulate declines to confirm your integration handles retry events, error codes, and fallback flows correctly - not just happy-path approvals.
 </Tip>
 
 ## Verifying your integration
@@ -62,7 +62,7 @@ Once you have validated your integration in the sandbox, follow these steps to g
     Replace your sandbox `terminal_friendly_id` with your production terminal ID in all endpoint URLs.
   </Step>
   <Step title="Point to the production base URL">
-    Confirm all requests go to `https://api.smartretry.com`. The sandbox and production environments share the same base URL — the API key and terminal ID determine which environment you are targeting.
+    Confirm all requests go to `https://api.smartretry.com`. The sandbox and production environments share the same base URL - the API key and terminal ID determine which environment you are targeting.
   </Step>
   <Step title="Run a live test transaction">
     Process a low-value real transaction to confirm end-to-end connectivity before enabling full traffic.
