@@ -3,7 +3,7 @@
   "projectName": "SmartRetry",
   "projectDescription": "An intelligent payment optimization engine that automatically recovers declined transactions by analyzing decline reasons and rerouting through the best acquirer, 3DS configuration, and card parameters.",
   "theme": "luma",
-  "primaryColor": "#fc34a4",
+  "primaryColor": "#fc34a4", 
   "lightColor": "#f094d4",
   "darkColor": null,
   "navigation": {
