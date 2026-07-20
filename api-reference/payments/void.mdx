@@ -17,7 +17,7 @@ A void cancels a pre-authorization and releases the hold on the customer's funds
 
 ```bash cURL
 curl --request POST \
-  --url https://api.smartretry.com/v1/payments/void/ABC123 \
+  --url https://terminal.smartretry.com/v1/payments/void/ABC123 \
   --header 'x-api-key: YOUR_API_KEY' \
   --header 'Content-Type: application/json' \
   --header 'Idempotency-Key: void-20260331-001' \
@@ -31,7 +31,7 @@ curl --request POST \
 import requests
 
 response = requests.post(
-    "https://api.smartretry.com/v1/payments/void/ABC123",
+    "https://terminal.smartretry.com/v1/payments/void/ABC123",
     headers={
         "x-api-key": "YOUR_API_KEY",
         "Content-Type": "application/json",
@@ -48,7 +48,7 @@ print(response.json())
 
 ```javascript Node.js
 const response = await fetch(
-  "https://api.smartretry.com/v1/payments/void/ABC123",
+  "https://terminal.smartretry.com/v1/payments/void/ABC123",
   {
     method: "POST",
     headers: {
@@ -81,7 +81,7 @@ console.log(data);
 
 ```json 400
 {
-  "type": "https://api.smartretry.com/errors/validation",
+  "type": "https://terminal.smartretry.com/errors/validation",
   "title": "Bad Request",
   "status": 400,
   "detail": "transaction has already been captured and cannot be voided",
@@ -113,8 +113,12 @@ console.log(data);
   SmartRetry's unique identifier for this void transaction. Exactly 8 characters.
 </ResponseField>
 
-<ResponseField name="order_id" type="string" required>
+<ResponseField name="order_id" type="string">
   The order identifier, matching the `order_id` from the original pre-authorization.
+</ResponseField>
+
+<ResponseField name="merchant_order_id" type="string">
+  The `merchant_order_id` associated with the order, when present.
 </ResponseField>
 
 <ResponseField name="accepted" type="boolean" required>

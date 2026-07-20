@@ -15,7 +15,7 @@ Updates configuration for an active recurring series. You can change the billing
 
 ```bash cURL
 curl --request PUT \
-  --url https://api.smartretry.com/v1/payments/recurring/update/ABC123 \
+  --url https://terminal.smartretry.com/v1/payments/recurring/update/ABC123 \
   --header 'Content-Type: application/json' \
   --header 'x-api-key: YOUR_API_KEY' \
   --data '{
@@ -29,7 +29,7 @@ curl --request PUT \
 import requests
 
 response = requests.put(
-    "https://api.smartretry.com/v1/payments/recurring/update/ABC123",
+    "https://terminal.smartretry.com/v1/payments/recurring/update/ABC123",
     headers={
         "Content-Type": "application/json",
         "x-api-key": "YOUR_API_KEY"
@@ -46,7 +46,7 @@ print(response.json())
 
 ```javascript Node.js
 const response = await fetch(
-  "https://api.smartretry.com/v1/payments/recurring/update/ABC123",
+  "https://terminal.smartretry.com/v1/payments/recurring/update/ABC123",
   {
     method: "PUT",
     headers: {
@@ -105,14 +105,14 @@ console.log(data);
   The identifier of the updated recurring series (8 characters).
 </ResponseField>
 
-<ResponseField name="accepted" type="boolean">
+<ResponseField name="updated" type="boolean">
   `true` if the update was applied successfully.
 </ResponseField>
 
 ```json Example response
 {
   "recurring_id": "RC9F4A2B",
-  "accepted": true
+  "updated": true
 }
 ```
 
