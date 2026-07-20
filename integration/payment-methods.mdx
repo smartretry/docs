@@ -52,16 +52,13 @@ When using `cards`, include the card details in `payment_instrument`:
 
 ## Token-based payments
 
-After a successful transaction, SmartRetry returns an 88-character `token` in the response. You can store this token and use it in place of raw card data for future charges from the same customer.
+For a tokenized payment, send the 88-character SmartRetry `token` at the top level of the sale or pre-authorization request. A normal successful payment response does not return a token. Retrieve a stored payment-instrument token from the [transaction status response](/api-reference/payments/status) when available.
 
-Pass the token in the `payment_instrument` object:
+Pass the token at the top level:
 
 ```json
 {
-  "payment_instrument": {
-    "payment_method": "cards",
-    "token": "a8f3k2m9xqv1p7r4t6y8u2i5o9e3w1q0a8f3k2m9xqv1p7r4t6y8u2i5o9e3w1q0a8f3k2m9x"
-  }
+  "token": "a8f3k2m9xqv1p7r4t6y8u2i5o9e3w1q0a8f3k2m9xqv1p7r4t6y8u2i5o9e3w1q0a8f3k2m9x"
 }
 ```
 

@@ -9,7 +9,7 @@ Fetch the full details and current status of any transaction by its `transaction
 
 ```bash cURL
 curl --request GET \
-  --url https://api.smartretry.com/v1/payments/status/ABC123/TX8A3F2C \
+  --url https://terminal.smartretry.com/v1/payments/status/ABC123/TX8A3F2C \
   --header 'x-api-key: YOUR_API_KEY'
 ```
 
@@ -17,7 +17,7 @@ curl --request GET \
 import requests
 
 response = requests.get(
-    "https://api.smartretry.com/v1/payments/status/ABC123/TX8A3F2C",
+    "https://terminal.smartretry.com/v1/payments/status/ABC123/TX8A3F2C",
     headers={"x-api-key": "YOUR_API_KEY"}
 )
 
@@ -26,7 +26,7 @@ print(response.json())
 
 ```javascript Node.js
 const response = await fetch(
-  "https://api.smartretry.com/v1/payments/status/ABC123/TX8A3F2C",
+  "https://terminal.smartretry.com/v1/payments/status/ABC123/TX8A3F2C",
   {
     method: "GET",
     headers: {
@@ -56,10 +56,10 @@ console.log(data);
   "updated_at": "2026-03-31T14:22:13Z",
   "status": {
     "status": "APPROVED",
-    "reasonCode": "AUTH.APPROVED",
-    "name": "Approved",
-    "description": "The transaction was approved by the issuer.",
-    "domain": "AUTH"
+    "reasonCode": "SYSTEM.SUCCESSFUL",
+    "name": "Successful",
+    "description": "The transaction completed successfully.",
+    "domain": "SYSTEM"
   },
   "order": {
     "order_id": "OR7B9E1D",
@@ -87,11 +87,11 @@ console.log(data);
 
 ```json 400
 {
-  "type": "https://api.smartretry.com/errors/validation",
+  "type": "https://terminal.smartretry.com/errors/validation",
   "title": "Bad Request",
   "status": 400,
   "detail": "transaction_id not found",
-  "reason_code": "TRANSACTION_NOT_FOUND"
+  "reason_code": "VALIDATION/TRANSACTION_NOT_FOUND"
 }
 ```
 
@@ -117,11 +117,11 @@ console.log(data);
   The transaction type. One of: `sale`, `preauth`, `capture`, `refund`, `void`, `recurring_init`, `recurring`, `payout`.
 </ResponseField>
 
-<ResponseField name="amount" type="number" required>
+<ResponseField name="amount" type="integer">
   Transaction amount in major currency units (e.g., `49.99`).
 </ResponseField>
 
-<ResponseField name="currency" type="string" required>
+<ResponseField name="currency" type="string">
   Three-letter [ISO 4217](https://en.wikipedia.org/wiki/ISO_4217) currency code.
 </ResponseField>
 
@@ -149,15 +149,15 @@ console.log(data);
   The current status of the transaction.
 
   <Expandable title="properties" defaultOpen={true}>
-    <ResponseField name="status" type="string" required>
+    <ResponseField name="status" type="string">
       The high-level status code. See [Status values](#status-values) below.
     </ResponseField>
 
     <ResponseField name="reasonCode" type="string" required>
-      A machine-readable code in `{domain}.{reason}` format (e.g., `AUTH.APPROVED`, `RISK.DECLINED`). Always present - use this to build targeted retry logic or surface specific error messages.
+      A machine-readable code in `{domain}.{reason}` format (e.g., `SYSTEM.SUCCESSFUL`, `RISK.DECLINED`). Always present - use this to build targeted retry logic or surface specific error messages.
     </ResponseField>
 
-    <ResponseField name="name" type="string">
+    <ResponseField name="name" type="string" required>
       A short, human-readable name for the current status (e.g., `"Approved"`, `"Insufficient Funds"`).
     </ResponseField>
 

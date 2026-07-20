@@ -19,7 +19,7 @@ Cancels a single upcoming payment within a recurring series. The rest of the bil
 
 ```bash cURL
 curl --request POST \
-  --url https://api.smartretry.com/v1/payments/recurring/future-transactions/cancel/ABC123 \
+  --url https://terminal.smartretry.com/v1/payments/recurring/future-transactions/cancel/ABC123 \
   --header 'Content-Type: application/json' \
   --header 'x-api-key: YOUR_API_KEY' \
   --header 'Idempotency-Key: future-cancel-20260401-001' \
@@ -33,7 +33,7 @@ curl --request POST \
 import requests
 
 response = requests.post(
-    "https://api.smartretry.com/v1/payments/recurring/future-transactions/cancel/ABC123",
+    "https://terminal.smartretry.com/v1/payments/recurring/future-transactions/cancel/ABC123",
     headers={
         "Content-Type": "application/json",
         "x-api-key": "YOUR_API_KEY",
@@ -50,7 +50,7 @@ print(response.json())
 
 ```javascript Node.js
 const response = await fetch(
-  "https://api.smartretry.com/v1/payments/recurring/future-transactions/cancel/ABC123",
+  "https://terminal.smartretry.com/v1/payments/recurring/future-transactions/cancel/ABC123",
   {
     method: "POST",
     headers: {
@@ -89,18 +89,23 @@ console.log(data);
 
 ## Response
 
+<ResponseField name="recurring_id" type="string">
+  The identifier of the recurring series (8 characters).
+</ResponseField>
+
 <ResponseField name="future_transaction_id" type="string">
   The identifier of the cancelled future transaction (8 characters).
 </ResponseField>
 
-<ResponseField name="accepted" type="boolean">
+<ResponseField name="cancelled" type="boolean">
   `true` if the cancellation was accepted and the transaction has been marked as cancelled.
 </ResponseField>
 
 ```json Example response
 {
+  "recurring_id": "RC9F4A2B",
   "future_transaction_id": "FT3D8E1C",
-  "accepted": true
+  "cancelled": true
 }
 ```
 

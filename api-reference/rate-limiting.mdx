@@ -38,7 +38,7 @@ When you exceed the rate limit, SmartRetry returns a `429 Too Many Requests` res
 
 ```json
 {
-  "type": "https://api.smartretry.com/errors/rate-limit",
+  "type": "https://terminal.smartretry.com/errors/rate-limit",
   "title": "Too Many Requests",
   "status": 429,
   "detail": "Rate limit exceeded. Retry after 1 second.",
@@ -104,7 +104,7 @@ def make_request_with_backoff(url, headers, json_data, max_retries=5):
 
 # Example usage
 response = make_request_with_backoff(
-    "https://api.smartretry.com/v1/payments/sale/ABC123",
+    "https://terminal.smartretry.com/v1/payments/sale/ABC123",
     headers={
         "x-api-key": "YOUR_API_KEY",
         "Content-Type": "application/json",
@@ -167,7 +167,7 @@ async function makeRequestWithBackoff(url, options, maxRetries = 5) {
 
 // Example usage
 const response = await makeRequestWithBackoff(
-  "https://api.smartretry.com/v1/payments/sale/ABC123",
+  "https://terminal.smartretry.com/v1/payments/sale/ABC123",
   {
     method: "POST",
     headers: {
@@ -177,7 +177,7 @@ const response = await makeRequestWithBackoff(
     },
     body: JSON.stringify({
       amount: 49.99,
-      currency: "USD"
+      currency: "USD",
       // ... other fields
     })
   }

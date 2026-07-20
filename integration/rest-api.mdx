@@ -8,7 +8,7 @@ The SmartRetry REST API accepts JSON over HTTPS. All requests are scoped to a te
 ## Base URL
 
 ```
-https://api.smartretry.com
+https://terminal.smartretry.com
 ```
 
 ## Authentication
@@ -71,7 +71,7 @@ All payment endpoints include the `terminal_friendly_id` as a path parameter at 
 
 ```bash cURL
 curl --request POST \
-  --url https://api.smartretry.com/v1/payments/sale/TERM01 \
+  --url https://terminal.smartretry.com/v1/payments/sale/TERM01 \
   --header 'Content-Type: application/json' \
   --header 'x-api-key: YOUR_API_KEY' \
   --header 'Idempotency-Key: sale-order-a1b2c3d4-e5f6-7890-abcd-ef1234567890' \
@@ -79,23 +79,24 @@ curl --request POST \
     "merchant_transaction_id": "txn-a1b2c3d4-e5f6-7890-abcd-ef1234567890",
     "amount": 49.99,
     "currency": "USD",
-    "payment_instrument": {
-      "card_number": "4111111111111111",
-      "expiry_month": 12,
-      "expiry_year": 2027,
-      "payment_method": "cards"
-    },
-    "cvv": "123",
-    "payer": {
-      "first_name": "Jane",
-      "last_name": "Smith",
-      "email": "jane.smith@example.com"
+    "order": {
+      "payment_instrument": {
+        "card_number": "4111111111111111",
+        "expiry_month": 12,
+        "expiry_year": 2027,
+        "payment_method": "cards"
+      },
+      "payer": {
+        "first_name": "Jane",
+        "last_name": "Smith",
+        "email": "jane.smith@example.com"
+      }
     }
   }'
 ```
 
 ```javascript Node.js
-const response = await fetch('https://api.smartretry.com/v1/payments/sale/TERM01', {
+const response = await fetch('https://terminal.smartretry.com/v1/payments/sale/TERM01', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -106,17 +107,18 @@ const response = await fetch('https://api.smartretry.com/v1/payments/sale/TERM01
     merchant_transaction_id: 'txn-a1b2c3d4-e5f6-7890-abcd-ef1234567890',
     amount: 49.99,
     currency: 'USD',
-    payment_instrument: {
-      card_number: '4111111111111111',
-      expiry_month: 12,
-      expiry_year: 2027,
-      payment_method: 'cards',
-    },
-    cvv: '123',
-    payer: {
-      first_name: 'Jane',
-      last_name: 'Smith',
-      email: 'jane.smith@example.com',
+    order: {
+      payment_instrument: {
+        card_number: '4111111111111111',
+        expiry_month: 12,
+        expiry_year: 2027,
+        payment_method: 'cards',
+      },
+      payer: {
+        first_name: 'Jane',
+        last_name: 'Smith',
+        email: 'jane.smith@example.com',
+      },
     },
   }),
 });
@@ -128,7 +130,7 @@ const data = await response.json();
 import requests
 
 response = requests.post(
-    'https://api.smartretry.com/v1/payments/sale/TERM01',
+    'https://terminal.smartretry.com/v1/payments/sale/TERM01',
     headers={
         'Content-Type': 'application/json',
         'x-api-key': 'YOUR_API_KEY',
@@ -138,17 +140,18 @@ response = requests.post(
         'merchant_transaction_id': 'txn-a1b2c3d4-e5f6-7890-abcd-ef1234567890',
         'amount': 49.99,
         'currency': 'USD',
-        'payment_instrument': {
-            'card_number': '4111111111111111',
-            'expiry_month': 12,
-            'expiry_year': 2027,
-            'payment_method': 'cards',
-        },
-        'cvv': '123',
-        'payer': {
-            'first_name': 'Jane',
-            'last_name': 'Smith',
-            'email': 'jane.smith@example.com',
+        'order': {
+            'payment_instrument': {
+                'card_number': '4111111111111111',
+                'expiry_month': 12,
+                'expiry_year': 2027,
+                'payment_method': 'cards',
+            },
+            'payer': {
+                'first_name': 'Jane',
+                'last_name': 'Smith',
+                'email': 'jane.smith@example.com',
+            },
         },
     },
 )
@@ -179,11 +182,11 @@ When a request fails, SmartRetry returns a JSON error object using the [RFC 7807
 
 ```json
 {
-  "type": "https://api.smartretry.com/errors/invalid-request",
+  "type": "https://terminal.smartretry.com/errors/invalid-request",
   "title": "Invalid request",
   "status": 400,
   "detail": "The field 'amount' must be a positive number in major currency units.",
-  "reason_code": "INVALID_AMOUNT"
+  "reason_code": "VALIDATION/INVALID_AMOUNT"
 }
 ```
 
