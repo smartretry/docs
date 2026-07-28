@@ -19,7 +19,7 @@ Triggers an immediate charge against an existing recurring series. Use this endp
 
 ```bash cURL
 curl --request POST \
-  --url https://api.smartretry.com/v1/payments/recurring/charge/ABC123 \
+  --url https://terminal.smartretry.com/v1/payments/recurring/charge/ABC123 \
   --header 'Content-Type: application/json' \
   --header 'x-api-key: YOUR_API_KEY' \
   --header 'Idempotency-Key: recurring-charge-20260401-001' \
@@ -34,7 +34,7 @@ curl --request POST \
 import requests
 
 response = requests.post(
-    "https://api.smartretry.com/v1/payments/recurring/charge/ABC123",
+    "https://terminal.smartretry.com/v1/payments/recurring/charge/ABC123",
     headers={
         "Content-Type": "application/json",
         "x-api-key": "YOUR_API_KEY",
@@ -52,7 +52,7 @@ print(response.json())
 
 ```javascript Node.js
 const response = await fetch(
-  "https://api.smartretry.com/v1/payments/recurring/charge/ABC123",
+  "https://terminal.smartretry.com/v1/payments/recurring/charge/ABC123",
   {
     method: "POST",
     headers: {
@@ -94,10 +94,6 @@ console.log(data);
   Override the default series currency for this charge only. Must be a valid ISO 4217 code. If omitted, the currency set during initialization is used.
 </ParamField>
 
-<ParamField body="cvv" type="string">
-  Card verification value for this charge. Optional, but may be required depending on your terminal configuration.
-</ParamField>
-
 ## Response
 
 <ResponseField name="transaction_id" type="string">
@@ -108,6 +104,10 @@ console.log(data);
   Order identifier for this transaction (8 characters).
 </ResponseField>
 
+<ResponseField name="recurring_id" type="string" required>
+  The identifier of the recurring series that was charged (8 characters).
+</ResponseField>
+
 <ResponseField name="accepted" type="boolean">
   `true` if the charge was authorized. `false` if the transaction was declined. Always check this field - a `200` status does not guarantee the payment succeeded.
 </ResponseField>
@@ -116,6 +116,7 @@ console.log(data);
 {
   "transaction_id": "TX8A3F2C",
   "order_id": "OR7B9E1D",
+  "recurring_id": "RC9F4A2B",
   "accepted": true
 }
 ```

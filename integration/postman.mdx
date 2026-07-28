@@ -8,10 +8,10 @@ Use our Postman collection to explore the SmartRetry API without writing code. T
 ## Download the collection
 
 <CardGroup cols={2}>
-  <Card title="Postman Collection" icon="download" href="https://www.postman.com/smartretry/workspace/smartretry-api">
+  <Card title="Postman Collection" icon="download" href="https://www.postman.com/smartretry-7733732/smartretry-api">
     Open in Postman workspace or download the collection JSON.
   </Card>
-  <Card title="Environment Template" icon="gear" href="https://www.postman.com/smartretry/workspace/smartretry-api">
+  <Card title="Environment Template" icon="gear" href="https://www.postman.com/smartretry-7733732/smartretry-api">
     Pre-configured environment with sandbox and production variables.
   </Card>
 </CardGroup>
@@ -29,7 +29,7 @@ Use our Postman collection to explore the SmartRetry API without writing code. T
 
   | Variable | Description | Example |
   |----------|-------------|---------|
-  | `base_url` | API base URL | `https://api.smartretry.com` |
+  | `base_url` | API base URL | `https://terminal.smartretry.com` |
   | `api_key` | Your API key | `sk_test_...` |
   | `terminal_id` | Your terminal ID | `ABC123` |
 
@@ -77,7 +77,7 @@ The collection uses variables for easy switching between sandbox and production:
 
 | Variable | Sandbox | Production |
 |----------|---------|------------|
-| `base_url` | `https://api.smartretry.com` | `https://api.smartretry.com` |
+| `base_url` | `https://terminal.smartretry.com` | `https://terminal.smartretry.com` |
 | `api_key` | `sk_test_...` | `sk_live_...` |
 | `terminal_id` | Your sandbox terminal | Your production terminal |
 
@@ -137,13 +137,13 @@ The collection supports request chaining for multi-step flows:
 Import directly from URL in Postman:
 
 ```
-https://api.smartretry.com/postman/collection.json
+https://terminal.smartretry.com/postman/collection.json
 ```
 
 Or use the Postman CLI:
 
 ```bash
-postman collection run https://api.smartretry.com/postman/collection.json \
+postman collection run https://terminal.smartretry.com/postman/collection.json \
   --environment your-environment.json
 ```
 
@@ -154,7 +154,7 @@ Prefer Insomnia? Import the same collection:
 1. Open Insomnia
 2. Go to **Application > Preferences > Data**
 3. Click **Import Data > From URL**
-4. Enter: `https://api.smartretry.com/postman/collection.json`
+4. Enter: `https://terminal.smartretry.com/postman/collection.json`
 
 <Tip>
   The collection is regularly updated when new endpoints are added. Re-import periodically to get the latest requests.

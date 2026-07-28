@@ -25,7 +25,7 @@ You might use separate terminals for:
 The `terminal_friendly_id` is a path parameter on every payment endpoint. Replace `{terminal_friendly_id}` in the URL with your 6-character ID.
 
 ```
-POST https://api.smartretry.com/v1/payments/sale/{terminal_friendly_id}
+POST https://terminal.smartretry.com/v1/payments/sale/{terminal_friendly_id}
 ```
 
 ### Example
@@ -34,23 +34,25 @@ If your terminal ID is `TERM01`, your sale endpoint is:
 
 ```bash
 curl --request POST \
-  --url https://api.smartretry.com/v1/payments/sale/TERM01 \
+  --url https://terminal.smartretry.com/v1/payments/sale/TERM01 \
   --header 'Content-Type: application/json' \
   --header 'x-api-key: YOUR_API_KEY' \
   --data '{
     "merchant_transaction_id": "txn-a1b2c3d4-e5f6-7890-abcd-ef1234567890",
     "amount": 2500,
     "currency": "EUR",
-    "payment_instrument": {
-      "card_number": "5500005555555559",
-      "expiry_month": 8,
-      "expiry_year": 2026,
-      "payment_method": "cards"
-    },
-    "payer": {
-      "first_name": "Carlos",
-      "last_name": "Mendez",
-      "email": "carlos.mendez@example.com"
+    "order": {
+      "payment_instrument": {
+        "card_number": "5500005555555559",
+        "expiry_month": 8,
+        "expiry_year": 2026,
+        "payment_method": "cards"
+      },
+      "payer": {
+        "first_name": "Carlos",
+        "last_name": "Mendez",
+        "email": "carlos.mendez@example.com"
+      }
     }
   }'
 ```

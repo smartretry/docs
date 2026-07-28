@@ -52,9 +52,9 @@ When a keyed POST request is stored or replayed from cache, SmartRetry returns t
 
 | Status | Reason code | When it happens |
 |---|---|---|
-| `400` | `INVALID_IDEMPOTENCY_KEY` | The header is too long or contains unsupported characters. |
-| `409` | `IDEMPOTENCY_CONFLICT` | The same key was reused with a different request body. |
-| `503` | `RESOURCE_LOCKED` | Another request with the same key is still in flight and SmartRetry could not obtain the cached result before the wait timeout. |
+| `400` | `VALIDATION/INVALID_IDEMPOTENCY_KEY` | The header is too long or contains unsupported characters. |
+| `409` | `ROUTING/IDEMPOTENCY_CONFLICT` | The same key was reused with a different request body. |
+| `503` | `ROUTING/RESOURCE_LOCKED` | Another request with the same key is still in flight and SmartRetry could not obtain the cached result before the wait timeout. |
 
 <Tip>
   If a duplicate request arrives while the original request is still running, SmartRetry waits briefly for the original result before returning `503 Resource Locked`. The current maximum wait is 10 seconds.
@@ -66,7 +66,7 @@ When a keyed POST request is stored or replayed from cache, SmartRetry returns t
 
 ```bash cURL
 curl --request POST \
-  --url https://api.smartretry.com/v1/payments/sale/ABC123 \
+  --url https://terminal.smartretry.com/v1/payments/sale/ABC123 \
   --header 'Content-Type: application/json' \
   --header 'x-api-key: YOUR_API_KEY' \
   --header 'Idempotency-Key: sale-order-20260401-001' \

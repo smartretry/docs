@@ -11,7 +11,7 @@ Returns the full state of a recurring series - its schedule configuration, payme
 
 ```bash cURL
 curl --request GET \
-  --url 'https://api.smartretry.com/v1/payments/recurring/status/ABC123?recurring_id=RC9F4A2B' \
+  --url 'https://terminal.smartretry.com/v1/payments/recurring/status/ABC123' \
   --header 'x-api-key: YOUR_API_KEY'
 ```
 
@@ -19,9 +19,8 @@ curl --request GET \
 import requests
 
 response = requests.get(
-    "https://api.smartretry.com/v1/payments/recurring/status/ABC123",
-    headers={"x-api-key": "YOUR_API_KEY"},
-    params={"recurring_id": "RC9F4A2B"}
+    "https://terminal.smartretry.com/v1/payments/recurring/status/ABC123",
+    headers={"x-api-key": "YOUR_API_KEY"}
 )
 
 print(response.json())
@@ -29,7 +28,7 @@ print(response.json())
 
 ```javascript Node.js
 const response = await fetch(
-  "https://api.smartretry.com/v1/payments/recurring/status/ABC123?recurring_id=RC9F4A2B",
+  "https://terminal.smartretry.com/v1/payments/recurring/status/ABC123",
   {
     method: "GET",
     headers: {
@@ -48,12 +47,6 @@ console.log(data);
 
 <ParamField path="terminal_friendly_id" type="string" required>
   Your 6-character terminal identifier.
-</ParamField>
-
-## Query parameters
-
-<ParamField query="recurring_id" type="string" required>
-  The 8-character identifier of the recurring series to look up.
 </ParamField>
 
 ## Response
