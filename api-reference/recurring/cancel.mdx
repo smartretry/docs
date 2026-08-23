@@ -1,9 +1,8 @@
 ---
 title: Cancel recurring
 description: Cancel an active recurring billing series and stop all future scheduled payments.
+openapi: "/api-reference/openapi.json POST /v1/payments/recurring/cancel/{terminal_friendly_id}"
 ---
-
-`POST /v1/payments/recurring/cancel/{terminal_friendly_id}`
 
 Cancels a recurring billing series. All future scheduled payments are halted immediately. Any payments that were already processing at the time of cancellation may still complete.
 
@@ -14,86 +13,6 @@ Cancels a recurring billing series. All future scheduled payments are halted imm
 <Note>
   Safe retries for this POST endpoint use the `Idempotency-Key` header. Reuse the same key only when retrying the exact same request body. See [Idempotency](/api-reference/idempotency).
 </Note>
-
-<RequestExample>
-
-```bash cURL
-curl --request POST \
-  --url https://terminal.smartretry.com/v1/payments/recurring/cancel/ABC123 \
-  --header 'Content-Type: application/json' \
-  --header 'x-api-key: YOUR_API_KEY' \
-  --header 'Idempotency-Key: recurring-cancel-20260401-001' \
-  --data '{
-    "recurring_id": "RC9F4A2B"
-  }'
-```
-
-```python Python
-import requests
-
-response = requests.post(
-    "https://terminal.smartretry.com/v1/payments/recurring/cancel/ABC123",
-    headers={
-        "Content-Type": "application/json",
-        "x-api-key": "YOUR_API_KEY",
-        "Idempotency-Key": "recurring-cancel-20260401-001"
-    },
-    json={"recurring_id": "RC9F4A2B"}
-)
-
-print(response.json())
-```
-
-```javascript Node.js
-const response = await fetch(
-  "https://terminal.smartretry.com/v1/payments/recurring/cancel/ABC123",
-  {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": "YOUR_API_KEY",
-      "Idempotency-Key": "recurring-cancel-20260401-001"
-    },
-    body: JSON.stringify({
-      recurring_id: "RC9F4A2B"
-    })
-  }
-);
-
-const data = await response.json();
-console.log(data);
-```
-
-</RequestExample>
-
-## Path parameters
-
-<ParamField path="terminal_friendly_id" type="string" required>
-  Your 6-character terminal identifier.
-</ParamField>
-
-## Request body
-
-<ParamField body="recurring_id" type="string" required>
-  The 8-character identifier of the recurring series to cancel.
-</ParamField>
-
-## Response
-
-<ResponseField name="recurring_id" type="string">
-  The identifier of the cancelled series (8 characters).
-</ResponseField>
-
-<ResponseField name="cancelled" type="boolean">
-  `true` if the cancellation was accepted and the series has been marked as cancelled.
-</ResponseField>
-
-```json Example response
-{
-  "recurring_id": "RC9F4A2B",
-  "cancelled": true
-}
-```
 
 <Note>
   After cancellation, calling the [status endpoint](/api-reference/recurring/status) for this `recurring_id` will return `status: cancelled`. Historical transactions remain accessible.
