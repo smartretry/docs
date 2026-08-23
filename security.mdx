@@ -1,80 +1,49 @@
+--
+title: "Security"
+description: "How to handle credentials, verify webhooks, and keep card data out of your scope."
 ---
-title: Security and compliance
-description: How SmartRetry protects card data, transaction records, and access to your account.
----
-
-SmartRetry sits between your checkout and your acquirers, so every transaction you send passes through our systems. This page explains how that data is protected, who can reach it, and what commitments apply to it.
-
-In data protection terms, you are the controller of your payer data and SmartRetry acts as your processor. We handle transaction data on your instruction and under the agreement between us.
-
+ 
+This page covers what you need to get right in your own integration. For certifications, data residency, retention, and contractual commitments, see the [SmartRetry security page](https://www.smartretry.com/security).
+ 
 ## Card data
-
+ 
 SmartRetry does not store card numbers. Card numbers and CVV are not retained once a transaction reaches a final status, and where card data appears in logs or storage it is masked.
-
-For repeat billing you can send a stored payment token instead of raw card details, which removes the need to re-transmit card data on every charge. See [Payment methods](/integration/payment-methods) for how tokenized payments work.
-
+ 
+For repeat billing you can send a stored payment token instead of raw card details, which removes the need to re-transmit card data on every charge. See [Payment methods](/docs/integration/payment-methods) for how tokenized payments work.
+ 
 <Note>
   Because SmartRetry transmits cardholder data on your behalf, your own PCI DSS obligations still apply to how you collect and send that data. Using tokenized flows reduces the scope you have to cover.
 </Note>
-
-## Encryption
-
-**In transit.** All connections are encrypted with TLS. TLS 1.3 is negotiated by default and TLS 1.2 is the enforced minimum - TLS 1.0 and 1.1 are rejected at the edge. HTTP Strict Transport Security is enabled across `smartretry.com` and its subdomains with a two-year max-age and preload.
-
-**At rest.** Transaction records and personal data are encrypted at rest, including backups.
-
-## Infrastructure and network
-
-SmartRetry runs on **Amazon Web Services**, behind **Cloudflare**. Both providers maintain their own independent certifications - including PCI DSS Level 1, SOC 2 Type II, and ISO 27001 - covering the physical, hypervisor, and edge layers our platform is built on.
-
-- **Web application firewall.** All traffic to the API and the dashboard passes through a WAF.
-- **DDoS protection.** Volumetric and application-layer protection is applied at the edge.
-- **DNSSEC.** `smartretry.com` is signed and validating, so DNS responses cannot be silently forged.
-- **Backups.** Data stores are backed up on a regular schedule, encrypted at rest.
-- **Logging.** Platform and application activity is logged and monitored.
-
+## Transport
+ 
+All connections are encrypted with TLS. TLS 1.3 is negotiated by default and TLS 1.2 is the enforced minimum — TLS 1.0 and 1.1 are rejected at the edge.
+ 
+Do not disable certificate verification in your HTTP client, including in staging.
+ 
 ## Access control
-
+ 
 Dashboard access uses role-based access control. A **User Master** manages the client account and creates additional users; a **User** has day-to-day operational access. Additional roles can be configured on request.
-
+ 
 Multi-factor authentication is required at login for every user.
-
-API keys are separate from dashboard accounts and authenticate server-to-server requests only. See [Authentication](/authentication) for how to handle them safely.
-
-## Vulnerability management
-
-SmartRetry runs regular internal and external vulnerability scanning across its infrastructure and applications. Findings are triaged and remediated as part of ongoing platform maintenance.
-
-## Data protection
-
-**Residency.** Processing locations vary by service component. All data stores are hosted with established cloud providers in approved regions, reviewed as part of our sub-processor management process. Transfers outside the EEA, where applicable, are carried out under a lawful transfer mechanism. A full breakdown by component is provided alongside our DPA.
-
-**Retention.** Financial record-keeping obligations set a minimum retention period, and storage limitation under GDPR and comparable regimes sets the maximum. Specific periods depend on your own regulatory obligations and are set out in the applicable agreement.
-
-**Deletion.** SmartRetry acts as processor and you act as controller. On termination, your data is deleted or returned per the agreement, subject to the retention floor above. Payer erasure requests are received by you and given effect by us on your instruction. Records we are required to retain by law are restricted from further processing rather than kept in active use.
-
-**Data processing agreement.** A standard DPA is executed at onboarding and is available on request beforehand.
-
-## Incident response and contact
-
-SmartRetry monitors its platform continuously and follows a defined process for handling security incidents, including notifying affected customers. Live platform availability is published at [status.smartretry.com](https://status.smartretry.com/).
-
-To report a suspected vulnerability or security issue, or to request further detail on our security posture and regulatory position, email [security@smartretry.com](mailto:security@smartretry.com) or use the [contact form](https://www.smartretry.com/contact). Specific commitments and documentation are provided within the framework of your agreement with SmartRetry.
-
+ 
+API keys are separate from dashboard accounts and authenticate server-to-server requests only. See [Authentication](/docs/authentication) for how to handle them safely.
+ 
 <Warning>
-  If you believe your API key has been exposed, contact us immediately so it can be revoked and replaced.
+  If you believe your API key has been exposed, contact [security@smartretry.com](mailto:security@smartretry.com) immediately so it can be revoked and replaced.
 </Warning>
-
-## For developers
-
+## Webhooks
+ 
+Your webhook endpoint is a public URL. Verify the signature on every incoming payload before acting on it, and reject anything that fails. See [Webhooks](/docs/integration/webhooks) for the signature scheme and verification examples.
+ 
 <CardGroup cols={3}>
-  <Card title="Authentication" icon="key" href="/authentication">
+  <Card title="Authentication" icon="key" href="/docs/authentication">
     API key handling, rotation, and best practices.
   </Card>
-  <Card title="Webhooks" icon="webhook" href="/integration/webhooks">
+  <Card title="Webhooks" icon="webhook" href="/docs/integration/webhooks">
     Verify webhook signatures before trusting a payload.
   </Card>
-  <Card title="Rate limiting" icon="gauge" href="/api-reference/rate-limiting">
+  <Card title="Rate limiting" icon="gauge" href="/docs/api-reference/rate-limiting">
     Request limits and how to handle throttling.
   </Card>
 </CardGroup>
+ 
