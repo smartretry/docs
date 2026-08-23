@@ -81,6 +81,12 @@
             "pages": [
               "changelog"
             ]
+          },
+          {
+            "group": "Security & Compliance",
+            "pages": [
+              "security"
+            ]
           }
         ]
       },
