@@ -99,7 +99,7 @@
     "Recurring payment management with platform-managed or merchant-managed scheduling",
     "Pre-auth, capture, refund, and void transaction lifecycle support",
     "BIN intelligence and issuer-side behavioral analytics",
-    "Performance-based pricing — charges only on successfully recovered transactions",
+    "Performance-based pricing - charges only on successfully recovered transactions",
     "Sandbox environment for safe integration testing"
   ],
   "publicApiSurface": [

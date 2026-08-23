@@ -7,7 +7,7 @@ This page covers what you need to get right in your own integration. For certifi
  
 ## Card data
  
-SmartRetry does not store card numbers. For repeat billing, send a stored payment token instead of raw card details — see [Payment methods](/docs/integration/payment-methods).
+SmartRetry does not store card numbers. For repeat billing, send a stored payment token instead of raw card details - see [Payment methods](/docs/integration/payment-methods).
  
 <Note>
   Because SmartRetry transmits cardholder data on your behalf, your own PCI DSS obligations still apply to how you collect and send that data. Using tokenized flows reduces the scope you have to cover.
@@ -21,7 +21,7 @@ API keys authenticate server-to-server requests only. Never expose a key client-
 </Warning>
 ## Webhooks
  
-Your webhook endpoint is a public URL — anyone can post to it. Verify the signature on every incoming payload before acting on it, and reject anything that fails. Treat delivery as at-least-once and key your processing on the event ID. See [Webhooks](/docs/integration/webhooks) for the signature scheme and verification examples.
+Your webhook endpoint is a public URL - anyone can post to it. Verify the signature on every incoming payload before acting on it, and reject anything that fails. Treat delivery as at-least-once and key your processing on the event ID. See [Webhooks](/docs/integration/webhooks) for the signature scheme and verification examples.
  
 ## Transport
  
