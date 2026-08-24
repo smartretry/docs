@@ -4,16 +4,9 @@ description: Execute a scheduled future payment immediately, before its planned 
 openapi: "/api-reference/openapi.json POST /v1/payments/recurring/future-transactions/charge/{terminal_friendly_id}"
 ---
 
-Processes a future transaction right away, before its scheduled date. Use this endpoint when you need to execute an upcoming payment early - for example, when a customer upgrades their plan mid-cycle and you want to collect the prorated amount immediately.
-
-<Warning>
-  This endpoint executes the payment before its scheduled date. Once processed, the transaction moves to `completed` status and will not be charged again on its original scheduled date.
-</Warning>
+Submit a future transaction for processing using its `future_transaction_id` and `recurring_id`.
+Provide `amount` to override its scheduled amount for this charge.
 
 <Note>
   Safe retries for this POST endpoint use the `Idempotency-Key` header. Reuse the same key only when retrying the exact same request body. See [Idempotency](/api-reference/idempotency).
 </Note>
-
-<Tip>
-  Before charging early, use the [future transaction status endpoint](/api-reference/future-transactions/status) to confirm the transaction is still in `pending` status. Attempting to charge a transaction that is already `completed`, `processing`, or `cancelled` returns an error.
-</Tip>

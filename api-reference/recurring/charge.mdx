@@ -4,11 +4,7 @@ description: Manually trigger a charge against an active merchant-managed recurr
 openapi: "/api-reference/openapi.json POST /v1/payments/recurring/charge/{terminal_friendly_id}"
 ---
 
-Triggers an immediate charge against an existing recurring series. Use this endpoint when `managed_by` is `merchant` - you control when each payment fires rather than relying on a platform-managed schedule.
-
-<Note>
-  This endpoint only applies to series where `managed_by` is `merchant`. For `our_platform`-managed series, SmartRetry schedules and processes charges automatically. Calling this endpoint on a platform-managed series returns an error.
-</Note>
+Submit a charge against an existing recurring series by its `recurring_id`.
 
 <Note>
   Safe retries for this POST endpoint use the `Idempotency-Key` header. Reuse the same key only when retrying the exact same request body. See [Idempotency](/api-reference/idempotency).

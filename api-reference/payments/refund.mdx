@@ -4,16 +4,10 @@ description: Return funds to a customer for a completed sale or capture.
 openapi: "/api-reference/openapi.json POST /v1/payments/refund/{terminal_friendly_id}"
 ---
 
-A refund returns funds to the customer's payment instrument for a previously completed sale or capture. You can issue a full refund or a partial refund by specifying an `amount`.
+A refund submits a reversal against a previous sale or capture. Identify both the originating
+transaction and its order in the request body. Provide `amount` for a partial refund, or omit it to
+use the remaining refundable amount.
 
 <Note>
   Safe retries for this POST endpoint use the `Idempotency-Key` header. Reuse the same key only when retrying the exact same request body. See [Idempotency](/api-reference/idempotency).
 </Note>
-
-<Tip>
-  To refund only part of a transaction, provide an `amount` less than the original transaction total. You can issue multiple partial refunds against the same transaction.
-</Tip>
-
-<Warning>
-  You cannot refund a pre-authorization that has not yet been captured. Use the [void](/api-reference/payments/void) endpoint to cancel a pre-authorization before capture.
-</Warning>

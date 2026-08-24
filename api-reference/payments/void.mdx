@@ -4,11 +4,9 @@ description: Cancel a pre-authorization before it is captured.
 openapi: "/api-reference/openapi.json POST /v1/payments/void/{terminal_friendly_id}"
 ---
 
-A void cancels a pre-authorization and releases the hold on the customer's funds. Use this endpoint when you need to cancel a reservation before calling [capture](/api-reference/payments/capture).
-
-<Warning>
-  You can only void a pre-authorization. To reverse a completed sale or capture, use the [refund](/api-reference/payments/refund) endpoint instead.
-</Warning>
+A void submits a cancellation against a previous pre-authorization. Identify both the originating
+transaction and its order in the request body. Use [refund](/api-reference/payments/refund) for a
+completed sale or capture.
 
 <Note>
   Safe retries for this POST endpoint use the `Idempotency-Key` header. Reuse the same key only when retrying the exact same request body. See [Idempotency](/api-reference/idempotency).

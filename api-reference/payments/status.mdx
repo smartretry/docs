@@ -4,36 +4,17 @@ description: Retrieve the current status and details of any transaction.
 openapi: "/api-reference/openapi.json GET /v1/payments/status/{terminal_friendly_id}/{transaction_id}"
 ---
 
-Fetch the full details and current status of any transaction by its `transaction_id`. Use this endpoint to confirm whether a payment was approved, to monitor retry attempts, or to display order history to your customers.
+Fetch the current transaction record by its `transaction_id`.
 
 ## Status values
 
 The `status.status` field indicates the current state of the transaction:
 
-| Value | Description |
-|---|---|
-| `APPROVED` | The transaction was approved by the issuer and funds have been reserved or captured. |
-| `PROCESSING` | The transaction is still being processed. Poll again shortly. |
-| `DECLINED` | The transaction was declined. Check `status.reasonCode` for the specific reason. |
-| `ERROR` | An unexpected error occurred during processing. |
-| `CANCELLED` | The transaction was cancelled (e.g., by a void). |
-| `UNKNOWN` | The status could not be determined. Contact support if this persists. |
+`APPROVED`, `PROCESSING`, `DECLINED`, `ERROR`, `CANCELLED`, `INFO`, or `UNKNOWN`.
 
 ## Status domains
 
 The `status.domain` field identifies which system was responsible for the status outcome:
 
-| Domain | Description |
-|---|---|
-| `SYSTEM` | An internal SmartRetry system error. |
-| `VALIDATION` | The request failed validation (e.g., missing or malformed fields). |
-| `RISK` | The transaction was blocked or flagged by a risk or fraud rule. |
-| `ROUTING` | The transaction could not be routed to an available processor. |
-| `AUTH` | The issuer approved or declined the authorization. |
-| `PROCESSOR` | The acquiring processor returned a result. |
-| `PAYMENT_METHOD` | The issue is specific to the payment method (e.g., unsupported card type). |
-| `PAYER_ACCOUNT` | The issue is related to the payer's account (e.g., card expired, account closed). |
-
-<Tip>
-  Use `status.domain` alongside `status.reasonCode` to build targeted retry logic or to surface the right error message to your customers - for example, prompting a payer to update their card details when `domain` is `PAYER_ACCOUNT`.
-</Tip>
+`SYSTEM`, `VALIDATION`, `RISK`, `ROUTING`, `AUTH`, `PROCESSOR`, `PAYMENT_METHOD`, or
+`PAYER_ACCOUNT`.

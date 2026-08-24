@@ -4,16 +4,8 @@ description: Cancel an active recurring billing series and stop all future sched
 openapi: "/api-reference/openapi.json POST /v1/payments/recurring/cancel/{terminal_friendly_id}"
 ---
 
-Cancels a recurring billing series. All future scheduled payments are halted immediately. Any payments that were already processing at the time of cancellation may still complete.
-
-<Warning>
-  Cancellation is permanent. Once a series is cancelled, it cannot be reactivated. If you need to resume billing for the same customer, create a new recurring agreement using the [init endpoint](/api-reference/recurring/init).
-</Warning>
+Cancel a recurring billing series by its `recurring_id`.
 
 <Note>
   Safe retries for this POST endpoint use the `Idempotency-Key` header. Reuse the same key only when retrying the exact same request body. See [Idempotency](/api-reference/idempotency).
-</Note>
-
-<Note>
-  After cancellation, calling the [status endpoint](/api-reference/recurring/status) for this `recurring_id` will return `status: cancelled`. Historical transactions remain accessible.
 </Note>
