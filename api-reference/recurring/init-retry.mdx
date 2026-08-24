@@ -1,0 +1,15 @@
+---
+title: Retry recurring initialization
+description: Retry recurring initialization through the dedicated SmartRetry retry operation.
+openapi: "/api-reference/openapi.json POST /v1/payments/recurring/init/retry/{terminal_friendly_id}"
+---
+
+Use this operation to create a new retry attempt for a previous
+[recurring initialization](/api-reference/recurring/init). Supply the originating SmartRetry
+transaction reference rendered in the request body below.
+
+<Note>
+  This operation creates a dedicated retry attempt. It is different from replaying the original
+  recurring initialization request with the same `Idempotency-Key`. See
+  [Idempotency](/api-reference/idempotency) for safe request replay.
+</Note>
