@@ -4,12 +4,5 @@ description: Modify the schedule, amount, or end conditions of an existing recur
 openapi: "/api-reference/openapi.json PUT /v1/payments/recurring/update/{terminal_friendly_id}"
 ---
 
-Updates configuration for an active recurring series. You can change the billing amount, frequency, total payment count, or cancellation date. Only fields you include in the request body are updated - omitted fields retain their current values.
-
-<Note>
-  Scheduling fields (`recurring_date_type`, `time_interval`) can only be updated on series where `managed_by` is `our_platform`. Attempting to update these fields on a `merchant`- or `payment_provider`-managed series returns an error.
-</Note>
-
-<Tip>
-  To preview how a schedule change affects upcoming payments before applying it, call the [status endpoint](/api-reference/recurring/status) first to review current `future_transactions`.
-</Tip>
+Update an existing recurring series by its `recurring_id`. Only the optional fields included in the
+request body are changed.

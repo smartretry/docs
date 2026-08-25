@@ -4,4 +4,6 @@ description: Retrieve the current state of a recurring billing series, including
 openapi: "/api-reference/openapi.json GET /v1/payments/recurring/status/{terminal_friendly_id}"
 ---
 
-Returns the full state of a recurring series - its schedule configuration, payment instrument, payer details, completed transaction history, and upcoming scheduled payments.
+Retrieve a recurring series by the required `recurring_id` query parameter. The response includes
+its configuration, payment instrument, payer, pending future transactions, and completed
+transactions.

@@ -4,16 +4,9 @@ description: Create a new recurring billing agreement and process the first paym
 openapi: "/api-reference/openapi.json POST /v1/payments/recurring/init/{terminal_friendly_id}"
 ---
 
-Initializing a recurring agreement creates a billing series and processes the first payment. SmartRetry returns a `recurring_id` that identifies the series for all subsequent operations - store it alongside your subscription record.
-
-<Warning>
-  Once a recurring series is cancelled, it cannot be reactivated. Create a new agreement if you need to resume billing.
-</Warning>
+Initializing recurring billing creates a series and submits its first transaction for processing.
+Save the returned `recurring_id` for later recurring and future-transaction operations.
 
 <Note>
   Safe retries for this POST endpoint use the `Idempotency-Key` header. Reuse the same key only when retrying the exact same request body. See [Idempotency](/api-reference/idempotency).
 </Note>
-
-<Tip>
-  Store `recurring_id` in your database alongside your subscription record immediately after a successful response. You need it to charge, update, cancel, or query the series.
-</Tip>

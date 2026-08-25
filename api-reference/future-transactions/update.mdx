@@ -4,8 +4,6 @@ description: Override the amount or reschedule a specific upcoming payment withi
 openapi: "/api-reference/openapi.json PUT /v1/payments/recurring/future-transactions/update/{terminal_friendly_id}"
 ---
 
-Updates a single future transaction within a recurring series. You can override the charge amount for that specific occurrence, reschedule it to a different date, or both. Changes apply only to the targeted transaction - the rest of the series schedule is unaffected.
-
-<Note>
-  To change the default amount or schedule for all future payments in a series, use the [recurring update endpoint](/api-reference/recurring/update) instead.
-</Note>
+Update one future transaction using its `future_transaction_id` and `recurring_id`. Supply an
+optional amount, scheduled date, or both. Use
+[recurring update](/api-reference/recurring/update) to update the recurring series instead.

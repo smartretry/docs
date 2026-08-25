@@ -46,7 +46,15 @@ curl --request POST \
   --data '{
     "merchant_transaction_id": "txn_001",
     "amount": 19.99,
-    "currency": "USD"
+    "currency": "USD",
+    "order": {
+      "payment_instrument": {
+        "card_number": "4111111111111111",
+        "expiry_month": 12,
+        "expiry_year": 2030,
+        "payment_method": "cards"
+      }
+    }
   }'
 ```
 
@@ -64,6 +72,14 @@ response = requests.post(
         "merchant_transaction_id": "txn_001",
         "amount": 19.99,
         "currency": "USD",
+        "order": {
+            "payment_instrument": {
+                "card_number": "4111111111111111",
+                "expiry_month": 12,
+                "expiry_year": 2030,
+                "payment_method": "cards",
+            },
+        },
     },
 )
 ```
@@ -82,6 +98,14 @@ const response = await fetch(
       merchant_transaction_id: "txn_001",
       amount: 19.99,
       currency: "USD",
+      order: {
+        payment_instrument: {
+          card_number: "4111111111111111",
+          expiry_month: 12,
+          expiry_year: 2030,
+          payment_method: "cards",
+        },
+      },
     }),
   }
 );
@@ -91,7 +115,8 @@ const response = await fetch(
 
 ## Terminal ID
 
-All payment and recurring endpoints include `{terminal_friendly_id}` as a path parameter. This 6-character alphanumeric string identifies your merchant terminal and scopes every operation to your account configuration.
+All documented payment and recurring endpoints include `{terminal_friendly_id}` as a path
+parameter. This 6-character string identifies the Terminal used for the operation.
 
 ```
 POST /v1/payments/sale/{terminal_friendly_id}
@@ -101,27 +126,16 @@ POST /v1/payments/sale/{terminal_friendly_id}
 
 You receive your `terminal_friendly_id` when SmartRetry provisions your account. A single API key may have access to multiple terminals.
 
-## Amount format
+## Amount and currency
 
-The `amount` field uses **major currency units** in standard decimal notation (e.g., `10.00` for $10.00). Always send a number - never an integer representing cents.
-
-| Currency | Decimal places | Example amount value | Represents |
-|----------|---------------|---------------------|------------|
-| USD | 2 | `10.00` | $10.00 |
-| GBP | 2 | `10.00` | £10.00 |
-| EUR | 2 | `25.50` | €25.50 |
-| JPY | 0 | `1000` | ¥1,000 |
-| KWD | 3 | `1.000` | KD 1.000 |
-
-<Note>
-  Zero-decimal currencies (e.g., JPY, KRW, UGX) have no fractional units - send the whole amount as a number with no decimals (e.g., `1000` = ¥1,000). Three-decimal currencies like KWD use three decimal places (e.g., `1.000` = KD 1.000).
-</Note>
-
-Supported currencies: USD, EUR, GBP, JPY, KWD, CNY, AUD, CAD, CHF, SEK, NOK, DKK, RUB, ILS, INR, BRL, MXN, ZAR, SGD, HKD, NZD, AED, SAR, TRY, PLN, CZK, HUF, THB, PHP, MYR, BGN, RON, IDR, KRW, COP, UAH, VND, QAR, BHD, EGP, MAD, KES, UGX, NGN, OMR, ARS, CLP, JOD, PYG, RWF.
+Send `amount` as a number in major currency units. Send `currency` as one of the ISO 4217 values
+shown by the bound operation schema. Amount and currency availability is operation-specific.
 
 ## Transaction reference
 
-`merchant_transaction_id` is your own unique identifier for each transaction. Include it on every request.
+`merchant_transaction_id` is your own transaction identifier. It is required for Sale and
+Pre-authorization requests and optional on some other operations. Follow the requiredness shown on
+the individual endpoint page.
 
 - **Reconciliation** - use this ID to match SmartRetry transactions back to orders in your system.
 - **Correlation** - log it in your application so you can trace a SmartRetry transaction back to the originating cart, invoice, or subscription event.
@@ -140,18 +154,18 @@ See [Idempotency](/api-reference/idempotency) for the full behavior, supported m
 
 ## Response format
 
-Successful payment responses include an `accepted` boolean at the top level. Use this field - not only the HTTP status code - to determine whether the transaction was approved.
+Submission responses include an `accepted` boolean at the top level. `accepted: true` means the
+operation was accepted for asynchronous processing; it does not confirm issuer approval. Retrieve
+the [transaction status](/api-reference/payments/status) using the returned `transaction_id` to get
+the current outcome.
 
 ```json
 {
   "transaction_id": "TX8A3F2C",
-  "order_id": "OR7B9E1D",
   "merchant_transaction_id": "txn_001",
   "accepted": true
 }
 ```
-
-A `200 OK` response with `"accepted": false` means the request was valid but the transaction was declined. Handle both cases in your integration.
 
 Errors follow a separate structure - see [Errors](/api-reference/errors).
 
@@ -179,10 +193,12 @@ curl -sI https://terminal.smartretry.com/v1/payments/status/ABC123/TX8A3F2C \
 
 <CardGroup cols={3}>
   <Card title="Payments" icon="credit-card" href="/api-reference/payments/sale">
-    One-time charges, pre-authorizations, captures, refunds, voids, and transaction status lookups.
+    Sale, pre-authorization, capture, their dedicated retry operations, refunds, voids, and
+    transaction status.
   </Card>
   <Card title="Recurring" icon="calendar-check" href="/api-reference/recurring/init">
-    Initialize and manage subscription billing - init, charge, update, cancel, and status.
+    Initialize and charge recurring series, retry those submissions, and retrieve, update, or
+    cancel a series.
   </Card>
   <Card title="Future Transactions" icon="clock" href="/api-reference/future-transactions/status">
     View, update, charge, or cancel scheduled future payments within a recurring plan.

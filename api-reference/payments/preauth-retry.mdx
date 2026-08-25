@@ -1,0 +1,15 @@
+---
+title: Retry pre-authorization
+description: Retry a pre-authorization through the dedicated SmartRetry retry operation.
+openapi: "/api-reference/openapi.json POST /v1/payments/preauth/retry/{terminal_friendly_id}"
+---
+
+Use this operation to create a new retry attempt for a previous
+[pre-authorization](/api-reference/payments/preauth). Identify the originating attempt using one of
+the request shapes rendered below.
+
+<Note>
+  This operation creates a dedicated retry attempt. It is different from replaying the original
+  Pre-authorization request with the same `Idempotency-Key`. See
+  [Idempotency](/api-reference/idempotency) for safe request replay.
+</Note>

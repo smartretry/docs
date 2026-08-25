@@ -4,8 +4,6 @@ description: Retrieve the details and current status of a single scheduled futur
 openapi: "/api-reference/openapi.json GET /v1/payments/recurring/future-transactions/status/{terminal_friendly_id}"
 ---
 
-Returns the details of a specific future transaction - its scheduled date, amount, currency, and current processing status. Use this endpoint to check the state of an individual upcoming payment within a recurring series.
-
-<Tip>
-  To see all upcoming payments for a series at once, use the [recurring status endpoint](/api-reference/recurring/status) - it includes the full `future_transactions` array in a single response.
-</Tip>
+Retrieve a future transaction by the required `future_transaction_id` query parameter. Use the
+[recurring status endpoint](/api-reference/recurring/status) to retrieve the future transactions
+associated with a recurring series.

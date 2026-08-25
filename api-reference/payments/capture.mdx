@@ -4,7 +4,9 @@ description: Settle a previously authorized pre-authorization.
 openapi: "/api-reference/openapi.json POST /v1/payments/capture/{terminal_friendly_id}"
 ---
 
-Capture settles a pre-authorization and moves the reserved funds to your account. You must have a successful [pre-authorization](/api-reference/payments/preauth) before calling this endpoint.
+Capture submits a settlement against a previous
+[pre-authorization](/api-reference/payments/preauth). Identify both the originating transaction and
+its order in the request body.
 
 <Note>
   The capture amount must not exceed the originally authorized amount. If you omit `amount`, the full authorized amount is captured.
@@ -13,7 +15,3 @@ Capture settles a pre-authorization and moves the reserved funds to your account
 <Note>
   Safe retries for this POST endpoint use the `Idempotency-Key` header. Reuse the same key only when retrying the exact same request body. See [Idempotency](/api-reference/idempotency).
 </Note>
-
-<Warning>
-  Each pre-authorization can only be captured once. Attempting to capture an already-captured or voided pre-authorization will return a `400` error.
-</Warning>
