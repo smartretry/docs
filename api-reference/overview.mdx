@@ -155,6 +155,26 @@ A `200 OK` response with `"accepted": false` means the request was valid but the
 
 Errors follow a separate structure - see [Errors](/api-reference/errors).
 
+## Discovery links
+
+Every response includes a `Link` header that points back to this documentation, following the [RFC 8631](https://www.rfc-editor.org/rfc/rfc8631.html) link relations. Use it to find the docs from any response you are holding, including errors.
+
+| Relation | Target |
+|---|---|
+| `service-doc` | `https://www.smartretry.com/docs` - this documentation site. |
+| `service-desc` | `https://www.smartretry.com/docs/api-reference/openapi.json` - the OpenAPI description of the API. |
+
+Read the header with any client:
+
+```bash
+curl -sI https://terminal.smartretry.com/v1/payments/status/ABC123/TX8A3F2C \
+  --header 'x-api-key: YOUR_API_KEY' | grep -i '^link:'
+```
+
+<Tip>
+  The `service-desc` target is the same OpenAPI description that powers this API reference. Point Postman, an SDK generator, or your own tooling at it directly.
+</Tip>
+
 ## Endpoint groups
 
 <CardGroup cols={3}>
