@@ -28,6 +28,10 @@
       {
         "label": "Contact",
         "href": "https://www.smartretry.com/contact"
+      },
+      {
+        "label": "Console",
+        "href": "https://console.smartretry.com/"
       }
     ]
   },
