@@ -195,17 +195,17 @@
 
   var STYLE_ID = "sr-consent-style";
   var STYLE = [
-    "#sr-consent-banner,#sr-consent-modal-overlay{font-family:inherit;box-sizing:border-box}",
-    "#sr-consent-banner *,#sr-consent-modal-overlay *{box-sizing:border-box}",
-    "#sr-consent-banner{position:fixed;left:0;right:0;bottom:0;z-index:9999;padding:16px}",
-    "@media(min-width:640px){#sr-consent-banner{padding:24px}}",
+    "#sr-consent-banner,#sr-consent-modal-overlay{font-family:'Poppins','Poppins Fallback',ui-sans-serif,system-ui,sans-serif;box-sizing:border-box}",
+    "#sr-consent-banner *,#sr-consent-modal-overlay *{box-sizing:border-box;font-family:inherit}",
+    "#sr-consent-banner{position:fixed;left:0;right:0;bottom:0;z-index:9999;padding:0 16px 16px}",
+    "@media(min-width:640px){#sr-consent-banner{padding:0 24px 24px}}",
     "#sr-consent-banner-inner{margin:0 auto;max-width:64rem;border-radius:16px;border:1px solid rgba(255,255,255,0.1);background:rgba(31,31,31,0.95);padding:20px;color:#fff;box-shadow:0 20px 60px rgba(0,0,0,0.5);backdrop-filter:blur(8px)}",
     "@media(min-width:640px){#sr-consent-banner-inner{padding:24px}}",
     "#sr-consent-banner-row{display:flex;flex-direction:column;gap:16px}",
     "@media(min-width:768px){#sr-consent-banner-row{flex-direction:row;align-items:center;justify-content:space-between;gap:24px}}",
     "#sr-consent-text{flex:1}",
     "#sr-consent-title{margin:0 0 8px;font-size:16px;font-weight:600}",
-    "#sr-consent-body{margin:0;font-size:14px;font-weight:400;line-height:1.6;color:rgba(255,255,255,0.8)}",
+    "#sr-consent-body{margin:0;font-size:14px;font-weight:400;line-height:1.625;color:rgba(255,255,255,0.8)}",
     ".sr-consent-link{color:inherit;text-decoration:underline;text-underline-offset:2px}",
     ".sr-consent-link:hover{color:#FE37A2}",
     "#sr-consent-actions{display:flex;flex-direction:column;gap:8px}",
@@ -218,19 +218,21 @@
     "#sr-consent-modal-overlay{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px}",
     "#sr-consent-modal{width:100%;max-width:32rem;border-radius:16px;border:1px solid rgba(255,255,255,0.1);background:#1F1F1F;padding:20px;color:#fff;box-shadow:0 20px 60px rgba(0,0,0,0.5);position:relative;display:flex;flex-direction:column;gap:16px}",
     "@media(min-width:640px){#sr-consent-modal{padding:24px}}",
-    "#sr-consent-modal-head{padding-right:32px}",
-    "#sr-consent-modal-title{margin:0 0 6px;font-size:16px;font-weight:600}",
+    "#sr-consent-modal-head{padding-right:32px;display:flex;flex-direction:column;gap:6px}",
+    "#sr-consent-modal-title{margin:0;font-size:16px;font-weight:600}",
     "@media(min-width:640px){#sr-consent-modal-title{font-size:18px}}",
-    "#sr-consent-modal-body{margin:0;font-size:14px;line-height:1.6;color:rgba(255,255,255,0.7)}",
-    "#sr-consent-modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;padding:4px;line-height:0;opacity:.7}",
+    "#sr-consent-modal-body{margin:0;font-size:14px;line-height:1.625;color:rgba(255,255,255,0.7)}",
+    "#sr-consent-modal-close{position:absolute;top:16px;right:16px;width:16px;height:16px;background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;padding:0;line-height:16px;font-size:16px;opacity:.7}",
     "#sr-consent-modal-close:hover{opacity:1}",
+    ".sr-consent-rows{display:flex;flex-direction:column;gap:12px}",
     ".sr-consent-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);padding:16px}",
+    ".sr-consent-row>div:first-child{flex:1}",
     ".sr-consent-row-title{margin:0;font-size:14px;font-weight:600}",
     "@media(min-width:640px){.sr-consent-row-title{font-size:16px}}",
-    ".sr-consent-row-body{margin:4px 0 0;font-size:12px;line-height:1.6;color:rgba(255,255,255,0.7)}",
+    ".sr-consent-row-body{margin:4px 0 0;font-size:12px;line-height:1.625;color:rgba(255,255,255,0.7)}",
     "@media(min-width:640px){.sr-consent-row-body{font-size:14px}}",
     ".sr-consent-row-control{flex-shrink:0;padding-top:2px}",
-    ".sr-consent-pill{border-radius:9999px;background:rgba(255,255,255,0.1);padding:4px 10px;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.02em;color:rgba(255,255,255,0.7)}",
+    ".sr-consent-pill{border-radius:9999px;background:rgba(255,255,255,0.1);padding:4px 10px;font-size:10px;line-height:14px;font-weight:500;text-transform:uppercase;letter-spacing:.02em;color:rgba(255,255,255,0.7)}",
     ".sr-consent-switch{position:relative;display:inline-flex;align-items:center;width:36px;height:20px;border-radius:9999px;border:none;background:rgba(255,255,255,0.2);cursor:pointer;padding:0;transition:background-color .15s}",
     ".sr-consent-switch[data-checked=\"true\"]{background:#D01A87}",
     ".sr-consent-switch-thumb{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:9999px;background:#fff;transition:transform .15s}",
@@ -239,7 +241,25 @@
     "@media(min-width:640px){#sr-consent-modal-actions{flex-direction:row;justify-content:flex-end}}",
   ].join("");
 
+  var FONT_LINK_ID = "sr-consent-font";
+
+  function injectFont() {
+    if (document.getElementById(FONT_LINK_ID)) return;
+    // Marketing site uses Poppins everywhere (confirmed via computed styles on
+    // the live banner). Mintlify's default theme font is not Poppins. A <link>
+    // loads in parallel and applies faster than an @import inside a JS-injected
+    // <style> tag, which can paint once with the fallback font first and throw
+    // off text wrapping before the swap happens.
+    var link = document.createElement("link");
+    link.id = FONT_LINK_ID;
+    link.rel = "stylesheet";
+    link.href =
+      "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap";
+    document.head.appendChild(link);
+  }
+
   function injectStyle() {
+    injectFont();
     if (document.getElementById(STYLE_ID)) return;
     var style = document.createElement("style");
     style.id = STYLE_ID;
