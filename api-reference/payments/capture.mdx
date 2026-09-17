@@ -8,10 +8,16 @@ Capture submits a settlement against a previous
 [pre-authorization](/api-reference/payments/preauth). Identify both the originating transaction and
 its order in the request body.
 
+## Retry a previous capture
+
+Use this same endpoint to create a new retry attempt. In the request body, provide
+`retry.originating_id` for the previous SmartRetry capture transaction.
+
 <Note>
   The capture amount must not exceed the originally authorized amount. If you omit `amount`, the full authorized amount is captured.
 </Note>
 
 <Note>
-  Safe retries for this POST endpoint use the `Idempotency-Key` header. Reuse the same key only when retrying the exact same request body. See [Idempotency](/api-reference/idempotency).
+  A retry request creates a new attempt. To safely replay the exact same request after an ambiguous
+  failure, reuse its `Idempotency-Key`. See [Idempotency](/api-reference/idempotency).
 </Note>

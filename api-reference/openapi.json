@@ -7,7 +7,11 @@
   },
   "components": {
     "securitySchemes": {
-      "ApiKeyAuth": { "type": "apiKey", "in": "header", "name": "x-api-key" }
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
     },
     "schemas": {
       "CurrencyCode": {
@@ -583,31 +587,75 @@
       },
       "ShipIndicator": {
         "type": "string",
-        "enum": ["01", "02", "03", "04", "05", "06", "07", "08", "09"]
+        "enum": [
+          "01",
+          "02",
+          "03",
+          "04",
+          "05",
+          "06",
+          "07",
+          "08",
+          "09"
+        ]
       },
       "AddressUsageType": {
         "type": "string",
-        "enum": ["residential", "business"]
+        "enum": [
+          "residential",
+          "business"
+        ]
       },
       "FutureTransactionStatus": {
         "type": "string",
-        "enum": ["pending", "processing", "completed", "failed", "cancelled"]
+        "enum": [
+          "pending",
+          "processing",
+          "completed",
+          "failed",
+          "cancelled"
+        ]
       },
       "RecurringStatus": {
         "type": "string",
-        "enum": ["active", "paused", "cancelled", "completed"]
+        "enum": [
+          "active",
+          "paused",
+          "cancelled",
+          "completed"
+        ]
       },
       "RecurringDateType": {
         "type": "string",
-        "enum": ["daily", "weekly", "monthly", "yearly"]
+        "enum": [
+          "daily",
+          "weekly",
+          "monthly",
+          "yearly"
+        ]
       },
       "RecurringManagedBy": {
         "type": "string",
-        "enum": ["merchant", "our_platform", "payment_provider"]
+        "enum": [
+          "merchant",
+          "our_platform",
+          "payment_provider"
+        ]
       },
       "PaymentCardType": {
         "type": "string",
-        "enum": ["DEBIT", "CREDIT", "CHARGE", "PREPAID"]
+        "enum": [
+          "DEBIT",
+          "CREDIT",
+          "CHARGE",
+          "PREPAID"
+        ]
+      },
+      "PaymentCollection": {
+        "type": "string",
+        "enum": [
+          "hosted_page"
+        ]
       },
       "EndCustomerAddressRequest": {
         "additionalProperties": false,
@@ -619,15 +667,42 @@
             "maxLength": 88,
             "type": "string"
           },
-          "address_1": { "maxLength": 100, "type": "string" },
-          "address_2": { "maxLength": 100, "type": "string" },
-          "apartment": { "maxLength": 20, "type": "string" },
-          "floor": { "maxLength": 20, "type": "string" },
-          "entrance": { "maxLength": 20, "type": "string" },
-          "building": { "maxLength": 20, "type": "string" },
-          "street": { "maxLength": 100, "type": "string" },
-          "postal_code": { "maxLength": 20, "type": "string" },
-          "city_name": { "maxLength": 50, "type": "string" },
+          "address_1": {
+            "maxLength": 100,
+            "type": "string"
+          },
+          "address_2": {
+            "maxLength": 100,
+            "type": "string"
+          },
+          "apartment": {
+            "maxLength": 20,
+            "type": "string"
+          },
+          "floor": {
+            "maxLength": 20,
+            "type": "string"
+          },
+          "entrance": {
+            "maxLength": 20,
+            "type": "string"
+          },
+          "building": {
+            "maxLength": 20,
+            "type": "string"
+          },
+          "street": {
+            "maxLength": 100,
+            "type": "string"
+          },
+          "postal_code": {
+            "maxLength": 20,
+            "type": "string"
+          },
+          "city_name": {
+            "maxLength": 50,
+            "type": "string"
+          },
           "city_geoname_id": {
             "description": "The GeoNames ID for the city. This should be a positive integer represented as a string.",
             "pattern": "^[1-9]\\d*$",
@@ -639,17 +714,34 @@
             "maxLength": 6,
             "type": "string"
           },
-          "country": { "$ref": "#/components/schemas/CountryCode" }
+          "country": {
+            "$ref": "#/components/schemas/CountryCode"
+          }
         }
       },
       "PayerRequest": {
         "additionalProperties": false,
         "type": "object",
-        "required": ["first_name", "last_name", "email"],
+        "required": [
+          "first_name",
+          "last_name",
+          "email"
+        ],
         "properties": {
-          "full_name": { "maxLength": 150, "type": "string" },
-          "first_name": { "minLength": 1, "maxLength": 50, "type": "string" },
-          "last_name": { "minLength": 1, "maxLength": 50, "type": "string" },
+          "full_name": {
+            "maxLength": 150,
+            "type": "string"
+          },
+          "first_name": {
+            "minLength": 1,
+            "maxLength": 50,
+            "type": "string"
+          },
+          "last_name": {
+            "minLength": 1,
+            "maxLength": 50,
+            "type": "string"
+          },
           "email": {
             "maxLength": 254,
             "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
@@ -661,7 +753,10 @@
             "maxLength": 16,
             "type": "string"
           },
-          "national_id": { "maxLength": 50, "type": "string" },
+          "national_id": {
+            "maxLength": 50,
+            "type": "string"
+          },
           "birth_date": {
             "description": "Birth date in ISO 8601 format (YYYY-MM-DD)",
             "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
@@ -674,26 +769,46 @@
       },
       "PayerResponse": {
         "type": "object",
-        "required": ["friendly_id"],
+        "required": [
+          "friendly_id"
+        ],
         "properties": {
           "friendly_id": {
             "description": "A unique friendly identifier for the payer generated by SmartRetry.",
             "minLength": 8,
             "maxLength": 8,
+            "pattern": "^[\\dA-Za-z]{8}$",
             "type": "string"
           },
-          "full_name": { "maxLength": 150, "type": "string" },
-          "first_name": { "maxLength": 50, "type": "string" },
-          "last_name": { "maxLength": 50, "type": "string" },
-          "email_username": { "maxLength": 254, "type": "string" },
-          "email_domain": { "type": "string" },
+          "full_name": {
+            "maxLength": 150,
+            "type": "string"
+          },
+          "first_name": {
+            "maxLength": 50,
+            "type": "string"
+          },
+          "last_name": {
+            "maxLength": 50,
+            "type": "string"
+          },
+          "email_username": {
+            "maxLength": 254,
+            "type": "string"
+          },
+          "email_domain": {
+            "type": "string"
+          },
           "phone_number": {
             "description": "Phone number in E.164 format (e.g., +1234567890)",
             "pattern": "^\\+[1-9]\\d{1,14}$",
             "maxLength": 16,
             "type": "string"
           },
-          "national_id": { "maxLength": 50, "type": "string" }
+          "national_id": {
+            "maxLength": 50,
+            "type": "string"
+          }
         }
       },
       "PaymentInstrumentRequest": {
@@ -750,7 +865,10 @@
       },
       "PaymentInstrumentResponse": {
         "type": "object",
-        "required": ["token", "payment_method"],
+        "required": [
+          "token",
+          "payment_method"
+        ],
         "properties": {
           "token": {
             "description": "A token representing the payment instrument, generated by SmartRetry.",
@@ -781,7 +899,10 @@
           },
           "card_profile": {
             "type": "object",
-            "required": ["fingerprint", "brand"],
+            "required": [
+              "fingerprint",
+              "brand"
+            ],
             "properties": {
               "fingerprint": {
                 "description": "A unique identifier for the card profile, generated by SmartRetry.",
@@ -791,7 +912,9 @@
               },
               "issuer": {
                 "type": "object",
-                "required": ["name"],
+                "required": [
+                  "name"
+                ],
                 "properties": {
                   "name": {
                     "description": "The name of the card issuer (e.g., Bank of America, Chase, etc.).",
@@ -805,7 +928,9 @@
               },
               "brand": {
                 "type": "object",
-                "required": ["name"],
+                "required": [
+                  "name"
+                ],
                 "properties": {
                   "name": {
                     "description": "The name of the card brand (e.g., Visa, Mastercard, Amex).",
@@ -817,7 +942,9 @@
                 "description": "Card category, e.g. one of PaymentCardCategory.",
                 "type": "string"
               },
-              "cardType": { "$ref": "#/components/schemas/PaymentCardType" },
+              "cardType": {
+                "$ref": "#/components/schemas/PaymentCardType"
+              },
               "panLength": {
                 "description": "The length of the card number (PAN).",
                 "minimum": 13,
@@ -841,7 +968,9 @@
             "maxLength": 100,
             "type": "string"
           },
-          "payer": { "$ref": "#/components/schemas/PayerRequest" },
+          "payer": {
+            "$ref": "#/components/schemas/PayerRequest"
+          },
           "payer_fingerprint": {
             "description": "Pre-computed payer fingerprint from an existing transaction. Mutually exclusive with payer.",
             "minLength": 88,
@@ -859,12 +988,15 @@
       },
       "OrderResponse": {
         "type": "object",
-        "required": ["order_id"],
+        "required": [
+          "order_id"
+        ],
         "properties": {
           "order_id": {
             "description": "A unique friendly identifier for the order generated by SmartRetry.",
             "minLength": 8,
             "maxLength": 8,
+            "pattern": "^[\\dA-Za-z]{8}$",
             "type": "string"
           },
           "merchant_order_id": {
@@ -877,7 +1009,9 @@
             "maxLength": 100,
             "type": "string"
           },
-          "payer": { "$ref": "#/components/schemas/PayerResponse" },
+          "payer": {
+            "$ref": "#/components/schemas/PayerResponse"
+          },
           "payment_instrument": {
             "$ref": "#/components/schemas/PaymentInstrumentResponse"
           },
@@ -891,18 +1025,33 @@
       "ShippingRecipientRequest": {
         "additionalProperties": false,
         "type": "object",
-        "required": ["first_name", "last_name"],
+        "required": [
+          "first_name",
+          "last_name"
+        ],
         "properties": {
           "friendly_id": {
             "description": "A unique identifier for the recipient of the shipment. Generated by SmartRetry.",
             "minLength": 8,
             "maxLength": 8,
+            "pattern": "^[\\dA-Za-z]{8}$",
             "type": "string"
           },
-          "full_name": { "maxLength": 150, "type": "string" },
-          "first_name": { "maxLength": 50, "type": "string" },
-          "last_name": { "maxLength": 50, "type": "string" },
-          "usage_type": { "$ref": "#/components/schemas/AddressUsageType" },
+          "full_name": {
+            "maxLength": 150,
+            "type": "string"
+          },
+          "first_name": {
+            "maxLength": 50,
+            "type": "string"
+          },
+          "last_name": {
+            "maxLength": 50,
+            "type": "string"
+          },
+          "usage_type": {
+            "$ref": "#/components/schemas/AddressUsageType"
+          },
           "address": {
             "$ref": "#/components/schemas/EndCustomerAddressRequest"
           }
@@ -912,23 +1061,38 @@
         "additionalProperties": false,
         "type": "object",
         "properties": {
-          "os_name": { "maxLength": 50, "type": "string" },
-          "os_version": { "maxLength": 20, "type": "string" }
+          "os_name": {
+            "maxLength": 50,
+            "type": "string"
+          },
+          "os_version": {
+            "maxLength": 20,
+            "type": "string"
+          }
         }
       },
       "BrowserProfileRequest": {
         "additionalProperties": false,
         "type": "object",
         "properties": {
-          "name": { "maxLength": 50, "type": "string" },
-          "version": { "maxLength": 20, "type": "string" },
+          "name": {
+            "maxLength": 50,
+            "type": "string"
+          },
+          "version": {
+            "maxLength": 20,
+            "type": "string"
+          },
           "language": {
             "description": "The language setting of the browser, represented as a BCP 47 language tag.",
             "minLength": 2,
             "maxLength": 35,
             "type": "string"
           },
-          "user_agent": { "maxLength": 2048, "type": "string" },
+          "user_agent": {
+            "maxLength": 2048,
+            "type": "string"
+          },
           "java_enabled": {
             "description": "Whether the browser has Java capability enabled.",
             "type": "boolean"
@@ -943,7 +1107,11 @@
         "additionalProperties": false,
         "type": "object",
         "properties": {
-          "screen_width": { "minimum": 0, "maximum": 65535, "type": "integer" },
+          "screen_width": {
+            "minimum": 0,
+            "maximum": 65535,
+            "type": "integer"
+          },
           "screen_height": {
             "minimum": 0,
             "maximum": 65535,
@@ -954,7 +1122,10 @@
             "maximum": 65535,
             "type": "integer"
           },
-          "accept_headers": { "maxLength": 2048, "type": "string" },
+          "accept_headers": {
+            "maxLength": 2048,
+            "type": "string"
+          },
           "time_zone_offset": {
             "description": "Offset from UTC in minutes, per EMV 3DS.",
             "minimum": -840,
@@ -966,12 +1137,15 @@
       "RetryFromOriginatingId": {
         "additionalProperties": false,
         "type": "object",
-        "required": ["originating_id"],
+        "required": [
+          "originating_id"
+        ],
         "properties": {
           "originating_id": {
             "description": "SmartRetry transaction friendly_id of the originating attempt.",
             "minLength": 8,
             "maxLength": 8,
+            "pattern": "^[\\dA-Za-z]{8}$",
             "type": "string"
           }
         }
@@ -979,7 +1153,9 @@
       "RetryFromProviderTransaction": {
         "additionalProperties": false,
         "type": "object",
-        "required": ["provider_key"],
+        "required": [
+          "provider_key"
+        ],
         "properties": {
           "provider_transaction_id": {
             "description": "External provider transaction identifier to look up and import as the originating attempt.",
@@ -996,16 +1172,29 @@
             "items": {
               "additionalProperties": false,
               "type": "object",
-              "required": ["type", "timestamp", "raw_request", "raw_response"],
+              "required": [
+                "type",
+                "timestamp",
+                "raw_request",
+                "raw_response"
+              ],
               "properties": {
-                "type": { "$ref": "#/components/schemas/TransactionType" },
+                "type": {
+                  "$ref": "#/components/schemas/TransactionType"
+                },
                 "timestamp": {
                   "description": "ISO 8601 timestamp of the interaction. Validated semantically (see retry.validation.service.ts) — TypeCompiler, used by the domain validators, does not evaluate the `format` keyword.",
                   "minLength": 1,
                   "type": "string"
                 },
-                "raw_request": { "minLength": 1, "type": "string" },
-                "raw_response": { "minLength": 1, "type": "string" }
+                "raw_request": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "raw_response": {
+                  "minLength": 1,
+                  "type": "string"
+                }
               }
             }
           }
@@ -1014,15 +1203,21 @@
       "DirectOriginRetryRequest": {
         "additionalProperties": false,
         "type": "object",
-        "required": ["retry"],
+        "required": [
+          "retry"
+        ],
         "properties": {
-          "retry": { "$ref": "#/components/schemas/RetryFromOriginatingId" }
+          "retry": {
+            "$ref": "#/components/schemas/RetryFromOriginatingId"
+          }
         }
       },
       "RetryNoAnchorRequest": {
         "additionalProperties": false,
         "type": "object",
-        "required": ["retry"],
+        "required": [
+          "retry"
+        ],
         "properties": {
           "retry": {
             "$ref": "#/components/schemas/RetryFromProviderTransaction"
@@ -1031,65 +1226,164 @@
       },
       "RetryNoAnchorUnion": {
         "anyOf": [
-          { "$ref": "#/components/schemas/RetryNoAnchorRequest" },
-          { "$ref": "#/components/schemas/DirectOriginRetryRequest" }
+          {
+            "$ref": "#/components/schemas/RetryNoAnchorRequest"
+          },
+          {
+            "$ref": "#/components/schemas/DirectOriginRetryRequest"
+          }
         ]
       },
       "ErrorResponse": {
         "type": "object",
-        "required": ["type", "title", "status", "detail", "reason_code"],
+        "required": [
+          "type",
+          "title",
+          "status",
+          "detail",
+          "reason_code"
+        ],
         "properties": {
-          "type": { "type": "string" },
-          "title": { "type": "string" },
-          "status": { "type": "integer" },
-          "detail": { "type": "string" },
-          "instance": { "type": "string" },
-          "reason_code": { "type": "string" },
-          "context": { "type": "object", "additionalProperties": {} }
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
+          },
+          "reason_code": {
+            "type": "string"
+          },
+          "context": {
+            "type": "object",
+            "additionalProperties": {}
+          }
         }
       },
       "SalePreauthAcceptedResponse": {
         "type": "object",
-        "required": ["transaction_id", "accepted"],
+        "required": [
+          "transaction_id",
+          "accepted"
+        ],
         "properties": {
           "transaction_id": {
             "minLength": 8,
             "maxLength": 8,
+            "pattern": "^[\\dA-Za-z]{8}$",
             "type": "string"
           },
-          "order_id": { "minLength": 8, "maxLength": 8, "type": "string" },
-          "merchant_transaction_id": { "type": "string" },
-          "merchant_order_id": { "type": "string" },
-          "accepted": { "type": "boolean" }
+          "order_id": {
+            "minLength": 8,
+            "maxLength": 8,
+            "pattern": "^[\\dA-Za-z]{8}$",
+            "type": "string"
+          },
+          "merchant_transaction_id": {
+            "type": "string"
+          },
+          "merchant_order_id": {
+            "type": "string"
+          },
+          "accepted": {
+            "type": "boolean"
+          }
         }
       },
       "AcceptedWithOrderResponse": {
         "type": "object",
-        "required": ["transaction_id", "accepted", "order_id"],
+        "required": [
+          "transaction_id",
+          "accepted",
+          "order_id"
+        ],
         "properties": {
           "transaction_id": {
             "minLength": 8,
             "maxLength": 8,
+            "pattern": "^[\\dA-Za-z]{8}$",
             "type": "string"
           },
-          "merchant_transaction_id": { "type": "string" },
-          "merchant_order_id": { "type": "string" },
-          "accepted": { "type": "boolean" },
-          "order_id": { "minLength": 8, "maxLength": 8, "type": "string" }
+          "merchant_transaction_id": {
+            "type": "string"
+          },
+          "merchant_order_id": {
+            "type": "string"
+          },
+          "accepted": {
+            "type": "boolean"
+          },
+          "order_id": {
+            "minLength": 8,
+            "maxLength": 8,
+            "pattern": "^[\\dA-Za-z]{8}$",
+            "type": "string"
+          }
+        }
+      },
+      "HostedSubmitAcceptedResponse": {
+        "type": "object",
+        "required": [
+          "transaction_id",
+          "accepted",
+          "order_id"
+        ],
+        "properties": {
+          "transaction_id": {
+            "minLength": 8,
+            "maxLength": 8,
+            "pattern": "^[\\dA-Za-z]{8}$",
+            "type": "string"
+          },
+          "accepted": {
+            "type": "boolean"
+          },
+          "order_id": {
+            "minLength": 8,
+            "maxLength": 8,
+            "pattern": "^[\\dA-Za-z]{8}$",
+            "type": "string"
+          }
         }
       },
       "RecurringAcceptedWithOrderResponse": {
         "type": "object",
-        "required": ["transaction_id", "recurring_id", "accepted", "order_id"],
+        "required": [
+          "transaction_id",
+          "recurring_id",
+          "accepted",
+          "order_id"
+        ],
         "properties": {
           "transaction_id": {
             "minLength": 8,
             "maxLength": 8,
+            "pattern": "^[\\dA-Za-z]{8}$",
             "type": "string"
           },
-          "recurring_id": { "minLength": 8, "maxLength": 8, "type": "string" },
-          "accepted": { "type": "boolean" },
-          "order_id": { "minLength": 8, "maxLength": 8, "type": "string" }
+          "recurring_id": {
+            "minLength": 8,
+            "maxLength": 8,
+            "pattern": "^[\\dA-Za-z]{8}$",
+            "type": "string"
+          },
+          "accepted": {
+            "type": "boolean"
+          },
+          "order_id": {
+            "minLength": 8,
+            "maxLength": 8,
+            "pattern": "^[\\dA-Za-z]{8}$",
+            "type": "string"
+          }
         }
       },
       "FutureTransactionResponse": {
@@ -1107,26 +1401,44 @@
           "future_transaction_id": {
             "minLength": 8,
             "maxLength": 8,
+            "pattern": "^[\\dA-Za-z]{8}$",
             "type": "string"
           },
-          "recurring_id": { "minLength": 8, "maxLength": 8, "type": "string" },
+          "recurring_id": {
+            "minLength": 8,
+            "maxLength": 8,
+            "pattern": "^[\\dA-Za-z]{8}$",
+            "type": "string"
+          },
           "scheduled_date": {
             "description": "Scheduled date and time for this payment (ISO 8601).",
             "type": "string"
           },
-          "sequence_number": { "minimum": 1, "type": "integer" },
-          "status": { "$ref": "#/components/schemas/FutureTransactionStatus" },
-          "amount": { "minimum": 0.01, "type": "number" },
+          "sequence_number": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/FutureTransactionStatus"
+          },
+          "amount": {
+            "minimum": 0.01,
+            "type": "number"
+          },
           "currency": {
             "description": "ISO 4217 currency code, e.g. one of CurrencyKey.",
             "type": "string"
           },
-          "notes": { "type": "string" }
+          "notes": {
+            "type": "string"
+          }
         }
       },
       "CompletedFutureTransactionResponse": {
         "allOf": [
-          { "$ref": "#/components/schemas/FutureTransactionResponse" },
+          {
+            "$ref": "#/components/schemas/FutureTransactionResponse"
+          },
           {
             "type": "object",
             "properties": {
@@ -1141,100 +1453,401 @@
             }
           }
         ]
+      },
+      "SaleRouteRequest": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "description": "Exactly one of `token`, `provider_token`, or `order.payment_instrument` must be supplied, unless `payment_collection` is `hosted_page`.",
+            "type": "object",
+            "required": [
+              "merchant_transaction_id",
+              "amount",
+              "currency"
+            ],
+            "properties": {
+              "merchant_transaction_id": {
+                "description": "A unique identifier for the transaction generated by the merchant.",
+                "maxLength": 100,
+                "type": "string"
+              },
+              "amount": {
+                "description": "The amount to be charged, in major currency units (e.g. 10.00 for $10.00 USD).",
+                "minimum": 0.01,
+                "maximum": 999999.99,
+                "type": "number"
+              },
+              "currency": {
+                "$ref": "#/components/schemas/CurrencyCode"
+              },
+              "device_profile": {
+                "$ref": "#/components/schemas/DeviceProfileRequest"
+              },
+              "browser_profile": {
+                "$ref": "#/components/schemas/BrowserProfileRequest"
+              },
+              "session": {
+                "$ref": "#/components/schemas/SessionRequest"
+              },
+              "order_id": {
+                "description": "A unique identifier for the order generated by SmartRetry. Additional notes internally this \n    is friendly_id for order and not the actual order_id in the database.",
+                "minLength": 8,
+                "maxLength": 8,
+                "pattern": "^[\\dA-Za-z]{8}$",
+                "type": "string"
+              },
+              "order": {
+                "$ref": "#/components/schemas/OrderRequest"
+              },
+              "payer_request_ip_address": {
+                "description": "The IP address of the payer making the request.",
+                "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+                "type": "string"
+              },
+              "ship_indicator": {
+                "$ref": "#/components/schemas/ShipIndicator"
+              },
+              "delivery_address_usage_indicator": {
+                "description": "Indicates how long the shipping address has been associated with the customer.",
+                "type": "string"
+              },
+              "delivery_timeframe": {
+                "description": "Indicates the delivery timeframe for the order.",
+                "type": "string"
+              },
+              "shipping_recipient": {
+                "$ref": "#/components/schemas/ShippingRecipientRequest"
+              },
+              "description": {
+                "description": "A description of the transaction.",
+                "maxLength": 500,
+                "type": "string"
+              },
+              "token": {
+                "description": "A stored payment token from the merchant's Payment Instruments.",
+                "minLength": 88,
+                "maxLength": 88,
+                "type": "string"
+              },
+              "provider_token": {
+                "description": "A tokenized payment method reference issued directly by the payment provider (e.g. a Stripe payment_method or Adyen storedPaymentMethodId), forwarded to the processor as-is. Distinct from `token`, which is a SmartRetry Payment Instrument token.",
+                "minLength": 1,
+                "maxLength": 255,
+                "type": "string"
+              },
+              "cvv": {
+                "description": "CVV/CVC of the card. Optional for added security (cannot be stored).",
+                "minLength": 3,
+                "maxLength": 4,
+                "pattern": "^[0-9]{3,4}$",
+                "type": "string"
+              },
+              "payment_collection": {
+                "$ref": "#/components/schemas/PaymentCollection"
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/RetryNoAnchorUnion"
+          }
+        ]
+      },
+      "PreauthRouteRequest": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "description": "Exactly one of `token`, `provider_token`, or `order.payment_instrument` must be supplied, unless `payment_collection` is `hosted_page`.",
+            "type": "object",
+            "required": [
+              "merchant_transaction_id",
+              "amount",
+              "currency"
+            ],
+            "properties": {
+              "merchant_transaction_id": {
+                "description": "A unique identifier for the transaction generated by the merchant.",
+                "maxLength": 100,
+                "type": "string"
+              },
+              "amount": {
+                "description": "The amount to be authorized, in major currency units (e.g. 10.00 for $10.00 USD).",
+                "minimum": 0.01,
+                "maximum": 999999.99,
+                "type": "number"
+              },
+              "currency": {
+                "$ref": "#/components/schemas/CurrencyCode"
+              },
+              "device_profile": {
+                "$ref": "#/components/schemas/DeviceProfileRequest"
+              },
+              "browser_profile": {
+                "$ref": "#/components/schemas/BrowserProfileRequest"
+              },
+              "session": {
+                "$ref": "#/components/schemas/SessionRequest"
+              },
+              "order_id": {
+                "description": "A unique identifier for the order generated by SmartRetry. Internally this\n    is the friendly_id for the order and not the actual order_id in the database.",
+                "minLength": 8,
+                "maxLength": 8,
+                "pattern": "^[\\dA-Za-z]{8}$",
+                "type": "string"
+              },
+              "order": {
+                "$ref": "#/components/schemas/OrderRequest"
+              },
+              "payer_request_ip_address": {
+                "description": "The IP address of the payer making the request.",
+                "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+                "type": "string"
+              },
+              "ship_indicator": {
+                "$ref": "#/components/schemas/ShipIndicator"
+              },
+              "delivery_address_usage_indicator": {
+                "description": "Indicates how long the shipping address has been associated with the customer.",
+                "type": "string"
+              },
+              "delivery_timeframe": {
+                "description": "Indicates the delivery timeframe for the order.",
+                "type": "string"
+              },
+              "shipping_recipient": {
+                "$ref": "#/components/schemas/ShippingRecipientRequest"
+              },
+              "description": {
+                "description": "A description of the pre-authorization.",
+                "maxLength": 500,
+                "type": "string"
+              },
+              "token": {
+                "description": "A stored payment token from the merchant's Payment Instruments.",
+                "minLength": 88,
+                "maxLength": 88,
+                "type": "string"
+              },
+              "provider_token": {
+                "description": "A tokenized payment method reference issued directly by the payment provider (e.g. a Stripe payment_method or Adyen storedPaymentMethodId), forwarded to the processor as-is. Distinct from `token`, which is a SmartRetry Payment Instrument token.",
+                "minLength": 1,
+                "maxLength": 255,
+                "type": "string"
+              },
+              "cvv": {
+                "description": "CVV/CVC of the card. Optional for added security (cannot be stored).",
+                "minLength": 3,
+                "maxLength": 4,
+                "pattern": "^[0-9]{3,4}$",
+                "type": "string"
+              },
+              "payment_collection": {
+                "$ref": "#/components/schemas/PaymentCollection"
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/RetryNoAnchorUnion"
+          }
+        ]
+      },
+      "CaptureRouteRequest": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "transaction_reference_id",
+              "order_reference_id"
+            ],
+            "properties": {
+              "transaction_reference_id": {
+                "description": "The transaction friendly ID of the original PREAUTH transaction to be captured",
+                "minLength": 8,
+                "maxLength": 8,
+                "pattern": "^[\\dA-Za-z]{8}$",
+                "type": "string"
+              },
+              "order_reference_id": {
+                "description": "The order friendly ID associated with the original PREAUTH transaction to be captured",
+                "minLength": 8,
+                "maxLength": 8,
+                "pattern": "^[\\dA-Za-z]{8}$",
+                "type": "string"
+              },
+              "amount": {
+                "description": "Amount to capture, in major currency units (e.g. 10.00 for $10.00 USD). Defaults to the full preauthorized amount if omitted.",
+                "minimum": 0.01,
+                "maximum": 999999.99,
+                "type": "number"
+              },
+              "merchant_transaction_id": {
+                "type": "string"
+              },
+              "description": {
+                "maxLength": 500,
+                "type": "string"
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/DirectOriginRetryRequest"
+          }
+        ]
+      },
+      "RecurringInitRouteRequest": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "description": "Exactly one of `token`, `provider_token`, or `payment_instrument` must be supplied, unless `payment_collection` is `hosted_page`.",
+            "type": "object",
+            "required": [
+              "amount",
+              "currency",
+              "recurring"
+            ],
+            "properties": {
+              "amount": {
+                "description": "Payment amount in major currency units (e.g. 10.00 for $10.00 USD).",
+                "minimum": 0.01,
+                "maximum": 999999.99,
+                "type": "number"
+              },
+              "currency": {
+                "$ref": "#/components/schemas/CurrencyCode"
+              },
+              "recurring": {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "managed_by"
+                ],
+                "properties": {
+                  "managed_by": {
+                    "$ref": "#/components/schemas/RecurringManagedBy"
+                  },
+                  "first_payment_date": {
+                    "description": "First payment date (YYYY-MM-DD). Required when managed_by is our_platform.",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                    "type": "string"
+                  },
+                  "recurring_date_type": {
+                    "$ref": "#/components/schemas/RecurringDateType"
+                  },
+                  "time_interval": {
+                    "description": "Interval between payments. Min: 1. Required when managed_by is our_platform.",
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "number_of_payments": {
+                    "description": "Total number of payments. Omit for unlimited recurring.",
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "cancellation_date": {
+                    "description": "End date for the recurring agreement (YYYY-MM-DD).",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                    "type": "string"
+                  }
+                }
+              },
+              "payment_instrument": {
+                "$ref": "#/components/schemas/PaymentInstrumentRequest"
+              },
+              "payer": {
+                "$ref": "#/components/schemas/PayerRequest"
+              },
+              "payer_fingerprint": {
+                "description": "Pre-computed payer fingerprint from an existing transaction. Mutually exclusive with payer.",
+                "minLength": 88,
+                "type": "string"
+              },
+              "token": {
+                "description": "A stored payment token from the merchant's Payment Instruments.",
+                "minLength": 88,
+                "maxLength": 88,
+                "type": "string"
+              },
+              "provider_token": {
+                "description": "A tokenized payment method reference issued directly by the payment provider (e.g. a Stripe payment_method or Adyen storedPaymentMethodId), forwarded to the processor as-is. Distinct from `token`, which is a SmartRetry Payment Instrument token.",
+                "minLength": 1,
+                "maxLength": 255,
+                "type": "string"
+              },
+              "cvv": {
+                "description": "CVV/CVC of the card. Optional for added security (cannot be stored).",
+                "minLength": 3,
+                "maxLength": 4,
+                "pattern": "^[0-9]{3,4}$",
+                "type": "string"
+              },
+              "payment_collection": {
+                "$ref": "#/components/schemas/PaymentCollection"
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/DirectOriginRetryRequest"
+          }
+        ]
+      },
+      "RecurringChargeRouteRequest": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "recurring_id"
+            ],
+            "properties": {
+              "recurring_id": {
+                "description": "The recurring series identifier.",
+                "minLength": 8,
+                "maxLength": 8,
+                "pattern": "^[\\dA-Za-z]{8}$",
+                "type": "string"
+              },
+              "amount": {
+                "description": "Payment amount in major currency units (e.g. 10.00 for $10.00 USD).",
+                "minimum": 0.01,
+                "maximum": 999999.99,
+                "type": "number"
+              },
+              "currency": {
+                "$ref": "#/components/schemas/CurrencyCode"
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/DirectOriginRetryRequest"
+          }
+        ]
       }
     }
   },
   "paths": {
     "/v1/payments/recurring/init/{terminal_friendly_id}": {
       "post": {
-        "tags": ["recurring"],
+        "tags": [
+          "recurring"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "additionalProperties": false,
-                "description": "Exactly one of `token`, `provider_token`, or `payment_instrument` must be supplied.",
-                "type": "object",
-                "required": ["amount", "currency", "recurring"],
-                "properties": {
-                  "amount": {
-                    "description": "Payment amount in major currency units (e.g. 10.00 for $10.00 USD).",
-                    "minimum": 0.01,
-                    "maximum": 999999.99,
-                    "type": "number"
-                  },
-                  "currency": { "$ref": "#/components/schemas/CurrencyCode" },
-                  "recurring": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "required": ["managed_by"],
-                    "properties": {
-                      "managed_by": {
-                        "$ref": "#/components/schemas/RecurringManagedBy"
-                      },
-                      "first_payment_date": {
-                        "description": "First payment date (YYYY-MM-DD). Required when managed_by is our_platform.",
-                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
-                        "type": "string"
-                      },
-                      "recurring_date_type": {
-                        "$ref": "#/components/schemas/RecurringDateType"
-                      },
-                      "time_interval": {
-                        "description": "Interval between payments. Min: 1. Required when managed_by is our_platform.",
-                        "minimum": 1,
-                        "type": "integer"
-                      },
-                      "number_of_payments": {
-                        "description": "Total number of payments. Omit for unlimited recurring.",
-                        "minimum": 1,
-                        "type": "integer"
-                      },
-                      "cancellation_date": {
-                        "description": "End date for the recurring agreement (YYYY-MM-DD).",
-                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "payment_instrument": {
-                    "$ref": "#/components/schemas/PaymentInstrumentRequest"
-                  },
-                  "payer": { "$ref": "#/components/schemas/PayerRequest" },
-                  "payer_fingerprint": {
-                    "description": "Pre-computed payer fingerprint from an existing transaction. Mutually exclusive with payer.",
-                    "minLength": 88,
-                    "type": "string"
-                  },
-                  "token": {
-                    "description": "A stored payment token from the merchant's Payment Instruments.",
-                    "minLength": 88,
-                    "maxLength": 88,
-                    "type": "string"
-                  },
-                  "provider_token": {
-                    "description": "A tokenized payment method reference issued directly by the payment provider (e.g. a Stripe payment_method or Adyen storedPaymentMethodId), forwarded to the processor as-is. Distinct from `token`, which is a SmartRetry Payment Instrument token.",
-                    "minLength": 1,
-                    "maxLength": 255,
-                    "type": "string"
-                  },
-                  "cvv": {
-                    "description": "CVV/CVC of the card. Optional for added security (cannot be stored).",
-                    "minLength": 3,
-                    "maxLength": 4,
-                    "pattern": "^[0-9]{3,4}$",
-                    "type": "string"
-                  }
-                }
+                "$ref": "#/components/schemas/RecurringInitRouteRequest"
               }
             }
-          },
-          "description": "Exactly one of `token`, `provider_token`, or `payment_instrument` must be supplied."
+          }
         },
         "parameters": [
           {
-            "schema": { "minLength": 6, "maxLength": 6, "type": "string" },
+            "schema": {
+              "minLength": 6,
+              "maxLength": 6,
+              "pattern": "^[\\dA-Za-z]{6}$",
+              "type": "string"
+            },
             "in": "path",
             "name": "terminal_friendly_id",
             "required": true,
@@ -1267,94 +1880,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "404": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "409": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "500": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "503": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/payments/recurring/init/retry/{terminal_friendly_id}": {
-      "post": {
-        "tags": ["recurring"],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DirectOriginRetryRequest"
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "schema": { "minLength": 6, "maxLength": 6, "type": "string" },
-            "in": "path",
-            "name": "terminal_friendly_id",
-            "required": true,
-            "description": "The unique identifier of the terminal."
-          },
-          {
-            "schema": {
-              "maxLength": 255,
-              "pattern": "^[\\w-]+$",
-              "type": "string"
-            },
-            "in": "header",
-            "name": "idempotency-key",
-            "required": false,
-            "description": "Optional idempotency key, scoped to terminal + matched route pattern. A replayed request returns the cached response with `Idempotency-Replayed: true`."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RecurringAcceptedWithOrderResponse"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
-              }
-            }
-          },
-          "400": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
               }
             }
           },
@@ -1362,7 +1890,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -1370,7 +1900,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -1378,7 +1910,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -1386,7 +1920,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -1394,7 +1930,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           }
@@ -1403,17 +1941,29 @@
     },
     "/v1/payments/recurring/status/{terminal_friendly_id}": {
       "get": {
-        "tags": ["recurring"],
+        "tags": [
+          "recurring"
+        ],
         "parameters": [
           {
-            "schema": { "minLength": 8, "maxLength": 8, "type": "string" },
+            "schema": {
+              "minLength": 8,
+              "maxLength": 8,
+              "pattern": "^[\\dA-Za-z]{8}$",
+              "type": "string"
+            },
             "in": "query",
             "name": "recurring_id",
             "required": true,
             "description": "The recurring series identifier."
           },
           {
-            "schema": { "minLength": 6, "maxLength": 6, "type": "string" },
+            "schema": {
+              "minLength": 6,
+              "maxLength": 6,
+              "pattern": "^[\\dA-Za-z]{6}$",
+              "type": "string"
+            },
             "in": "path",
             "name": "terminal_friendly_id",
             "required": true,
@@ -1442,12 +1992,14 @@
                       "description": "The recurring series identifier.",
                       "minLength": 8,
                       "maxLength": 8,
+                      "pattern": "^[\\dA-Za-z]{8}$",
                       "type": "string"
                     },
                     "order_id": {
                       "description": "The order linked to this recurring series.",
                       "minLength": 8,
                       "maxLength": 8,
+                      "pattern": "^[\\dA-Za-z]{8}$",
                       "type": "string"
                     },
                     "status": {
@@ -1467,16 +2019,23 @@
                         "managed_by": {
                           "$ref": "#/components/schemas/RecurringManagedBy"
                         },
-                        "first_payment_date": { "type": "string" },
+                        "first_payment_date": {
+                          "type": "string"
+                        },
                         "recurring_date_type": {
                           "$ref": "#/components/schemas/RecurringDateType"
                         },
-                        "time_interval": { "minimum": 1, "type": "integer" },
+                        "time_interval": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
                         "number_of_payments": {
                           "minimum": 1,
                           "type": "integer"
                         },
-                        "cancellation_date": { "type": "string" },
+                        "cancellation_date": {
+                          "type": "string"
+                        },
                         "completed_payments": {
                           "minimum": 0,
                           "type": "integer"
@@ -1490,7 +2049,9 @@
                     "payment_instrument": {
                       "$ref": "#/components/schemas/PaymentInstrumentResponse"
                     },
-                    "payer": { "$ref": "#/components/schemas/PayerResponse" },
+                    "payer": {
+                      "$ref": "#/components/schemas/PayerResponse"
+                    },
                     "future_transactions": {
                       "type": "array",
                       "items": {
@@ -1512,7 +2073,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -1520,7 +2083,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -1528,7 +2093,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           }
@@ -1537,7 +2104,9 @@
     },
     "/v1/payments/recurring/cancel/{terminal_friendly_id}": {
       "post": {
-        "tags": ["recurring"],
+        "tags": [
+          "recurring"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1545,12 +2114,15 @@
               "schema": {
                 "additionalProperties": false,
                 "type": "object",
-                "required": ["recurring_id"],
+                "required": [
+                  "recurring_id"
+                ],
                 "properties": {
                   "recurring_id": {
                     "description": "The recurring series identifier.",
                     "minLength": 8,
                     "maxLength": 8,
+                    "pattern": "^[\\dA-Za-z]{8}$",
                     "type": "string"
                   }
                 }
@@ -1560,7 +2132,12 @@
         },
         "parameters": [
           {
-            "schema": { "minLength": 6, "maxLength": 6, "type": "string" },
+            "schema": {
+              "minLength": 6,
+              "maxLength": 6,
+              "pattern": "^[\\dA-Za-z]{6}$",
+              "type": "string"
+            },
             "in": "path",
             "name": "terminal_friendly_id",
             "required": true,
@@ -1585,14 +2162,20 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["recurring_id", "cancelled"],
+                  "required": [
+                    "recurring_id",
+                    "cancelled"
+                  ],
                   "properties": {
                     "recurring_id": {
                       "minLength": 8,
                       "maxLength": 8,
+                      "pattern": "^[\\dA-Za-z]{8}$",
                       "type": "string"
                     },
-                    "cancelled": { "type": "boolean" }
+                    "cancelled": {
+                      "type": "boolean"
+                    }
                   }
                 }
               }
@@ -1602,7 +2185,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -1610,7 +2195,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -1618,7 +2205,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -1626,7 +2215,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -1634,7 +2225,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           }
@@ -1643,37 +2236,27 @@
     },
     "/v1/payments/recurring/charge/{terminal_friendly_id}": {
       "post": {
-        "tags": ["recurring"],
+        "tags": [
+          "recurring"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "additionalProperties": false,
-                "type": "object",
-                "required": ["recurring_id"],
-                "properties": {
-                  "recurring_id": {
-                    "description": "The recurring series identifier.",
-                    "minLength": 8,
-                    "maxLength": 8,
-                    "type": "string"
-                  },
-                  "amount": {
-                    "description": "Payment amount in major currency units (e.g. 10.00 for $10.00 USD).",
-                    "minimum": 0.01,
-                    "maximum": 999999.99,
-                    "type": "number"
-                  },
-                  "currency": { "$ref": "#/components/schemas/CurrencyCode" }
-                }
+                "$ref": "#/components/schemas/RecurringChargeRouteRequest"
               }
             }
           }
         },
         "parameters": [
           {
-            "schema": { "minLength": 6, "maxLength": 6, "type": "string" },
+            "schema": {
+              "minLength": 6,
+              "maxLength": 6,
+              "pattern": "^[\\dA-Za-z]{6}$",
+              "type": "string"
+            },
             "in": "path",
             "name": "terminal_friendly_id",
             "required": true,
@@ -1706,102 +2289,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "404": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "409": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "422": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "500": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "503": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/payments/recurring/charge/retry/{terminal_friendly_id}": {
-      "post": {
-        "tags": ["recurring"],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DirectOriginRetryRequest"
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "schema": { "minLength": 6, "maxLength": 6, "type": "string" },
-            "in": "path",
-            "name": "terminal_friendly_id",
-            "required": true,
-            "description": "The unique identifier of the terminal."
-          },
-          {
-            "schema": {
-              "maxLength": 255,
-              "pattern": "^[\\w-]+$",
-              "type": "string"
-            },
-            "in": "header",
-            "name": "idempotency-key",
-            "required": false,
-            "description": "Optional idempotency key, scoped to terminal + matched route pattern. A replayed request returns the cached response with `Idempotency-Replayed: true`."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RecurringAcceptedWithOrderResponse"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
-              }
-            }
-          },
-          "400": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
               }
             }
           },
@@ -1809,7 +2299,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -1817,7 +2309,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -1825,7 +2319,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -1833,7 +2329,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -1841,7 +2339,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -1849,7 +2349,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           }
@@ -1858,7 +2360,9 @@
     },
     "/v1/payments/recurring/update/{terminal_friendly_id}": {
       "put": {
-        "tags": ["recurring"],
+        "tags": [
+          "recurring"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1866,12 +2370,15 @@
               "schema": {
                 "additionalProperties": false,
                 "type": "object",
-                "required": ["recurring_id"],
+                "required": [
+                  "recurring_id"
+                ],
                 "properties": {
                   "recurring_id": {
                     "description": "The recurring series identifier.",
                     "minLength": 8,
                     "maxLength": 8,
+                    "pattern": "^[\\dA-Za-z]{8}$",
                     "type": "string"
                   },
                   "amount": {
@@ -1905,7 +2412,12 @@
         },
         "parameters": [
           {
-            "schema": { "minLength": 6, "maxLength": 6, "type": "string" },
+            "schema": {
+              "minLength": 6,
+              "maxLength": 6,
+              "pattern": "^[\\dA-Za-z]{6}$",
+              "type": "string"
+            },
             "in": "path",
             "name": "terminal_friendly_id",
             "required": true,
@@ -1919,14 +2431,20 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["recurring_id", "updated"],
+                  "required": [
+                    "recurring_id",
+                    "updated"
+                  ],
                   "properties": {
                     "recurring_id": {
                       "minLength": 8,
                       "maxLength": 8,
+                      "pattern": "^[\\dA-Za-z]{8}$",
                       "type": "string"
                     },
-                    "updated": { "type": "boolean" }
+                    "updated": {
+                      "type": "boolean"
+                    }
                   }
                 }
               }
@@ -1936,7 +2454,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -1944,7 +2464,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -1952,7 +2474,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -1960,7 +2484,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -1968,7 +2494,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           }
@@ -1977,17 +2505,29 @@
     },
     "/v1/payments/recurring/future-transactions/status/{terminal_friendly_id}": {
       "get": {
-        "tags": ["future-transactions"],
+        "tags": [
+          "future-transactions"
+        ],
         "parameters": [
           {
-            "schema": { "minLength": 8, "maxLength": 8, "type": "string" },
+            "schema": {
+              "minLength": 8,
+              "maxLength": 8,
+              "pattern": "^[\\dA-Za-z]{8}$",
+              "type": "string"
+            },
             "in": "query",
             "name": "future_transaction_id",
             "required": true,
             "description": "The future transaction identifier."
           },
           {
-            "schema": { "minLength": 6, "maxLength": 6, "type": "string" },
+            "schema": {
+              "minLength": 6,
+              "maxLength": 6,
+              "pattern": "^[\\dA-Za-z]{6}$",
+              "type": "string"
+            },
             "in": "path",
             "name": "terminal_friendly_id",
             "required": true,
@@ -2009,7 +2549,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2017,7 +2559,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2025,7 +2569,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           }
@@ -2034,7 +2580,9 @@
     },
     "/v1/payments/recurring/future-transactions/update/{terminal_friendly_id}": {
       "put": {
-        "tags": ["future-transactions"],
+        "tags": [
+          "future-transactions"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -2042,18 +2590,23 @@
               "schema": {
                 "additionalProperties": false,
                 "type": "object",
-                "required": ["future_transaction_id", "recurring_id"],
+                "required": [
+                  "future_transaction_id",
+                  "recurring_id"
+                ],
                 "properties": {
                   "future_transaction_id": {
                     "description": "The future transaction identifier to update.",
                     "minLength": 8,
                     "maxLength": 8,
+                    "pattern": "^[\\dA-Za-z]{8}$",
                     "type": "string"
                   },
                   "recurring_id": {
                     "description": "The recurring subscription identifier this future transaction belongs to.",
                     "minLength": 8,
                     "maxLength": 8,
+                    "pattern": "^[\\dA-Za-z]{8}$",
                     "type": "string"
                   },
                   "amount": {
@@ -2073,7 +2626,12 @@
         },
         "parameters": [
           {
-            "schema": { "minLength": 6, "maxLength": 6, "type": "string" },
+            "schema": {
+              "minLength": 6,
+              "maxLength": 6,
+              "pattern": "^[\\dA-Za-z]{6}$",
+              "type": "string"
+            },
             "in": "path",
             "name": "terminal_friendly_id",
             "required": true,
@@ -2096,14 +2654,18 @@
                     "recurring_id": {
                       "minLength": 8,
                       "maxLength": 8,
+                      "pattern": "^[\\dA-Za-z]{8}$",
                       "type": "string"
                     },
                     "future_transaction_id": {
                       "minLength": 8,
                       "maxLength": 8,
+                      "pattern": "^[\\dA-Za-z]{8}$",
                       "type": "string"
                     },
-                    "updated": { "type": "boolean" }
+                    "updated": {
+                      "type": "boolean"
+                    }
                   }
                 }
               }
@@ -2113,7 +2675,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2121,7 +2685,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2129,7 +2695,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2137,7 +2705,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2145,7 +2715,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           }
@@ -2154,7 +2726,9 @@
     },
     "/v1/payments/recurring/future-transactions/charge/{terminal_friendly_id}": {
       "post": {
-        "tags": ["future-transactions"],
+        "tags": [
+          "future-transactions"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -2162,18 +2736,23 @@
               "schema": {
                 "additionalProperties": false,
                 "type": "object",
-                "required": ["future_transaction_id", "recurring_id"],
+                "required": [
+                  "future_transaction_id",
+                  "recurring_id"
+                ],
                 "properties": {
                   "future_transaction_id": {
                     "description": "The future transaction identifier to charge immediately.",
                     "minLength": 8,
                     "maxLength": 8,
+                    "pattern": "^[\\dA-Za-z]{8}$",
                     "type": "string"
                   },
                   "recurring_id": {
                     "description": "The recurring subscription identifier this future transaction belongs to.",
                     "minLength": 8,
                     "maxLength": 8,
+                    "pattern": "^[\\dA-Za-z]{8}$",
                     "type": "string"
                   },
                   "amount": {
@@ -2189,7 +2768,12 @@
         },
         "parameters": [
           {
-            "schema": { "minLength": 6, "maxLength": 6, "type": "string" },
+            "schema": {
+              "minLength": 6,
+              "maxLength": 6,
+              "pattern": "^[\\dA-Za-z]{6}$",
+              "type": "string"
+            },
             "in": "path",
             "name": "terminal_friendly_id",
             "required": true,
@@ -2225,22 +2809,28 @@
                     "transaction_id": {
                       "minLength": 8,
                       "maxLength": 8,
+                      "pattern": "^[\\dA-Za-z]{8}$",
                       "type": "string"
                     },
                     "recurring_id": {
                       "minLength": 8,
                       "maxLength": 8,
+                      "pattern": "^[\\dA-Za-z]{8}$",
                       "type": "string"
                     },
                     "future_transaction_id": {
                       "minLength": 8,
                       "maxLength": 8,
+                      "pattern": "^[\\dA-Za-z]{8}$",
                       "type": "string"
                     },
-                    "accepted": { "type": "boolean" },
+                    "accepted": {
+                      "type": "boolean"
+                    },
                     "order_id": {
                       "minLength": 8,
                       "maxLength": 8,
+                      "pattern": "^[\\dA-Za-z]{8}$",
                       "type": "string"
                     }
                   }
@@ -2252,7 +2842,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2260,7 +2852,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2268,7 +2862,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2276,7 +2872,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2284,7 +2882,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2292,7 +2892,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           }
@@ -2301,7 +2903,9 @@
     },
     "/v1/payments/recurring/future-transactions/cancel/{terminal_friendly_id}": {
       "post": {
-        "tags": ["future-transactions"],
+        "tags": [
+          "future-transactions"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -2309,18 +2913,23 @@
               "schema": {
                 "additionalProperties": false,
                 "type": "object",
-                "required": ["future_transaction_id", "recurring_id"],
+                "required": [
+                  "future_transaction_id",
+                  "recurring_id"
+                ],
                 "properties": {
                   "future_transaction_id": {
                     "description": "The future transaction identifier to cancel.",
                     "minLength": 8,
                     "maxLength": 8,
+                    "pattern": "^[\\dA-Za-z]{8}$",
                     "type": "string"
                   },
                   "recurring_id": {
                     "description": "The recurring subscription identifier this future transaction belongs to.",
                     "minLength": 8,
                     "maxLength": 8,
+                    "pattern": "^[\\dA-Za-z]{8}$",
                     "type": "string"
                   }
                 }
@@ -2330,7 +2939,12 @@
         },
         "parameters": [
           {
-            "schema": { "minLength": 6, "maxLength": 6, "type": "string" },
+            "schema": {
+              "minLength": 6,
+              "maxLength": 6,
+              "pattern": "^[\\dA-Za-z]{6}$",
+              "type": "string"
+            },
             "in": "path",
             "name": "terminal_friendly_id",
             "required": true,
@@ -2364,14 +2978,18 @@
                     "recurring_id": {
                       "minLength": 8,
                       "maxLength": 8,
+                      "pattern": "^[\\dA-Za-z]{8}$",
                       "type": "string"
                     },
                     "future_transaction_id": {
                       "minLength": 8,
                       "maxLength": 8,
+                      "pattern": "^[\\dA-Za-z]{8}$",
                       "type": "string"
                     },
-                    "cancelled": { "type": "boolean" }
+                    "cancelled": {
+                      "type": "boolean"
+                    }
                   }
                 }
               }
@@ -2381,7 +2999,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2389,7 +3009,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2397,7 +3019,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2405,7 +3029,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2413,7 +3039,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2421,7 +3049,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           }
@@ -2430,95 +3060,27 @@
     },
     "/v1/payments/preauth/{terminal_friendly_id}": {
       "post": {
-        "tags": ["payments"],
+        "tags": [
+          "payments"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "additionalProperties": false,
-                "description": "Exactly one of `token`, `provider_token`, or `order.payment_instrument` must be supplied.",
-                "type": "object",
-                "required": ["merchant_transaction_id", "amount", "currency"],
-                "properties": {
-                  "merchant_transaction_id": {
-                    "description": "A unique identifier for the transaction generated by the merchant.",
-                    "maxLength": 100,
-                    "type": "string"
-                  },
-                  "amount": {
-                    "description": "The amount to be authorized, in major currency units (e.g. 10.00 for $10.00 USD).",
-                    "minimum": 0.01,
-                    "maximum": 999999.99,
-                    "type": "number"
-                  },
-                  "currency": { "$ref": "#/components/schemas/CurrencyCode" },
-                  "device_profile": {
-                    "$ref": "#/components/schemas/DeviceProfileRequest"
-                  },
-                  "browser_profile": {
-                    "$ref": "#/components/schemas/BrowserProfileRequest"
-                  },
-                  "session": { "$ref": "#/components/schemas/SessionRequest" },
-                  "order_id": {
-                    "description": "A unique identifier for the order generated by SmartRetry. Internally this\n    is the friendly_id for the order and not the actual order_id in the database.",
-                    "minLength": 8,
-                    "maxLength": 8,
-                    "type": "string"
-                  },
-                  "order": { "$ref": "#/components/schemas/OrderRequest" },
-                  "payer_request_ip_address": {
-                    "description": "The IP address of the payer making the request.",
-                    "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
-                    "type": "string"
-                  },
-                  "ship_indicator": {
-                    "$ref": "#/components/schemas/ShipIndicator"
-                  },
-                  "delivery_address_usage_indicator": {
-                    "description": "Indicates how long the shipping address has been associated with the customer.",
-                    "type": "string"
-                  },
-                  "delivery_timeframe": {
-                    "description": "Indicates the delivery timeframe for the order.",
-                    "type": "string"
-                  },
-                  "shipping_recipient": {
-                    "$ref": "#/components/schemas/ShippingRecipientRequest"
-                  },
-                  "description": {
-                    "description": "A description of the pre-authorization.",
-                    "maxLength": 500,
-                    "type": "string"
-                  },
-                  "token": {
-                    "description": "A stored payment token from the merchant's Payment Instruments.",
-                    "minLength": 88,
-                    "maxLength": 88,
-                    "type": "string"
-                  },
-                  "provider_token": {
-                    "description": "A tokenized payment method reference issued directly by the payment provider (e.g. a Stripe payment_method or Adyen storedPaymentMethodId), forwarded to the processor as-is. Distinct from `token`, which is a SmartRetry Payment Instrument token.",
-                    "minLength": 1,
-                    "maxLength": 255,
-                    "type": "string"
-                  },
-                  "cvv": {
-                    "description": "CVV/CVC of the card. Optional for added security (cannot be stored).",
-                    "minLength": 3,
-                    "maxLength": 4,
-                    "pattern": "^[0-9]{3,4}$",
-                    "type": "string"
-                  }
-                }
+                "$ref": "#/components/schemas/PreauthRouteRequest"
               }
             }
-          },
-          "description": "Exactly one of `token`, `provider_token`, or `order.payment_instrument` must be supplied."
+          }
         },
         "parameters": [
           {
-            "schema": { "minLength": 6, "maxLength": 6, "type": "string" },
+            "schema": {
+              "minLength": 6,
+              "maxLength": 6,
+              "pattern": "^[\\dA-Za-z]{6}$",
+              "type": "string"
+            },
             "in": "path",
             "name": "terminal_friendly_id",
             "required": true,
@@ -2551,108 +3113,19 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "403": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "404": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "409": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "500": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "503": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/payments/preauth/retry/{terminal_friendly_id}": {
-      "post": {
-        "tags": ["payments"],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/RetryNoAnchorUnion" }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "schema": { "minLength": 6, "maxLength": 6, "type": "string" },
-            "in": "path",
-            "name": "terminal_friendly_id",
-            "required": true,
-            "description": "The unique identifier of the terminal."
-          },
-          {
-            "schema": {
-              "maxLength": 255,
-              "pattern": "^[\\w-]+$",
-              "type": "string"
-            },
-            "in": "header",
-            "name": "idempotency-key",
-            "required": false,
-            "description": "Optional idempotency key, scoped to terminal + matched route pattern. A replayed request returns the cached response with `Idempotency-Replayed: true`."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SalePreauthAcceptedResponse"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
           },
-          "400": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
           "403": {
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2660,7 +3133,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2668,7 +3143,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2676,7 +3153,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2684,7 +3163,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2692,7 +3173,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           }
@@ -2701,95 +3184,27 @@
     },
     "/v1/payments/sale/{terminal_friendly_id}": {
       "post": {
-        "tags": ["payments"],
+        "tags": [
+          "payments"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "additionalProperties": false,
-                "description": "Exactly one of `token`, `provider_token`, or `order.payment_instrument` must be supplied.",
-                "type": "object",
-                "required": ["merchant_transaction_id", "amount", "currency"],
-                "properties": {
-                  "merchant_transaction_id": {
-                    "description": "A unique identifier for the transaction generated by the merchant.",
-                    "maxLength": 100,
-                    "type": "string"
-                  },
-                  "amount": {
-                    "description": "The amount to be charged, in major currency units (e.g. 10.00 for $10.00 USD).",
-                    "minimum": 0.01,
-                    "maximum": 999999.99,
-                    "type": "number"
-                  },
-                  "currency": { "$ref": "#/components/schemas/CurrencyCode" },
-                  "device_profile": {
-                    "$ref": "#/components/schemas/DeviceProfileRequest"
-                  },
-                  "browser_profile": {
-                    "$ref": "#/components/schemas/BrowserProfileRequest"
-                  },
-                  "session": { "$ref": "#/components/schemas/SessionRequest" },
-                  "order_id": {
-                    "description": "A unique identifier for the order generated by SmartRetry. Additional notes internally this \n    is friendly_id for order and not the actual order_id in the database.",
-                    "minLength": 8,
-                    "maxLength": 8,
-                    "type": "string"
-                  },
-                  "order": { "$ref": "#/components/schemas/OrderRequest" },
-                  "payer_request_ip_address": {
-                    "description": "The IP address of the payer making the request.",
-                    "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
-                    "type": "string"
-                  },
-                  "ship_indicator": {
-                    "$ref": "#/components/schemas/ShipIndicator"
-                  },
-                  "delivery_address_usage_indicator": {
-                    "description": "Indicates how long the shipping address has been associated with the customer.",
-                    "type": "string"
-                  },
-                  "delivery_timeframe": {
-                    "description": "Indicates the delivery timeframe for the order.",
-                    "type": "string"
-                  },
-                  "shipping_recipient": {
-                    "$ref": "#/components/schemas/ShippingRecipientRequest"
-                  },
-                  "description": {
-                    "description": "A description of the transaction.",
-                    "maxLength": 500,
-                    "type": "string"
-                  },
-                  "token": {
-                    "description": "A stored payment token from the merchant's Payment Instruments.",
-                    "minLength": 88,
-                    "maxLength": 88,
-                    "type": "string"
-                  },
-                  "provider_token": {
-                    "description": "A tokenized payment method reference issued directly by the payment provider (e.g. a Stripe payment_method or Adyen storedPaymentMethodId), forwarded to the processor as-is. Distinct from `token`, which is a SmartRetry Payment Instrument token.",
-                    "minLength": 1,
-                    "maxLength": 255,
-                    "type": "string"
-                  },
-                  "cvv": {
-                    "description": "CVV/CVC of the card. Optional for added security (cannot be stored).",
-                    "minLength": 3,
-                    "maxLength": 4,
-                    "pattern": "^[0-9]{3,4}$",
-                    "type": "string"
-                  }
-                }
+                "$ref": "#/components/schemas/SaleRouteRequest"
               }
             }
-          },
-          "description": "Exactly one of `token`, `provider_token`, or `order.payment_instrument` must be supplied."
+          }
         },
         "parameters": [
           {
-            "schema": { "minLength": 6, "maxLength": 6, "type": "string" },
+            "schema": {
+              "minLength": 6,
+              "maxLength": 6,
+              "pattern": "^[\\dA-Za-z]{6}$",
+              "type": "string"
+            },
             "in": "path",
             "name": "terminal_friendly_id",
             "required": true,
@@ -2822,108 +3237,19 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "403": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "404": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "409": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "500": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "503": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/payments/sale/retry/{terminal_friendly_id}": {
-      "post": {
-        "tags": ["payments"],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/RetryNoAnchorUnion" }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "schema": { "minLength": 6, "maxLength": 6, "type": "string" },
-            "in": "path",
-            "name": "terminal_friendly_id",
-            "required": true,
-            "description": "The unique identifier of the terminal."
-          },
-          {
-            "schema": {
-              "maxLength": 255,
-              "pattern": "^[\\w-]+$",
-              "type": "string"
-            },
-            "in": "header",
-            "name": "idempotency-key",
-            "required": false,
-            "description": "Optional idempotency key, scoped to terminal + matched route pattern. A replayed request returns the cached response with `Idempotency-Replayed: true`."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SalePreauthAcceptedResponse"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
           },
-          "400": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
           "403": {
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2931,7 +3257,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2939,7 +3267,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2947,7 +3277,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2955,7 +3287,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -2963,7 +3297,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           }
@@ -2972,7 +3308,9 @@
     },
     "/v1/payments/refund/{terminal_friendly_id}": {
       "post": {
-        "tags": ["payments"],
+        "tags": [
+          "payments"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -2980,28 +3318,37 @@
               "schema": {
                 "additionalProperties": false,
                 "type": "object",
-                "required": ["transaction_reference_id", "order_reference_id"],
+                "required": [
+                  "transaction_reference_id",
+                  "order_reference_id"
+                ],
                 "properties": {
                   "transaction_reference_id": {
                     "description": "The transaction friendly ID of the original transaction to be refunded",
                     "minLength": 8,
                     "maxLength": 8,
+                    "pattern": "^[\\dA-Za-z]{8}$",
                     "type": "string"
                   },
                   "order_reference_id": {
                     "description": "The order friendly ID associated with the original transaction to be refunded",
                     "minLength": 8,
                     "maxLength": 8,
+                    "pattern": "^[\\dA-Za-z]{8}$",
                     "type": "string"
                   },
-                  "merchant_transaction_id": { "type": "string" },
+                  "merchant_transaction_id": {
+                    "type": "string"
+                  },
                   "amount": {
                     "description": "Amount to refund, in major currency units (e.g. 10.00 for $10.00 USD). Defaults to the full transaction amount if omitted.",
                     "minimum": 0.01,
                     "maximum": 999999.99,
                     "type": "number"
                   },
-                  "currency": { "$ref": "#/components/schemas/CurrencyCode" }
+                  "currency": {
+                    "$ref": "#/components/schemas/CurrencyCode"
+                  }
                 }
               }
             }
@@ -3009,7 +3356,12 @@
         },
         "parameters": [
           {
-            "schema": { "minLength": 6, "maxLength": 6, "type": "string" },
+            "schema": {
+              "minLength": 6,
+              "maxLength": 6,
+              "pattern": "^[\\dA-Za-z]{6}$",
+              "type": "string"
+            },
             "in": "path",
             "name": "terminal_friendly_id",
             "required": true,
@@ -3042,7 +3394,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -3050,7 +3404,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -3058,7 +3414,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -3066,7 +3424,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -3074,7 +3434,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -3082,7 +3444,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -3090,7 +3454,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           }
@@ -3099,7 +3465,9 @@
     },
     "/v1/payments/void/{terminal_friendly_id}": {
       "post": {
-        "tags": ["payments"],
+        "tags": [
+          "payments"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -3107,18 +3475,23 @@
               "schema": {
                 "additionalProperties": false,
                 "type": "object",
-                "required": ["transaction_reference_id", "order_reference_id"],
+                "required": [
+                  "transaction_reference_id",
+                  "order_reference_id"
+                ],
                 "properties": {
                   "transaction_reference_id": {
                     "description": "The transaction friendly ID of the original transaction to be voided",
                     "minLength": 8,
                     "maxLength": 8,
+                    "pattern": "^[\\dA-Za-z]{8}$",
                     "type": "string"
                   },
                   "order_reference_id": {
                     "description": "The order friendly ID associated with the original transaction to be voided",
                     "minLength": 8,
                     "maxLength": 8,
+                    "pattern": "^[\\dA-Za-z]{8}$",
                     "type": "string"
                   }
                 }
@@ -3128,7 +3501,12 @@
         },
         "parameters": [
           {
-            "schema": { "minLength": 6, "maxLength": 6, "type": "string" },
+            "schema": {
+              "minLength": 6,
+              "maxLength": 6,
+              "pattern": "^[\\dA-Za-z]{6}$",
+              "type": "string"
+            },
             "in": "path",
             "name": "terminal_friendly_id",
             "required": true,
@@ -3153,18 +3531,28 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["transaction_id", "accepted", "order_id"],
+                  "required": [
+                    "transaction_id",
+                    "accepted",
+                    "order_id"
+                  ],
                   "properties": {
                     "transaction_id": {
                       "minLength": 8,
                       "maxLength": 8,
+                      "pattern": "^[\\dA-Za-z]{8}$",
                       "type": "string"
                     },
-                    "merchant_order_id": { "type": "string" },
-                    "accepted": { "type": "boolean" },
+                    "merchant_order_id": {
+                      "type": "string"
+                    },
+                    "accepted": {
+                      "type": "boolean"
+                    },
                     "order_id": {
                       "minLength": 8,
                       "maxLength": 8,
+                      "pattern": "^[\\dA-Za-z]{8}$",
                       "type": "string"
                     }
                   }
@@ -3176,7 +3564,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -3184,7 +3574,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -3192,7 +3584,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -3200,7 +3594,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -3208,7 +3604,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -3216,7 +3614,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -3224,7 +3624,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           }
@@ -3233,44 +3635,27 @@
     },
     "/v1/payments/capture/{terminal_friendly_id}": {
       "post": {
-        "tags": ["payments"],
+        "tags": [
+          "payments"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "additionalProperties": false,
-                "type": "object",
-                "required": ["transaction_reference_id", "order_reference_id"],
-                "properties": {
-                  "transaction_reference_id": {
-                    "description": "The transaction friendly ID of the original PREAUTH transaction to be captured",
-                    "minLength": 8,
-                    "maxLength": 8,
-                    "type": "string"
-                  },
-                  "order_reference_id": {
-                    "description": "The order friendly ID associated with the original PREAUTH transaction to be captured",
-                    "minLength": 8,
-                    "maxLength": 8,
-                    "type": "string"
-                  },
-                  "amount": {
-                    "description": "Amount to capture, in major currency units (e.g. 10.00 for $10.00 USD). Defaults to the full preauthorized amount if omitted.",
-                    "minimum": 0.01,
-                    "maximum": 999999.99,
-                    "type": "number"
-                  },
-                  "merchant_transaction_id": { "type": "string" },
-                  "description": { "maxLength": 500, "type": "string" }
-                }
+                "$ref": "#/components/schemas/CaptureRouteRequest"
               }
             }
           }
         },
         "parameters": [
           {
-            "schema": { "minLength": 6, "maxLength": 6, "type": "string" },
+            "schema": {
+              "minLength": 6,
+              "maxLength": 6,
+              "pattern": "^[\\dA-Za-z]{6}$",
+              "type": "string"
+            },
             "in": "path",
             "name": "terminal_friendly_id",
             "required": true,
@@ -3303,118 +3688,19 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "403": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "404": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "409": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "422": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "500": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "503": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/payments/capture/retry/{terminal_friendly_id}": {
-      "post": {
-        "tags": ["payments"],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DirectOriginRetryRequest"
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "schema": { "minLength": 6, "maxLength": 6, "type": "string" },
-            "in": "path",
-            "name": "terminal_friendly_id",
-            "required": true,
-            "description": "The unique identifier of the terminal."
-          },
-          {
-            "schema": {
-              "maxLength": 255,
-              "pattern": "^[\\w-]+$",
-              "type": "string"
-            },
-            "in": "header",
-            "name": "idempotency-key",
-            "required": false,
-            "description": "Optional idempotency key, scoped to terminal + matched route pattern. A replayed request returns the cached response with `Idempotency-Replayed: true`."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AcceptedWithOrderResponse"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
           },
-          "400": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
           "403": {
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -3422,7 +3708,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -3430,7 +3718,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -3438,7 +3728,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -3446,7 +3738,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -3454,7 +3748,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           }
@@ -3463,17 +3759,29 @@
     },
     "/v1/payments/status/{terminal_friendly_id}/{transaction_id}": {
       "get": {
-        "tags": ["payments"],
+        "tags": [
+          "payments"
+        ],
         "parameters": [
           {
-            "schema": { "minLength": 8, "maxLength": 8, "type": "string" },
+            "schema": {
+              "minLength": 8,
+              "maxLength": 8,
+              "pattern": "^[\\dA-Za-z]{8}$",
+              "type": "string"
+            },
             "in": "path",
             "name": "transaction_id",
             "required": true,
             "description": "The unique identifier of the transaction."
           },
           {
-            "schema": { "minLength": 6, "maxLength": 6, "type": "string" },
+            "schema": {
+              "minLength": 6,
+              "maxLength": 6,
+              "pattern": "^[\\dA-Za-z]{6}$",
+              "type": "string"
+            },
             "in": "path",
             "name": "terminal_friendly_id",
             "required": true,
@@ -3499,59 +3807,173 @@
                     "transaction_id": {
                       "minLength": 8,
                       "maxLength": 8,
+                      "pattern": "^[\\dA-Za-z]{8}$",
                       "type": "string"
                     },
-                    "type": { "$ref": "#/components/schemas/TransactionType" },
+                    "type": {
+                      "$ref": "#/components/schemas/TransactionType"
+                    },
                     "status": {
                       "type": "object",
-                      "required": ["reasonCode", "name"],
+                      "required": [
+                        "reasonCode",
+                        "name"
+                      ],
                       "properties": {
                         "status": {
                           "anyOf": [
-                            { "type": "string", "enum": ["APPROVED"] },
-                            { "type": "string", "enum": ["PROCESSING"] },
-                            { "type": "string", "enum": ["DECLINED"] },
-                            { "type": "string", "enum": ["ERROR"] },
-                            { "type": "string", "enum": ["CANCELLED"] },
-                            { "type": "string", "enum": ["INFO"] },
-                            { "type": "string", "enum": ["UNKNOWN"] }
+                            {
+                              "type": "string",
+                              "enum": [
+                                "APPROVED"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "PROCESSING"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "DECLINED"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "ERROR"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "CANCELLED"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "INFO"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "UNKNOWN"
+                              ]
+                            }
                           ]
                         },
-                        "reasonCode": { "type": "string" },
+                        "reasonCode": {
+                          "type": "string"
+                        },
                         "domain": {
                           "anyOf": [
-                            { "type": "string", "enum": ["SYSTEM"] },
-                            { "type": "string", "enum": ["VALIDATION"] },
-                            { "type": "string", "enum": ["RISK"] },
-                            { "type": "string", "enum": ["ROUTING"] },
-                            { "type": "string", "enum": ["AUTH"] },
-                            { "type": "string", "enum": ["PROCESSOR"] },
-                            { "type": "string", "enum": ["PAYMENT_METHOD"] },
-                            { "type": "string", "enum": ["PAYER_ACCOUNT"] }
+                            {
+                              "type": "string",
+                              "enum": [
+                                "SYSTEM"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "VALIDATION"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "RISK"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "ROUTING"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "AUTH"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "PROCESSOR"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "PAYMENT_METHOD"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "PAYER_ACCOUNT"
+                              ]
+                            }
                           ]
                         },
-                        "reason": { "type": "string" },
-                        "name": { "type": "string" },
-                        "description": { "type": "string" },
+                        "reason": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
                         "field": {
                           "type": "object",
-                          "required": ["pointer"],
-                          "properties": { "pointer": { "type": "string" } }
+                          "required": [
+                            "pointer"
+                          ],
+                          "properties": {
+                            "pointer": {
+                              "type": "string"
+                            }
+                          }
                         }
                       }
                     },
-                    "authorization_code": { "type": "string" },
-                    "arn": { "type": "string" },
-                    "amount": { "type": "number" },
-                    "currency": { "type": "string" },
-                    "order": { "$ref": "#/components/schemas/OrderResponse" },
-                    "attempt_number": { "type": "number" },
+                    "authorization_code": {
+                      "type": "string"
+                    },
+                    "arn": {
+                      "type": "string"
+                    },
+                    "amount": {
+                      "type": "number"
+                    },
+                    "currency": {
+                      "type": "string"
+                    },
+                    "order": {
+                      "$ref": "#/components/schemas/OrderResponse"
+                    },
+                    "attempt_number": {
+                      "type": "number"
+                    },
                     "risk_decision": {
                       "type": "object",
-                      "required": ["success", "allowed"],
+                      "required": [
+                        "success",
+                        "allowed"
+                      ],
                       "properties": {
-                        "success": { "type": "boolean" },
-                        "allowed": { "type": "boolean" },
+                        "success": {
+                          "type": "boolean"
+                        },
+                        "allowed": {
+                          "type": "boolean"
+                        },
                         "blockedBy": {
                           "type": "array",
                           "items": {
@@ -3565,14 +3987,35 @@
                             "properties": {
                               "type": {
                                 "anyOf": [
-                                  { "type": "string", "enum": ["blocklist"] },
-                                  { "type": "string", "enum": ["velocity"] },
-                                  { "type": "string", "enum": ["risk_rules"] }
+                                  {
+                                    "type": "string",
+                                    "enum": [
+                                      "blocklist"
+                                    ]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "enum": [
+                                      "velocity"
+                                    ]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "enum": [
+                                      "risk_rules"
+                                    ]
+                                  }
                                 ]
                               },
-                              "policyId": { "type": "number" },
-                              "policyName": { "type": "string" },
-                              "details": { "type": "string" }
+                              "policyId": {
+                                "type": "number"
+                              },
+                              "policyName": {
+                                "type": "string"
+                              },
+                              "details": {
+                                "type": "string"
+                              }
                             }
                           }
                         },
@@ -3580,26 +4023,55 @@
                           "type": "array",
                           "items": {
                             "type": "object",
-                            "required": ["vipMode"],
+                            "required": [
+                              "vipMode"
+                            ],
                             "properties": {
                               "bypassedChecks": {
                                 "type": "array",
                                 "items": {
                                   "anyOf": [
-                                    { "type": "string", "enum": ["blocklist"] },
-                                    { "type": "string", "enum": ["velocity"] },
-                                    { "type": "string", "enum": ["risk_rules"] }
+                                    {
+                                      "type": "string",
+                                      "enum": [
+                                        "blocklist"
+                                      ]
+                                    },
+                                    {
+                                      "type": "string",
+                                      "enum": [
+                                        "velocity"
+                                      ]
+                                    },
+                                    {
+                                      "type": "string",
+                                      "enum": [
+                                        "risk_rules"
+                                      ]
+                                    }
                                   ]
                                 }
                               },
                               "vipMode": {
                                 "anyOf": [
-                                  { "type": "string", "enum": ["payer"] },
                                   {
                                     "type": "string",
-                                    "enum": ["payment_instrument"]
+                                    "enum": [
+                                      "payer"
+                                    ]
                                   },
-                                  { "type": "string", "enum": ["parameter"] }
+                                  {
+                                    "type": "string",
+                                    "enum": [
+                                      "payment_instrument"
+                                    ]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "enum": [
+                                      "parameter"
+                                    ]
+                                  }
                                 ]
                               }
                             }
@@ -3609,26 +4081,54 @@
                           "type": "array",
                           "items": {
                             "type": "object",
-                            "required": ["policyId", "policyName"],
+                            "required": [
+                              "policyId",
+                              "policyName"
+                            ],
                             "properties": {
-                              "policyId": { "type": "number" },
-                              "policyName": { "type": "string" },
-                              "description": { "type": "string" }
+                              "policyId": {
+                                "type": "number"
+                              },
+                              "policyName": {
+                                "type": "string"
+                              },
+                              "description": {
+                                "type": "string"
+                              }
                             }
                           }
                         },
-                        "error": { "type": "string" }
+                        "error": {
+                          "type": "string"
+                        }
                       }
                     },
-                    "created_at": { "type": "string" },
-                    "updated_at": { "type": "string" },
+                    "created_at": {
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "type": "string"
+                    },
                     "retry": {
                       "type": "object",
-                      "required": ["plan_id", "state", "expires_at"],
+                      "required": [
+                        "plan_id",
+                        "state",
+                        "expires_at"
+                      ],
                       "properties": {
-                        "plan_id": { "type": "string" },
-                        "state": { "type": "string", "enum": ["PENDING"] },
-                        "expires_at": { "type": "string" }
+                        "plan_id": {
+                          "type": "string"
+                        },
+                        "state": {
+                          "type": "string",
+                          "enum": [
+                            "PENDING"
+                          ]
+                        },
+                        "expires_at": {
+                          "type": "string"
+                        }
                       }
                     },
                     "pending_payer_actions": {
@@ -3637,62 +4137,148 @@
                         "anyOf": [
                           {
                             "type": "object",
-                            "required": ["action"],
+                            "required": [
+                              "action"
+                            ],
                             "properties": {
                               "action": {
                                 "type": "string",
-                                "enum": ["UPDATE_CARD_NUMBER"]
-                              }
-                            }
-                          },
-                          {
-                            "type": "object",
-                            "required": ["action"],
-                            "properties": {
-                              "action": {
-                                "type": "string",
-                                "enum": ["USE_DIFFERENT_CARD"]
-                              }
-                            }
-                          },
-                          {
-                            "type": "object",
-                            "required": ["action"],
-                            "properties": {
-                              "action": {
-                                "type": "string",
-                                "enum": ["ENTER_SECURITY_CODE"]
-                              },
-                              "length": { "type": "integer" },
-                              "label": {
-                                "anyOf": [
-                                  { "type": "string", "enum": ["CVV"] },
-                                  { "type": "string", "enum": ["CVC"] },
-                                  { "type": "string", "enum": ["CID"] },
-                                  { "type": "string", "enum": ["CVN"] },
-                                  { "type": "string", "enum": ["CVE"] },
-                                  { "type": "string", "enum": ["CVP2"] }
+                                "enum": [
+                                  "UPDATE_CARD_NUMBER"
                                 ]
                               }
                             }
                           },
                           {
                             "type": "object",
-                            "required": ["action"],
+                            "required": [
+                              "action"
+                            ],
                             "properties": {
                               "action": {
                                 "type": "string",
-                                "enum": ["UPDATE_EXPIRY_DATE"]
+                                "enum": [
+                                  "USE_DIFFERENT_CARD"
+                                ]
                               }
                             }
                           },
                           {
                             "type": "object",
-                            "required": ["action"],
+                            "required": [
+                              "action"
+                            ],
                             "properties": {
                               "action": {
                                 "type": "string",
-                                "enum": ["UPDATE_BILLING_ADDRESS"]
+                                "enum": [
+                                  "ENTER_SECURITY_CODE"
+                                ]
+                              },
+                              "length": {
+                                "type": "integer"
+                              },
+                              "label": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": [
+                                      "CVV"
+                                    ]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "enum": [
+                                      "CVC"
+                                    ]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "enum": [
+                                      "CID"
+                                    ]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "enum": [
+                                      "CVN"
+                                    ]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "enum": [
+                                      "CVE"
+                                    ]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "enum": [
+                                      "CVP2"
+                                    ]
+                                  }
+                                ]
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "required": [
+                              "action"
+                            ],
+                            "properties": {
+                              "action": {
+                                "type": "string",
+                                "enum": [
+                                  "UPDATE_EXPIRY_DATE"
+                                ]
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "required": [
+                              "action"
+                            ],
+                            "properties": {
+                              "action": {
+                                "type": "string",
+                                "enum": [
+                                  "UPDATE_BILLING_ADDRESS"
+                                ]
+                              },
+                              "address": {
+                                "additionalProperties": false,
+                                "type": "object",
+                                "properties": {
+                                  "street": {
+                                    "maxLength": 100,
+                                    "type": "string"
+                                  },
+                                  "building": {
+                                    "maxLength": 20,
+                                    "type": "string"
+                                  },
+                                  "address_2": {
+                                    "maxLength": 100,
+                                    "type": "string"
+                                  },
+                                  "postal_code": {
+                                    "maxLength": 20,
+                                    "type": "string"
+                                  },
+                                  "city_name": {
+                                    "maxLength": 50,
+                                    "type": "string"
+                                  },
+                                  "state_code": {
+                                    "minLength": 2,
+                                    "maxLength": 6,
+                                    "type": "string"
+                                  },
+                                  "country": {
+                                    "$ref": "#/components/schemas/CountryCode"
+                                  }
+                                }
                               }
                             }
                           },
@@ -3710,7 +4296,9 @@
                             "properties": {
                               "action": {
                                 "type": "string",
-                                "enum": ["APPROVE_CURRENCY_CHANGE"]
+                                "enum": [
+                                  "APPROVE_CURRENCY_CHANGE"
+                                ]
                               },
                               "from": {
                                 "$ref": "#/components/schemas/CurrencyCode"
@@ -3718,19 +4306,32 @@
                               "to": {
                                 "$ref": "#/components/schemas/CurrencyCode"
                               },
-                              "from_amount": { "type": "number" },
-                              "to_amount": { "type": "number" },
-                              "rate": { "type": "number" },
-                              "rate_as_of": { "type": "string" }
+                              "from_amount": {
+                                "type": "number"
+                              },
+                              "to_amount": {
+                                "type": "number"
+                              },
+                              "rate": {
+                                "type": "number"
+                              },
+                              "rate_as_of": {
+                                "type": "string"
+                              }
                             }
                           },
                           {
                             "type": "object",
-                            "required": ["action", "reasons"],
+                            "required": [
+                              "action",
+                              "reasons"
+                            ],
                             "properties": {
                               "action": {
                                 "type": "string",
-                                "enum": ["CONTACT_BANK"]
+                                "enum": [
+                                  "CONTACT_BANK"
+                                ]
                               },
                               "reasons": {
                                 "type": "array",
@@ -3738,55 +4339,81 @@
                                   "anyOf": [
                                     {
                                       "type": "string",
-                                      "enum": ["ABROAD_RESTRICTION"]
+                                      "enum": [
+                                        "ABROAD_RESTRICTION"
+                                      ]
                                     },
                                     {
                                       "type": "string",
-                                      "enum": ["MCC_RESTRICTION"]
+                                      "enum": [
+                                        "MCC_RESTRICTION"
+                                      ]
                                     },
                                     {
                                       "type": "string",
-                                      "enum": ["RECURRING_NOT_PERMITTED"]
+                                      "enum": [
+                                        "RECURRING_NOT_PERMITTED"
+                                      ]
                                     },
                                     {
                                       "type": "string",
-                                      "enum": ["CARD_NOT_ACTIVATED"]
+                                      "enum": [
+                                        "CARD_NOT_ACTIVATED"
+                                      ]
                                     },
                                     {
                                       "type": "string",
-                                      "enum": ["SELF_BLOCKED_CARD"]
+                                      "enum": [
+                                        "SELF_BLOCKED_CARD"
+                                      ]
                                     },
                                     {
                                       "type": "string",
-                                      "enum": ["SUSPECTED_FRAUD_FLAG"]
+                                      "enum": [
+                                        "SUSPECTED_FRAUD_FLAG"
+                                      ]
                                     },
                                     {
                                       "type": "string",
-                                      "enum": ["ACCOUNT_CLOSED"]
+                                      "enum": [
+                                        "ACCOUNT_CLOSED"
+                                      ]
                                     },
                                     {
                                       "type": "string",
-                                      "enum": ["CREDIT_LIMIT_INCREASE"]
+                                      "enum": [
+                                        "CREDIT_LIMIT_INCREASE"
+                                      ]
                                     },
                                     {
                                       "type": "string",
-                                      "enum": ["VELOCITY_LIMIT"]
+                                      "enum": [
+                                        "VELOCITY_LIMIT"
+                                      ]
                                     },
                                     {
                                       "type": "string",
-                                      "enum": ["ADDRESS_MISMATCH"]
+                                      "enum": [
+                                        "ADDRESS_MISMATCH"
+                                      ]
                                     },
                                     {
                                       "type": "string",
-                                      "enum": ["IDENTITY_VERIFICATION_REQUIRED"]
+                                      "enum": [
+                                        "IDENTITY_VERIFICATION_REQUIRED"
+                                      ]
                                     },
                                     {
                                       "type": "string",
-                                      "enum": ["RECURRING_CONSENT_REQUIRED"]
+                                      "enum": [
+                                        "RECURRING_CONSENT_REQUIRED"
+                                      ]
                                     },
                                     {
                                       "type": "string",
-                                      "enum": ["THREE_DS_ENROLLMENT"]
+                                      "enum": [
+                                        "THREE_DS_ENROLLMENT"
+                                      ]
                                     }
                                   ]
                                 }
@@ -3805,136 +4432,19 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
           "403": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "404": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "500": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/payments/status/{terminal_friendly_id}/{transaction_id}/payer-actions/{plan_id}/complete": {
-      "post": {
-        "tags": ["payments"],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "additionalProperties": false,
-                "type": "object",
-                "required": ["responses"],
-                "properties": {
-                  "responses": {
-                    "minItems": 1,
-                    "maxItems": 1,
-                    "type": "array",
-                    "items": {
-                      "additionalProperties": false,
-                      "type": "object",
-                      "required": ["action", "outcome"],
-                      "properties": {
-                        "action": {
-                          "type": "string",
-                          "enum": ["CONTACT_BANK"]
-                        },
-                        "outcome": {
-                          "anyOf": [
-                            { "type": "string", "enum": ["RESOLVED"] },
-                            { "type": "string", "enum": ["NOT_RESOLVED"] },
-                            { "type": "string", "enum": ["SKIPPED"] }
-                          ]
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "schema": { "minLength": 8, "maxLength": 8, "type": "string" },
-            "in": "path",
-            "name": "transaction_id",
-            "required": true
-          },
-          {
-            "schema": { "minLength": 6, "maxLength": 6, "type": "string" },
-            "in": "path",
-            "name": "terminal_friendly_id",
-            "required": true
-          },
-          {
-            "schema": { "minLength": 1, "type": "string" },
-            "in": "path",
-            "name": "plan_id",
-            "required": true
-          },
-          {
-            "schema": {
-              "maxLength": 255,
-              "pattern": "^[\\w-]+$",
-              "type": "string"
-            },
-            "in": "header",
-            "name": "idempotency-key",
-            "required": false,
-            "description": "Optional idempotency key, scoped to terminal + matched route pattern. A replayed request returns the cached response with `Idempotency-Replayed: true`."
-          }
-        ],
-        "responses": {
-          "202": {
             "description": "Default Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "required": ["accepted"],
-                  "properties": {
-                    "accepted": { "type": "boolean", "enum": [true] }
-                  }
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
-              }
-            }
-          },
-          "400": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "403": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
               }
             }
           },
@@ -3942,15 +4452,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "409": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -3958,15 +4462,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "503": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           }
@@ -3975,10 +4473,15 @@
     },
     "/webhooks/{provider}": {
       "post": {
-        "tags": ["webhooks"],
+        "tags": [
+          "webhooks"
+        ],
         "parameters": [
           {
-            "schema": { "minLength": 1, "type": "string" },
+            "schema": {
+              "minLength": 1,
+              "type": "string"
+            },
             "in": "path",
             "name": "provider",
             "required": true,
@@ -3992,9 +4495,14 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["accepted", "webhookId"],
+                  "required": [
+                    "accepted",
+                    "webhookId"
+                  ],
                   "properties": {
-                    "accepted": { "type": "boolean" },
+                    "accepted": {
+                      "type": "boolean"
+                    },
                     "webhookId": {
                       "description": "A freshly generated UUID identifying this webhook envelope in the queue.",
                       "format": "uuid",
@@ -4009,7 +4517,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -4017,7 +4527,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -4025,7 +4537,9 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           }
@@ -4033,8 +4547,16 @@
       }
     }
   },
-  "servers": [{ "url": "https://terminal.smartretry.com" }],
-  "security": [{ "ApiKeyAuth": [] }],
+  "servers": [
+    {
+      "url": "https://terminal.smartretry.com"
+    }
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
   "tags": [
     {
       "name": "payments",

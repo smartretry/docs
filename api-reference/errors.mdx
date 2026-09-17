@@ -62,25 +62,20 @@ an operation.
 
 | Operation | Method and path | Declared error statuses |
 |---|---|---|
-| Initialize recurring | `POST /v1/payments/recurring/init/{terminal_friendly_id}` | `400`, `404`, `409`, `500`, `503` |
-| Retry recurring initialization | `POST /v1/payments/recurring/init/retry/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `500`, `503` |
+| Initialize recurring | `POST /v1/payments/recurring/init/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `500`, `503` |
 | Recurring status | `GET /v1/payments/recurring/status/{terminal_friendly_id}` | `400`, `404`, `500` |
 | Cancel recurring | `POST /v1/payments/recurring/cancel/{terminal_friendly_id}` | `400`, `404`, `409`, `500`, `503` |
-| Charge recurring | `POST /v1/payments/recurring/charge/{terminal_friendly_id}` | `400`, `404`, `409`, `422`, `500`, `503` |
-| Retry recurring charge | `POST /v1/payments/recurring/charge/retry/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `422`, `500`, `503` |
+| Charge recurring | `POST /v1/payments/recurring/charge/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `422`, `500`, `503` |
 | Update recurring | `PUT /v1/payments/recurring/update/{terminal_friendly_id}` | `400`, `404`, `409`, `422`, `500` |
 | Future transaction status | `GET /v1/payments/recurring/future-transactions/status/{terminal_friendly_id}` | `400`, `404`, `500` |
 | Update future transaction | `PUT /v1/payments/recurring/future-transactions/update/{terminal_friendly_id}` | `400`, `404`, `409`, `422`, `500` |
 | Charge future transaction | `POST /v1/payments/recurring/future-transactions/charge/{terminal_friendly_id}` | `400`, `404`, `409`, `422`, `500`, `503` |
 | Cancel future transaction | `POST /v1/payments/recurring/future-transactions/cancel/{terminal_friendly_id}` | `400`, `404`, `409`, `422`, `500`, `503` |
-| Pre-authorization | `POST /v1/payments/preauth/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `500`, `503` |
-| Retry pre-authorization | `POST /v1/payments/preauth/retry/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `422`, `500`, `503` |
-| Sale | `POST /v1/payments/sale/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `500`, `503` |
-| Retry sale | `POST /v1/payments/sale/retry/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `422`, `500`, `503` |
+| Pre-authorization | `POST /v1/payments/preauth/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `422`, `500`, `503` |
+| Sale | `POST /v1/payments/sale/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `422`, `500`, `503` |
 | Refund | `POST /v1/payments/refund/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `422`, `500`, `503` |
 | Void | `POST /v1/payments/void/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `422`, `500`, `503` |
 | Capture | `POST /v1/payments/capture/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `422`, `500`, `503` |
-| Retry capture | `POST /v1/payments/capture/retry/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `422`, `500`, `503` |
 | Transaction status | `GET /v1/payments/status/{terminal_friendly_id}/{transaction_id}` | `400`, `403`, `404`, `500` |
 
 ## Reason codes
