@@ -110,11 +110,8 @@
             "group": "Payments",
             "pages": [
               "api-reference/payments/sale",
-              "api-reference/payments/sale-retry",
               "api-reference/payments/preauth",
-              "api-reference/payments/preauth-retry",
               "api-reference/payments/capture",
-              "api-reference/payments/capture-retry",
               "api-reference/payments/refund",
               "api-reference/payments/void",
               "api-reference/payments/status"
@@ -124,10 +121,8 @@
             "group": "Recurring",
             "pages": [
               "api-reference/recurring/init",
-              "api-reference/recurring/init-retry",
               "api-reference/recurring/status",
               "api-reference/recurring/charge",
-              "api-reference/recurring/charge-retry",
               "api-reference/recurring/update",
               "api-reference/recurring/cancel"
             ]
