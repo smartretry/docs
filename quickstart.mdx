@@ -73,7 +73,7 @@ This guide walks you through making your first API request with SmartRetry. You'
   </Step>
 
   <Step title="Handle the response">
-    A successful request returns HTTP `200` with a JSON body. Check the `accepted` field to confirm the transaction was approved.
+    A successful request returns HTTP `200` with a JSON body. `accepted: true` means SmartRetry accepted the transaction for processing - it does not confirm issuer approval.
 
     ```json Success response
     {
@@ -89,11 +89,13 @@ This guide walks you through making your first API request with SmartRetry. You'
     | `transaction_id` | SmartRetry's unique identifier for this transaction |
     | `order_id` | SmartRetry's order reference |
     | `merchant_transaction_id` | The ID you provided in the request |
-    | `accepted` | `true` if the transaction was approved, `false` otherwise |
+    | `accepted` | `true` if SmartRetry accepted the transaction for processing |
 
     <Tip>
       Store both `transaction_id` and `order_id` in your system. You'll need them to perform follow-up operations like capture, refund, or void.
     </Tip>
+
+    Fetch [transaction status](/api-reference/transaction-status) using the returned `transaction_id` to find out whether the issuer approved or declined the payment.
   </Step>
 
   <Step title="Test in the sandbox">

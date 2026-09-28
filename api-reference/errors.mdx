@@ -12,7 +12,7 @@ for diagnostics.
 All error responses share this shape:
 
 <ResponseField name="type" type="string" required>
-  Identifies the error category.
+  A URI identifying the error type, in the form `https://terminal.smartretry.com/errors/<reason_code>`.
 </ResponseField>
 
 <ResponseField name="title" type="string" required>
@@ -62,25 +62,20 @@ an operation.
 
 | Operation | Method and path | Declared error statuses |
 |---|---|---|
-| Initialize recurring | `POST /v1/payments/recurring/init/{terminal_friendly_id}` | `400`, `404`, `409`, `500`, `503` |
-| Retry recurring initialization | `POST /v1/payments/recurring/init/retry/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `500`, `503` |
+| Initialize recurring | `POST /v1/payments/recurring/init/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `500`, `503` |
 | Recurring status | `GET /v1/payments/recurring/status/{terminal_friendly_id}` | `400`, `404`, `500` |
 | Cancel recurring | `POST /v1/payments/recurring/cancel/{terminal_friendly_id}` | `400`, `404`, `409`, `500`, `503` |
-| Charge recurring | `POST /v1/payments/recurring/charge/{terminal_friendly_id}` | `400`, `404`, `409`, `422`, `500`, `503` |
-| Retry recurring charge | `POST /v1/payments/recurring/charge/retry/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `422`, `500`, `503` |
+| Charge recurring | `POST /v1/payments/recurring/charge/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `422`, `500`, `503` |
 | Update recurring | `PUT /v1/payments/recurring/update/{terminal_friendly_id}` | `400`, `404`, `409`, `422`, `500` |
 | Future transaction status | `GET /v1/payments/recurring/future-transactions/status/{terminal_friendly_id}` | `400`, `404`, `500` |
 | Update future transaction | `PUT /v1/payments/recurring/future-transactions/update/{terminal_friendly_id}` | `400`, `404`, `409`, `422`, `500` |
 | Charge future transaction | `POST /v1/payments/recurring/future-transactions/charge/{terminal_friendly_id}` | `400`, `404`, `409`, `422`, `500`, `503` |
 | Cancel future transaction | `POST /v1/payments/recurring/future-transactions/cancel/{terminal_friendly_id}` | `400`, `404`, `409`, `422`, `500`, `503` |
-| Pre-authorization | `POST /v1/payments/preauth/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `500`, `503` |
-| Retry pre-authorization | `POST /v1/payments/preauth/retry/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `422`, `500`, `503` |
-| Sale | `POST /v1/payments/sale/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `500`, `503` |
-| Retry sale | `POST /v1/payments/sale/retry/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `422`, `500`, `503` |
+| Pre-authorization | `POST /v1/payments/preauth/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `422`, `500`, `503` |
+| Sale | `POST /v1/payments/sale/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `422`, `500`, `503` |
 | Refund | `POST /v1/payments/refund/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `422`, `500`, `503` |
 | Void | `POST /v1/payments/void/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `422`, `500`, `503` |
 | Capture | `POST /v1/payments/capture/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `422`, `500`, `503` |
-| Retry capture | `POST /v1/payments/capture/retry/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `422`, `500`, `503` |
 | Transaction status | `GET /v1/payments/status/{terminal_friendly_id}/{transaction_id}` | `400`, `403`, `404`, `500` |
 
 ## Reason codes
@@ -88,18 +83,24 @@ an operation.
 | Reason code | Status | Description |
 |-------------|--------|-------------|
 | `INVALID_API_KEY` | 401 | The `x-api-key` header is missing, malformed, or the key has been revoked. |
-| `TERMINAL_NOT_FOUND` | 403 / 404 | The `terminal_friendly_id` in the path does not match any terminal your key can access. |
+| `ROUTING/RECORD_NOT_FOUND` | 404 | The `terminal_friendly_id` in the path does not match any known terminal. |
+| `ROUTING/TERMINAL_RESOURCE_ACCESS_DENIED` | 403 | The referenced resource (transaction, order, recurring series) belongs to a different terminal than your key can access. |
 | `VALIDATION/TRANSACTION_NOT_FOUND` | 404 | No transaction with the given ID exists on this terminal. |
 | `VALIDATION/INVALID_IDEMPOTENCY_KEY` | 400 | The `Idempotency-Key` header is malformed, too long, or contains unsupported characters. |
 | `ROUTING/IDEMPOTENCY_CONFLICT` | 409 | The `Idempotency-Key` value was reused with a different request body. Reuse the same key only for an exact retry of the original POST request. |
 | `ROUTING/RESOURCE_LOCKED` | 503 | Another request using the same `Idempotency-Key` is still in flight and SmartRetry could not obtain the cached result before the wait timeout. |
 | `VALIDATION/INVALID_AMOUNT` | 400 | The `amount` value is missing, zero, negative, or not a valid number in major currency units. |
-| `INVALID_CURRENCY` | 400 | The `currency` value is not a supported ISO 4217 currency code. |
-| `INVALID_CARD_NUMBER` | 400 | The card number failed the Luhn check or is not a recognised card format. |
-| `INVALID_EXPIRY` | 400 | The card expiry date is missing, in the wrong format, or in the past. |
-| `VALIDATION/MISSING_FIELD` | 400 | A field required by this endpoint was not included in the request body. The `context` object identifies the missing field. |
+| `VALIDATION/INVALID_FIELD/CURRENCY` | 400 | The `currency` value is not a supported ISO 4217 currency code, or `VALIDATION/UNAUTHORIZED_CURRENCY` if it isn't enabled for this terminal. |
+| `VALIDATION/INVALID_FIELD/PAYMENT_CARD_NUMBER` | 400 | The card number failed the Luhn check or is not a recognised card format. |
+| `VALIDATION/INVALID_FIELD/PAYMENT_CARD_EXPIRY_MONTH` / `..._EXPIRY_YEAR` | 400 | The card expiry date is missing, out of range, or in the past. |
+| `VALIDATION/MISSING_FIELD` | 400 | A field required by this endpoint was not included in the request body. `context.field` is a JSON pointer to the missing field. |
+| `VALIDATION/UNKNOWN_FIELD` | 400 | The request body included a field the schema does not accept. `context.field` is a JSON pointer to it. |
+| `VALIDATION/INVALID_FIELD` | 400 | A field failed schema validation for a reason not covered above (wrong type, pattern, or range). `context.field` is a JSON pointer to it. |
 | `RATE_LIMIT_EXCEEDED` | 429 | Too many requests in a short window. Honour the `Retry-After` header before retrying. |
 | `VALIDATION/RECURRING_NOT_FOUND` | 404 | No recurring plan with the given terminal and reference exists. |
+
+This is a curated shortlist of common codes. See [Status reason codes](/api-reference/status-reason-codes)
+for the full catalog, including all decline and processor-level reasons.
 
 ## Example error responses
 
@@ -110,77 +111,68 @@ The values below illustrate the shared response shape. A specific `detail`, `rea
 
 ```json 401 Unauthorized
 {
-  "type": "https://www.smartretry.com/docs/api-reference/errors#invalid-api-key",
+  "type": "https://terminal.smartretry.com/errors/INVALID_API_KEY",
   "title": "Unauthorized",
   "status": 401,
   "detail": "The x-api-key header is missing or the provided key is invalid.",
-  "reason_code": "INVALID_API_KEY",
-  "context": {}
+  "reason_code": "INVALID_API_KEY"
 }
 ```
 
 ```json 400 Bad Request
 {
-  "type": "https://www.smartretry.com/docs/api-reference/errors#missing-required-field",
-  "title": "Bad Request",
+  "type": "https://terminal.smartretry.com/errors/VALIDATION/MISSING_FIELD",
+  "title": "Validation Error",
   "status": 400,
   "detail": "The 'amount' field is required and must be a positive number in major currency units.",
+  "instance": "/v1/payments/sale/ABC123",
   "reason_code": "VALIDATION/MISSING_FIELD",
   "context": {
-    "field": "amount"
+    "field": "/amount"
   }
 }
 ```
 
 ```json 404 Not Found
 {
-  "type": "https://www.smartretry.com/docs/api-reference/errors#transaction-not-found",
+  "type": "https://terminal.smartretry.com/errors/VALIDATION/TRANSACTION_NOT_FOUND",
   "title": "Not Found",
   "status": 404,
   "detail": "No transaction with ID 'txn_001' was found on terminal 'ABC123'.",
   "instance": "/v1/payments/status/ABC123/txn_001",
-  "reason_code": "VALIDATION/TRANSACTION_NOT_FOUND",
-  "context": {
-    "terminal_friendly_id": "ABC123",
-    "transaction_id": "txn_001"
-  }
+  "reason_code": "VALIDATION/TRANSACTION_NOT_FOUND"
 }
 ```
 
 ```json 429 Too Many Requests
 {
-  "type": "https://www.smartretry.com/docs/api-reference/errors#rate-limit-exceeded",
+  "type": "https://terminal.smartretry.com/errors/RATE_LIMIT_EXCEEDED",
   "title": "Too Many Requests",
   "status": 429,
   "detail": "You have exceeded the request rate limit. Please wait before retrying.",
-  "reason_code": "RATE_LIMIT_EXCEEDED",
-  "context": {
-    "retry_after_seconds": 30
-  }
+  "reason_code": "RATE_LIMIT_EXCEEDED"
 }
 ```
 
 ```json 409 Conflict
 {
-  "type": "https://www.smartretry.com/docs/api-reference/errors#idempotency-conflict",
+  "type": "https://terminal.smartretry.com/errors/ROUTING/IDEMPOTENCY_CONFLICT",
   "title": "Conflict",
   "status": 409,
   "detail": "The Idempotency-Key was already used with a different request body.",
-  "reason_code": "ROUTING/IDEMPOTENCY_CONFLICT",
-  "context": {
-    "idempotency_key": "sale-order-20260401-001"
-  }
+  "instance": "/v1/payments/sale/ABC123",
+  "reason_code": "ROUTING/IDEMPOTENCY_CONFLICT"
 }
 ```
 
 ```json 503 Service Unavailable
 {
-  "type": "https://www.smartretry.com/docs/api-reference/errors#resource-locked",
+  "type": "https://terminal.smartretry.com/errors/ROUTING/RESOURCE_LOCKED",
   "title": "Service Unavailable",
   "status": 503,
   "detail": "Another request with the same Idempotency-Key is still being processed. Retry shortly.",
-  "reason_code": "ROUTING/RESOURCE_LOCKED",
-  "context": {}
+  "instance": "/v1/payments/sale/ABC123",
+  "reason_code": "ROUTING/RESOURCE_LOCKED"
 }
 ```
 

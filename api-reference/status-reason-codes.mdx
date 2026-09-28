@@ -1,0 +1,21 @@
+---
+title: Status reason codes
+description: The full catalog of status-reason codes, grouped by domain.
+openapi-schema: StatusReasonCode
+---
+
+Every decline, error, and validation failure SmartRetry produces carries one of the codes below. You
+encounter this catalog in two places:
+
+- As `reason_code` on any [error response](/api-reference/errors) — the exact code, unmodified.
+- As `status.reasonCode` on a [transaction status](/api-reference/payments/status) response — dot-separated
+  and truncated to two segments. See [Reason code formats](/api-reference/transaction-status#reason-code-formats)
+  for the mapping between the two.
+
+<Tip>
+  Branch your integration logic on the code itself, not on its `name` or `description` text. Human-readable
+  fields may change without notice.
+</Tip>
+
+Codes are grouped below by `domain` — see [Transaction status](/api-reference/transaction-status#status-domains)
+for what each domain represents.

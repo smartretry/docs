@@ -1,0 +1,144 @@
+---
+title: Transaction status
+description: The top-level status values a transaction can carry, the status object shape, and how to act on each outcome.
+openapi-schema: TransactionStatus
+---
+
+## Lifecycle
+
+`PROCESSING` is the only non-final status. `APPROVED`, `DECLINED`, `CANCELLED`, `ERROR`, and `UNKNOWN`
+are all final — none of them transition to another status on their own.
+
+<Warning>
+  Treat `UNKNOWN` as unresolved, not as a failure. Query [transaction status](/api-reference/payments/status)
+  again or contact support before taking any action based on it.
+</Warning>
+
+## How to act on each status
+
+<AccordionGroup>
+  <Accordion title="APPROVED">
+    The payment succeeded. For a sale, funds are captured. For a pre-authorization, funds are held —
+    call [capture](/api-reference/payments/capture) to settle them, or
+    [void](/api-reference/payments/void) to release the hold.
+  </Accordion>
+  <Accordion title="PROCESSING">
+    The transaction is still in flight. Poll [transaction status](/api-reference/payments/status) or
+    wait for a webhook event rather than resubmitting the request.
+  </Accordion>
+  <Accordion title="DECLINED">
+    The issuer, processor, or a SmartRetry risk/validation rule refused the transaction. Read
+    `reasonCode` and `domain` to determine whether the decline is retryable — see
+    [Decline codes](/concepts/decline-codes).
+  </Accordion>
+  <Accordion title="ERROR">
+    A technical failure prevented the transaction from completing, distinct from an issuer decline.
+    These are typically safe to retry with a new `Idempotency-Key`.
+  </Accordion>
+  <Accordion title="CANCELLED">
+    The transaction was cancelled — for example, by a [void](/api-reference/payments/void) — before it
+    reached a final outcome. No funds moved.
+  </Accordion>
+  <Accordion title="UNKNOWN">
+    The outcome could not be determined, for example after a timeout with no response from the
+    processor. Do not assume success or failure.
+  </Accordion>
+</AccordionGroup>
+
+## The status object
+
+`GET /v1/payments/status/{terminal_friendly_id}/{transaction_id}` returns `status` as a structured
+object, not a plain string:
+
+```json
+{
+  "status": "DECLINED",
+  "reasonCode": "PAYER_ACCOUNT.STOLEN_INSTRUMENT",
+  "domain": "PAYER_ACCOUNT",
+  "reason": "STOLEN_INSTRUMENT",
+  "name": "Stolen Card",
+  "description": "The payment card has been reported as stolen by the cardholder or the issuing bank."
+}
+```
+
+<ResponseField name="status" type="string">
+  The top-level outcome. See the values above.
+</ResponseField>
+
+<ResponseField name="reasonCode" type="string" required>
+  A dot-separated code identifying the reason for the status. See **Reason code formats** below for
+  how this differs from the `reason_code` on error responses.
+</ResponseField>
+
+<ResponseField name="domain" type="string">
+  The functional area responsible for the status. See [Status reason codes](/api-reference/status-reason-codes) for the full breakdown by domain.
+</ResponseField>
+
+<ResponseField name="reason" type="string">
+  The reason segment of the code, without the domain prefix.
+</ResponseField>
+
+<ResponseField name="name" type="string" required>
+  A human-readable name for the specific reason.
+</ResponseField>
+
+<ResponseField name="description" type="string">
+  A plain-language description of what this reason means.
+</ResponseField>
+
+<ResponseField name="field" type="object">
+  Present for validation-related reasons. Identifies the offending field.
+  <Expandable title="properties">
+    <ResponseField name="field.pointer" type="string" required>
+      A JSON pointer to the invalid field in the original request body.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Reason code formats
+
+SmartRetry uses the same underlying catalog in two different string formats, depending on where it
+appears.
+
+<Tabs>
+  <Tab title="status.reasonCode">
+    Dot-separated, and truncated to at most two segments: `DOMAIN.REASON`. The full three-segment
+    detail is still reflected in `name` and `description`.
+
+    ```
+    PAYER_ACCOUNT/STOLEN_INSTRUMENT/STOLEN_CARD   (underlying code)
+      → reasonCode: "PAYER_ACCOUNT.STOLEN_INSTRUMENT"
+      → domain:     "PAYER_ACCOUNT"
+      → reason:     "STOLEN_INSTRUMENT"
+    ```
+  </Tab>
+  <Tab title="error reason_code">
+    Slash-separated, and never truncated: `DOMAIN/REASON` or `DOMAIN/REASON/DETAIL`. This is the value
+    returned as `reason_code` on every [error response](/api-reference/errors), and it matches an
+    entry in the full [Status reason codes](/api-reference/status-reason-codes) catalog exactly.
+  </Tab>
+</Tabs>
+
+## Status domains
+
+The `domain` field tells you which part of the payment chain produced a status — SmartRetry's own
+validation, risk rules, routing, the card network, the processor, the payment method, or the payer's
+account. Domain names and descriptions are documented alongside the full code catalog.
+
+<Card title="Status reason codes" icon="list" href="/api-reference/status-reason-codes">
+  All 300+ reason codes, grouped and described by domain.
+</Card>
+
+## Related
+
+<CardGroup cols={3}>
+  <Card title="Transaction status endpoint" icon="magnifying-glass" href="/api-reference/payments/status">
+    Retrieve the current status and details of any transaction.
+  </Card>
+  <Card title="Status reason codes" icon="list" href="/api-reference/status-reason-codes">
+    The full reason-code catalog, grouped by domain.
+  </Card>
+  <Card title="Errors" icon="triangle-exclamation" href="/api-reference/errors">
+    HTTP status codes and error response structure.
+  </Card>
+</CardGroup>

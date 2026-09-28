@@ -146,6 +146,31 @@
     };
   }
 
+  function generateEventId() {
+    if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+      return crypto.randomUUID();
+    }
+    return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10);
+  }
+
+  // Mirrors services/analytics/trackEvent + pushToDataLayer in
+  // marketing-website-app: same dataLayer push shape (event, event_id,
+  // event_timestamp, ...params), so downstream GTM/Zaraz triggers keyed on
+  // "ConsentUpdate" fire the same way from docs as from the marketing site.
+  function trackEvent(event, params) {
+    if (typeof window === "undefined") return;
+    window.dataLayer = window.dataLayer || [];
+    var payload = {
+      event: event,
+      event_id: generateEventId(),
+      event_timestamp: Date.now(),
+    };
+    for (var key in params) {
+      if (Object.prototype.hasOwnProperty.call(params, key)) payload[key] = params[key];
+    }
+    window.dataLayer.push(payload);
+  }
+
   // ---------------------------------------------------------------------
   // Third-party script loaders
   // ---------------------------------------------------------------------
@@ -324,10 +349,12 @@
 
     acceptBtn.addEventListener("click", function () {
       acceptAll();
+      trackEvent("ConsentUpdate", { choice: "accept_all" });
       hideBanner();
     });
     rejectBtn.addEventListener("click", function () {
       rejectAll();
+      trackEvent("ConsentUpdate", { choice: "reject_all" });
       hideBanner();
     });
     customizeBtn.addEventListener("click", function () {
@@ -362,7 +389,7 @@
     if (banner) banner.remove();
   }
 
-  function makeSwitch(labelText, checked) {
+  function makeSwitch(labelText, checked, onToggle) {
     var thumb = el("span", { class: "sr-consent-switch-thumb" });
     var button = el("button", {
       type: "button",
@@ -376,19 +403,35 @@
       var next = button.getAttribute("data-checked") !== "true";
       button.setAttribute("data-checked", next ? "true" : "false");
       button.setAttribute("aria-pressed", next ? "true" : "false");
+      if (onToggle) onToggle(next);
     });
     return button;
   }
 
+  // Toggle state lives outside the modal DOM, mirroring marketing's React
+  // state: closing without saving (Cancel, Escape, overlay click) must not
+  // reset choices the user already flipped, matching the marketing dialog's
+  // behavior of only re-syncing from stored consent, never from defaults, on
+  // every open.
+  var modalChoices = { analytics: true, advertising: true };
+  var modalLastFocused = null;
+  var modalKeydownHandler = null;
+
   function openModal() {
     closeModal();
 
-    var current = hasUserChosen()
-      ? getCurrentChoices()
-      : { analytics: true, advertising: true };
+    modalLastFocused = document.activeElement;
 
-    var analyticsSwitch = makeSwitch(LABELS.analyticsTitle, current.analytics);
-    var advertisingSwitch = makeSwitch(LABELS.advertisingTitle, current.advertising);
+    if (hasUserChosen()) {
+      modalChoices = getCurrentChoices();
+    }
+
+    var analyticsSwitch = makeSwitch(LABELS.analyticsTitle, modalChoices.analytics, function (checked) {
+      modalChoices.analytics = checked;
+    });
+    var advertisingSwitch = makeSwitch(LABELS.advertisingTitle, modalChoices.advertising, function (checked) {
+      modalChoices.advertising = checked;
+    });
 
     var saveBtn = el("button", {
       type: "button",
@@ -408,9 +451,11 @@
     });
 
     saveBtn.addEventListener("click", function () {
-      setConsent({
-        analytics: analyticsSwitch.getAttribute("data-checked") === "true",
-        advertising: advertisingSwitch.getAttribute("data-checked") === "true",
+      setConsent(modalChoices);
+      trackEvent("ConsentUpdate", {
+        choice: "customize",
+        analytics: modalChoices.analytics,
+        advertising: modalChoices.advertising,
       });
       closeModal();
       hideBanner();
@@ -473,11 +518,54 @@
     });
 
     document.body.appendChild(overlay);
+
+    // Mirrors Radix Dialog's keyboard contract: Escape closes, Tab is
+    // trapped inside the dialog while it's open. Radix provides both for
+    // free on the marketing site; this is the manual equivalent for docs.
+    var dialogEl = overlay.querySelector("#sr-consent-modal");
+    modalKeydownHandler = function (event) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeModal();
+        return;
+      }
+      if (event.key !== "Tab") return;
+
+      var focusable = dialogEl.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length === 0) return;
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", modalKeydownHandler);
+
+    closeBtn.focus();
   }
 
   function closeModal() {
     var overlay = document.getElementById("sr-consent-modal-overlay");
     if (overlay) overlay.remove();
+
+    if (modalKeydownHandler) {
+      document.removeEventListener("keydown", modalKeydownHandler);
+      modalKeydownHandler = null;
+    }
+
+    // Radix restores focus to whatever triggered the dialog (the Customize
+    // button) once it closes; same here.
+    if (modalLastFocused && typeof modalLastFocused.focus === "function") {
+      modalLastFocused.focus();
+    }
+    modalLastFocused = null;
   }
 
   function checkBanner() {

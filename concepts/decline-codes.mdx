@@ -44,22 +44,29 @@ Not all declines are equal. The most important distinction in payment recovery i
 
 ## Common decline reason codes
 
-The API returns exact `DOMAIN.REASON` values in `reasonCode`. The following source-backed examples are not a retry-policy matrix; determine any retry action from your SmartRetry configuration and the transaction context.
+`status.reasonCode` on the transaction status object is a `DOMAIN.REASON` value, truncated to two
+segments even when the underlying code has three (see
+[Reason code formats](/api-reference/transaction-status#reason-code-formats)). The `reason_code` on an
+error response is not truncated. The following source-backed examples are not a retry-policy matrix;
+determine any retry action from your SmartRetry configuration and the transaction context.
 
-| Reason code | Description |
+| `status.reasonCode` | Description |
 |---|---|
 | `PAYER_ACCOUNT.INSUFFICIENT_FUNDS` | The payer's account does not have enough funds to cover the transaction. |
 | `PAYER_ACCOUNT.DO_NOT_HONOR` | The issuer declined the transaction without providing a more specific reason. |
 | `PAYER_ACCOUNT.INVALID_EXPIRY_DATE` | The payment instrument expiry date is invalid. |
 | `PAYER_ACCOUNT.SUSPECTED_FRAUD` | The payer account was flagged for suspected fraud. |
-| `PAYER_ACCOUNT.STOLEN_INSTRUMENT.STOLEN_CARD` | The payment instrument was reported stolen. |
-| `PAYER_ACCOUNT.LOST_INSTRUMENT.LOST_CARD` | The payment instrument was reported lost. |
+| `PAYER_ACCOUNT.STOLEN_INSTRUMENT` | The payment instrument was reported stolen. |
+| `PAYER_ACCOUNT.LOST_INSTRUMENT` | The payment instrument was reported lost. |
 | `PAYER_ACCOUNT.INVALID_SECURITY_CODE` | The payment instrument security code is invalid. |
 | `AUTH.3DS_CHALLENGE_FAILED` | The payer did not complete the 3DS authentication challenge. |
 | `PAYER_ACCOUNT.DUPLICATE_TRANSACTION` | The payer account identified the transaction as a duplicate. |
 | `PAYER_ACCOUNT.EXCEEDS_WITHDRAWAL_FREQUENCY_LIMIT` | The payer account exceeded a frequency limit. |
 | `PAYER_ACCOUNT.EXCEEDS_AMOUNT_LIMIT` | The payer account exceeded an amount limit. |
 | `PAYER_ACCOUNT.RESTRICTED_CARD` | The payment instrument has a restriction that prevents the transaction. |
+
+See [Status reason codes](/api-reference/status-reason-codes) for the complete catalog, including the
+full three-segment codes as they appear in `reason_code` on error responses.
 
 ## Using the domain field
 
