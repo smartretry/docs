@@ -15,6 +15,9 @@
     "light": "/images/logo.svg",
     "dark": "/images/logo.svg"
   },
+  "api": {
+     "openapi":"api-reference/openapi.json"
+  },
   "navbar": {
     "primary": {
       "type": "github",
@@ -104,6 +107,13 @@
               "api-reference/idempotency",
               "api-reference/rate-limiting",
               "api-reference/errors"
+            ]
+          },
+          {
+            "group": "Statuses",
+            "pages": [
+              "api-reference/transaction-status",
+              "api-reference/status-reason-codes"
             ]
           },
           {

@@ -18,6 +18,7 @@ SmartRetry supports a broad range of payment methods. You specify the payment me
 | `cash` | Cash-based payment methods | PayCash, OXXOPay |
 | `direct_debit` | Direct debit schemes | ACH, SEPA Direct Debit, BACS |
 | `cryptocurrencies` | Crypto payments | Bitcoin, Ethereum, stablecoins |
+| `bank_transfer` | Bank-to-bank transfers | Wire transfer, local bank transfer schemes |
 
 ## Specifying a payment method
 
@@ -44,25 +45,51 @@ When using `cards`, include the card details in `payment_instrument`:
 | `card_number` | Yes | 13–19 digit primary account number (PAN) |
 | `expiry_month` | Yes | Card expiry month (1–12) |
 | `expiry_year` | Yes | Card expiry year (2024–2099) |
+| `card_cardholder_name` | No | The name on the card, up to 100 characters |
+| `card_profile.fingerprint` | No | A pre-computed 88-character card-profile identifier from an earlier transaction |
 | `cvv` | No | Card verification value - optional but recommended |
 
 <Note>
   SmartRetry has access to card details and transaction data as part of the retry and optimization process. Card numbers are not stored, and all sensitive data is encrypted in transit and at rest. See [Security and compliance](/security) for details.
 </Note>
 
+A `payment_instrument` carries exactly one credential source: card details, a SmartRetry `token`, or
+a processor `provider_token`. An optional `cvv` can accompany any of them.
+
 ## Token-based payments
 
-For a tokenized payment, send the 88-character SmartRetry `token` at the top level of the sale or pre-authorization request. A normal successful payment response does not return a token. Retrieve a stored payment-instrument token from the [transaction status response](/api-reference/payments/status) when available.
-
-Pass the token at the top level:
+For a tokenized payment, send the 88-character SmartRetry `token` inside `payment_instrument` (under `order` on a sale or pre-authorization request). No submission response returns a token. Retrieve a stored payment-instrument token from `order.payment_instrument.token` on the [transaction status response](/api-reference/payments/status) when available.
 
 ```json
 {
-  "token": "a8f3k2m9xqv1p7r4t6y8u2i5o9e3w1q0a8f3k2m9xqv1p7r4t6y8u2i5o9e3w1q0a8f3k2m9x"
+  "payment_instrument": {
+    "token": "xaji0y6dpbhsahxthv3a3zmf8mdd4v30t9nt3w5uzbikcidkwnnhj7xvg0fn9xuy41ibljh75lxo6qjiujv6oh9s",
+    "cvv": "123"
+  }
 }
 ```
 
 This removes the need to re-transmit raw card data, simplifying repeat billing and reducing PCI scope.
+
+## Provider-token payments
+
+If you already hold a credential issued directly by one of SmartRetry's connected processors, send it
+as `provider_token` (1–255 characters) instead:
+
+```json
+{
+  "payment_instrument": {
+    "provider_token": "pm_1AbCdEfGhIjKlMnOpQrStUv",
+    "cvv": "123"
+  }
+}
+```
+
+<Note>
+  Setting `payment_collection: hosted_page` on a sale or pre-authorization request makes
+  `payment_instrument` optional and rejects `token`/`provider_token` outright - the payer supplies a
+  fresh credential later through the hosted payment page, not at create time.
+</Note>
 
 ## Currency support
 

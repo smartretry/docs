@@ -657,6 +657,656 @@
           "hosted_page"
         ]
       },
+      "TransactionStatus": {
+        "description": "The high-level outcome of a transaction.\n\n| Value | Description |\n|---|---|\n| `APPROVED` | Transaction was approved and completed successfully. |\n| `PROCESSING` | Transaction is still being processed. |\n| `DECLINED` | Transaction was declined (e.g., by issuer, risk, validation). |\n| `ERROR` | Transaction failed due to a system or technical error. |\n| `CANCELLED` | Transaction was cancelled by the user or merchant. |\n| `UNKNOWN` | Transaction outcome is unknown or indeterminate. |",
+        "x-enumDescriptions": {
+          "APPROVED": "Transaction was approved and completed successfully.",
+          "PROCESSING": "Transaction is still being processed.",
+          "DECLINED": "Transaction was declined (e.g., by issuer, risk, validation).",
+          "ERROR": "Transaction failed due to a system or technical error.",
+          "CANCELLED": "Transaction was cancelled by the user or merchant.",
+          "UNKNOWN": "Transaction outcome is unknown or indeterminate."
+        },
+        "type": "string",
+        "enum": [
+          "APPROVED",
+          "PROCESSING",
+          "DECLINED",
+          "ERROR",
+          "CANCELLED",
+          "UNKNOWN"
+        ]
+      },
+      "StatusReasonCode": {
+        "description": "The full set of status-reason codes a transaction can carry, as `reason_code` on error responses and as `status.reasonCode`/`status.reason` on transaction status responses. Codes are grouped by domain below.\n\n### System\nInternal platform, infrastructure, or configuration issues.\n\n| Code | State | Name | Description |\n|---|---|---|---|\n| `SYSTEM/SUCCESSFUL` | APPROVED | Transaction Approved | The transaction was successfully processed and approved. |\n| `SYSTEM/PARTIAL_APPROVAL` | APPROVED | Partial Approval | The transaction was approved for a lower amount than requested (partial approval). |\n| `SYSTEM/ZERO_AMOUNT_AUTHORIZATION_ONLY` | APPROVED | Zero-Amount Authorization Only | The authorization succeeded for zero-amount verification only; the card is valid but nothing was charged. |\n| `SYSTEM/PROCESSING` | PROCESSING | Transaction Processing | Transaction is currently being processed by the system. |\n| `SYSTEM/CREATED` | PROCESSING | Transaction Created | A new transaction has been initiated in the system and is awaiting customer input to provide the required details in order to proceed. |\n| `SYSTEM/TIMEOUT` | ERROR | System Timeout | The system timed out while processing the transaction. |\n| `SYSTEM/INTERNAL_ERROR` | ERROR | Internal System Error | An unexpected internal system error occurred. |\n| `SYSTEM/UNKNOWN` | UNKNOWN | Unmapped Status | The received status could not be mapped to a known internal state. |\n\n### Payer account\nExternal decisions or restrictions from the payer's account provider (issuer).\n\n| Code | State | Name | Description |\n|---|---|---|---|\n| `PAYER_ACCOUNT/TRANSACTION_REJECTED_AS_INVALID` | DECLINED | Invalid Transaction | The transaction was rejected as invalid by the payment provider managing the payer’s account. |\n| `PAYER_ACCOUNT/REENTER_TRANSACTION` | DECLINED | Transaction Must Be Resubmitted | The payment provider managing the payer’s account requires the transaction to be resubmitted. |\n| `PAYER_ACCOUNT/NO_ACTION_TAKEN` | DECLINED | No Action Taken | No action was taken on this transaction request. |\n| `PAYER_ACCOUNT/RECORD_NOT_FOUND` | DECLINED | Record Not Found | Unable to locate the requested record. |\n| `PAYER_ACCOUNT/TEMPORARILY_UNAVAILABLE` | ERROR | Temporarily Unavailable | The service is temporarily unavailable for processing. |\n| `PAYER_ACCOUNT/EXCEEDS_PREAUTHORIZED_AMOUNT` | DECLINED | Exceeds Pre-authorized Amount | The transaction amount exceeds the pre-authorized approval amount. |\n| `PAYER_ACCOUNT/INVALID_ACCOUNT_IDENTIFIER` | DECLINED | Invalid Account Identifier | The account identifier provided for the customer’s payment method is invalid. |\n| `PAYER_ACCOUNT/INVALID_ACCOUNT_IDENTIFIER/CARD_NUMBER` | DECLINED | Invalid Card Number | The card number (PAN) is invalid or unrecognized by the issuer. |\n| `PAYER_ACCOUNT/NOT_PERMITTED_TO_HOLDER` | DECLINED | Transaction Not Permitted to Holder | This transaction type is not permitted for the account holder. |\n| `PAYER_ACCOUNT/SECURITY_VIOLATION` | DECLINED | Security Violation | A security violation was detected by the issuer. |\n| `PAYER_ACCOUNT/INVALID_SECURITY_CODE` | DECLINED | Invalid or Missing Security Code | The security code provided for the customer's payment instrument is invalid or missing. |\n| `PAYER_ACCOUNT/INVALID_SECURITY_CODE/CARD_SECURITY_CODE` | DECLINED | Invalid or Missing Card Security Code | The card security code (CVV/CVC) provided is invalid or missing. |\n| `PAYER_ACCOUNT/INVALID_EXPIRY_DATE` | DECLINED | Invalid or Incorrect Expiry Date | The expiry date provided for the customer's payment instrument is invalid or does not match the provider's records. |\n| `PAYER_ACCOUNT/INVALID_EXPIRY_DATE/CARD_EXPIRY_DATE` | DECLINED | Invalid or Incorrect Card Expiry Date | The card expiry date provided is invalid or does not match the issuer's records. |\n| `PAYER_ACCOUNT/INVALID_EFFECTIVE_DATE` | DECLINED | Invalid or Incorrect Effective Date | The effective (\"valid from\") date for the customer's payment instrument is invalid, or the instrument is not yet active. |\n| `PAYER_ACCOUNT/INVALID_EFFECTIVE_DATE/CARD_EFFECTIVE_DATE` | DECLINED | Invalid or Incorrect Card Effective Date | The card effective (\"valid from\") date is invalid, or the card is not yet active. |\n| `PAYER_ACCOUNT/INSTRUMENT_REPLACED` | DECLINED | Instrument Replaced | The payment instrument has been replaced by a newly issued one; the current instrument is no longer valid. |\n| `PAYER_ACCOUNT/INSTRUMENT_REPLACED/REPLACED_CARD` | DECLINED | Card Replaced | A new card has been issued (reissue or renewal); the current card is no longer valid and should not be used. |\n| `PAYER_ACCOUNT/CARD_ACTIVATION_REQUIRED` | DECLINED | Card Activation Required | The card has not been activated. The issuer requires an activation step (e.g. PIN transaction or ATM use) before it can be used. |\n| `PAYER_ACCOUNT/CARD_LIFECYCLE_DECLINE` | DECLINED | Card Lifecycle Decline | The issuer declined for an unspecified card lifecycle reason (e.g. expiry, replacement, migration, or closure) without indicating which. |\n| `PAYER_ACCOUNT/INVALID_AMOUNT` | DECLINED | Invalid Amount | The issuer rejected the transaction because the amount value is invalid or unacceptable (e.g. negative or zero). |\n| `PAYER_ACCOUNT/EXCEEDS_CUMULATIVE_AMOUNT_LIMIT` | DECLINED | Exceeds Cumulative Amount Limit | The cumulative transaction amount over a defined period (e.g. daily or monthly) has exceeded the cardholder's limit. |\n| `PAYER_ACCOUNT/INVALID_INSTALLMENT_PLAN` | DECLINED | Invalid Installment Plan | The selected installment plan is invalid, unsupported, or not permitted for this card or transaction type. |\n| `PAYER_ACCOUNT/INVALID_INSTALLMENT_COUNT` | DECLINED | Invalid Installment Count | The requested number of installment payments is invalid or outside the allowed range. |\n| `PAYER_ACCOUNT/RELATED_TRANSACTION_LOCKED` | DECLINED | Related Transaction Locked | The referenced transaction or issuer record is currently locked and cannot be modified (e.g. an update is in progress or restricted by issuer policy). |\n| `PAYER_ACCOUNT/CASH_BACK_NOT_ALLOWED` | DECLINED | Cash Back Not Allowed | The issuer declined the cash-back request because the card or transaction type permits purchase transactions only. |\n| `PAYER_ACCOUNT/CANCELLED` | CANCELLED | Transaction Cancelled | Transaction was cancelled before completion. |\n| `PAYER_ACCOUNT/INSUFFICIENT_FUNDS` | DECLINED | Insufficient Funds | The holder account has insufficient funds to complete the purchase. |\n| `PAYER_ACCOUNT/LOST_INSTRUMENT` | DECLINED | Lost Instrument | The payment instrument has been reported as lost. |\n| `PAYER_ACCOUNT/LOST_INSTRUMENT/LOST_CARD` | DECLINED | Lost Card | The payment card has been reported as lost by the cardholder or the issuing bank. |\n| `PAYER_ACCOUNT/STOLEN_INSTRUMENT` | DECLINED | Stolen Instrument | The payment instrument has been reported as stolen. |\n| `PAYER_ACCOUNT/STOLEN_INSTRUMENT/STOLEN_CARD` | DECLINED | Stolen Card | The payment card has been reported as stolen by the cardholder or the issuing bank. |\n| `PAYER_ACCOUNT/INSTRUMENT_NOT_AVAILABLE` | DECLINED | Payment Instrument Unavailable | The payer’s account payment provider declined the transaction because the payment instrument is not available for use (e.g., inactive, suspended, or revoked). |\n| `PAYER_ACCOUNT/CONTACT_PAYER_PAYMENT_PROVIDER` | DECLINED | Contact Payer Payment Provider | The customer must contact their payment provider that manages their account (e.g., issuing bank, wallet provider) to proceed with the transaction. |\n| `PAYER_ACCOUNT/CONTACT_PAYER_PAYMENT_PROVIDER/REFER_TO_CARD_ISSUER` | DECLINED | Refer to Card Issuer | The card issuer requests the cardholder to contact them directly. |\n| `PAYER_ACCOUNT/DO_NOT_HONOR` | DECLINED | Do Not Honor | The issuer declined the transaction without providing a specific reason. |\n| `PAYER_ACCOUNT/PICKUP_CARD` | DECLINED | Pick Up Card | The issuer requests that the card be retained. |\n| `PAYER_ACCOUNT/NO_CREDIT_ACCOUNT` | DECLINED | No Credit Account | The holder does not have a credit account associated with the card. |\n| `PAYER_ACCOUNT/NO_CHECKING_ACCOUNT` | DECLINED | No Checking Account | The holder does not have a checking account associated with the card. |\n| `PAYER_ACCOUNT/NO_SAVINGS_ACCOUNT` | DECLINED | No Savings Account | The holder does not have a savings account associated with the card. |\n| `PAYER_ACCOUNT/INCORRECT_PIN` | DECLINED | Incorrect PIN | The PIN entered is incorrect. |\n| `PAYER_ACCOUNT/PIN_TRIES_EXCEEDED` | DECLINED | PIN Tries Exceeded | The allowable number of PIN entry attempts has been exceeded. |\n| `PAYER_ACCOUNT/PIN_MANAGEMENT_DENIED` | ERROR | PIN Management Denied | The issuer declined a request to change or unblock the card PIN. |\n| `PAYER_ACCOUNT/PIN_REQUIRED` | DECLINED | PIN Required by Payer’s Payment Provider | The payer’s payment provider requires a PIN (online or offline) to authorize this transaction, but no PIN was provided. |\n| `PAYER_ACCOUNT/PIN_VERIFICATION_ERROR` | ERROR | PIN Verification Error | The issuing bank could not validate your PIN. |\n| `PAYER_ACCOUNT/OFFLINE_PIN_REQUIRED` | DECLINED | Offline PIN Required by Payer’s Payment Provider | The payer’s payment provider requires an offline PIN for this transaction. The provided authentication method does not meet this requirement. |\n| `PAYER_ACCOUNT/EXCEEDS_AMOUNT_LIMIT` | DECLINED | Exceeds Amount Limit | The transaction amount exceeds the cardholder's approval limit. |\n| `PAYER_ACCOUNT/EXCEEDS_WITHDRAWAL_FREQUENCY_LIMIT` | DECLINED | Exceeds Withdrawal Frequency Limit | The cardholder has exceeded the allowed number of withdrawals. |\n| `PAYER_ACCOUNT/RESTRICTED_CARD` | DECLINED | Restricted Card | The card is restricted and cannot be used for this transaction or region. |\n| `PAYER_ACCOUNT/DOMESTIC_DEBIT_NOT_ALLOWED` | DECLINED | Domestic Debit Not Allowed | The debit card is not permitted for domestic transactions due to issuer, scheme, or regulatory restrictions (common in markets such as India or Russia where certain cards are valid only for international or specific channels). |\n| `PAYER_ACCOUNT/INVALID_DESTINATION_ACCOUNT` | DECLINED | Invalid Destination Account | The destination (\"to\") account is invalid, non-existent, or restricted, so the transfer could not be completed. |\n| `PAYER_ACCOUNT/INVALID_SOURCE_ACCOUNT` | DECLINED | Invalid Source Account | The source (\"from\") funding account is invalid, missing, or not supported for this transaction. |\n| `PAYER_ACCOUNT/ACCOUNT_CLOSED` | DECLINED | Account Closed | The underlying account is no longer active — permanently closed or deactivated by the cardholder or issuer (e.g. voluntary closure, issuer policy, or long-term inactivity) — and cannot be used again. |\n| `PAYER_ACCOUNT/CARD_BLOCKED` | DECLINED | Card Blocked | The card is blocked, possibly due to first use or security restrictions. |\n| `PAYER_ACCOUNT/STOP_PAYMENT_ORDER` | DECLINED | Stop Payment Order | A stop payment order has been placed on this transaction. |\n| `PAYER_ACCOUNT/AUTHORIZATION_REVOKED` | DECLINED | Authorization Revoked | All authorizations for this account have been revoked. |\n| `PAYER_ACCOUNT/SUSPECTED_FRAUD` | DECLINED | Transaction Declined Due to Suspected Fraud | The transaction was declined by the payer’s account payment provider due to suspected fraudulent activity or exceeding internal fraud risk thresholds. |\n| `PAYER_ACCOUNT/DUPLICATE_TRANSACTION` | DECLINED | Duplicate Transaction Detected | The transaction was declined by the payer’s account payment provider because a duplicate transaction was detected within a short time window. |\n| `PAYER_ACCOUNT/OPERATION_NOT_ALLOWED_UNAUTHENTICATED_ORIGINAL` | DECLINED | Operation Not Allowed Without Authentication | The requested operation is not permitted because the original transaction did not include the required customer authentication. |\n| `PAYER_ACCOUNT/STRONG_AUTHENTICATION_REQUIRED` | DECLINED | Additional Authentication Required by Issuer | The issuer requires additional customer authentication (e.g., 3DS) to proceed with the transaction. The attempt did not include the required authentication and was soft declined. |\n\n### Risk\nInternal fraud and risk decisions enforced by the platform.\n\n| Code | State | Name | Description |\n|---|---|---|---|\n| `RISK/DECLINED` | DECLINED | Risk Declined | The transaction was declined by the risk engine. |\n| `RISK/BLOCK_LISTED` | DECLINED | Blocklisted Transaction | The transaction was rejected because one or more of its attributes match a value that has been blocklisted by SmartRetry’s risk management system. |\n| `RISK/VELOCITY_BLOCKED` | DECLINED | Velocity Limit Exceeded | The transaction was blocked due to velocity checks enforced by SmartRetry’s risk management system or the merchant’s configured rules, indicating that activity thresholds (e.g., frequency or volume) have been exceeded. |\n| `RISK/NO_ELIGIBLE_MERCHANT_ACCOUNTS` | DECLINED | No Eligible Merchant Accounts | No candidate merchant accounts remained after filtering by the payment providers allowed under risk policy. |\n\n### Processor\nExternal errors or outcomes from the payment processor or acquirer.\n\n| Code | State | Name | Description |\n|---|---|---|---|\n| `PROCESSOR/DECLINED` | DECLINED | Transaction Declined | The transaction was declined by the payment processor. |\n| `PROCESSOR/INVALID_RESPONSE` | ERROR | Invalid Response from Payment Provider | The payment provider returned a malformed or unparseable response. |\n| `PROCESSOR/NO_ACCOUNT_RECORD` | DECLINED | No Account Record | No account record found by the verifying party. |\n| `PROCESSOR/TIMEOUT` | ERROR | Payment Processor Timeout | The payment processor did not respond within the expected time. |\n| `PROCESSOR/VALIDATION_INVALID_FIELD` | ERROR | Invalid Field | The request contains a field value that could not be validated by the payment processor due to an invalid format or length. |\n| `PROCESSOR/VALIDATION_MISSING_FIELD` | ERROR | Missing Field | The request is missing a required field needed by the payment processor to proceed. |\n| `PROCESSOR/PRE_CHECK_MISSING_FIELD` | ERROR | Missing Field | A required field was not provided before the request could be sent to the payment processor. |\n| `PROCESSOR/PRE_CHECK_MISSING_FIELD/AMOUNT` | ERROR | Missing Amount | An amount value is required but was not provided before sending the request to the payment processor. |\n| `PROCESSOR/PRE_CHECK_MISSING_FIELD/CURRENCY` | ERROR | Missing Currency | A required currency value was not provided before sending the request to the payment processor. |\n| `PROCESSOR/PRE_CHECK_MISSING_FIELD/PAYMENT_CARD_NUMBER` | ERROR | Missing Payment Card Number | A payment card number is required but was not provided before sending the request to the payment processor. |\n| `PROCESSOR/PRE_CHECK_MISSING_FIELD/PAYMENT_CARD_EXPIRY_MONTH` | ERROR | Missing Payment Card Expiry Month | A payment card expiry month is required but was not provided before sending the request to the payment processor. |\n| `PROCESSOR/PRE_CHECK_MISSING_FIELD/PAYMENT_CARD_EXPIRY_YEAR` | ERROR | Missing Payment Card Expiry Year | A payment card expiry year is required but was not provided before sending the request to the payment processor. |\n| `PROCESSOR/PRE_CHECK_MISSING_FIELD/PAYMENT_CARD_SECURITY_CODE` | ERROR | Missing Payment Card Security Code (CVV) | A payment card security code (CVV) is required but was not provided before sending the request to the payment processor. |\n| `PROCESSOR/PRE_CHECK_MISSING_FIELD/PAYMENT_CARD_HOLDER_NAME` | ERROR | Missing Payment Card Holder Name | A payment card holder name is required but was not provided before sending the request to the payment processor. |\n| `PROCESSOR/PRE_CHECK_INVALID_FIELD` | ERROR | Invalid Field | A field value did not pass format validation before the request could be sent to the payment processor. |\n| `PROCESSOR/PRE_CHECK_INVALID_FIELD/CURRENCY` | ERROR | Invalid Currency | The currency specified is not valid or not supported by the payment processor. |\n| `PROCESSOR/RISK` | DECLINED | Declined by Processor Risk Controls | The transaction was declined by the payment processor based on internal risk assessment and controls. |\n| `PROCESSOR/NO_STATUS_RETURNED` | UNKNOWN | No Status Returned by Payment Provider | The payment provider did not include a status/reason code in its response. |\n| `PROCESSOR/UNSUPPORTED_TRANSACTION_TYPE` | DECLINED | Unsupported Transaction Type | The processor or provider does not support the requested transaction type. |\n| `PROCESSOR/ZERO_VALUE_AUTH_NOT_SUPPORTED` | DECLINED | Zero-Value Authorization Not Supported | The provider or issuer does not support zero-value (account verification) authorization for this transaction. |\n\n### Payment method\nExternal issues related to the payment method or scheme.\n\n| Code | State | Name | Description |\n|---|---|---|---|\n| `PAYMENT_METHOD/ALREADY_REVERSED` | DECLINED | Already Reversed | This transaction has already been reversed. |\n| `PAYMENT_METHOD/INELIGIBLE_FOR_RESUBMISSION` | DECLINED | Ineligible for Resubmission | This transaction is not eligible for resubmission. |\n| `PAYMENT_METHOD/DECLINED` | DECLINED | Payment Method Declined | The payment method was declined. |\n| `PAYMENT_METHOD/NOT_ALLOWED_AT_TERMINAL` | DECLINED | Not Allowed at Terminal | This transaction type is not allowed at this terminal. |\n| `PAYMENT_METHOD/INVALID_MERCHANT` | DECLINED | Invalid Merchant | The merchant is not valid or not authorized for this transaction. |\n| `PAYMENT_METHOD/UNABLE_TO_ROUTE_OR_AUTHORIZE` | DECLINED | Unable to Reach Issuer for Authorization | The payment method could not be authorized because the issuer could not be reached, could not be identified, or because offline authorization is not permitted when online authorization is unavailable. |\n| `PAYMENT_METHOD/INVALID_PROVIDER_RESPONSE` | ERROR | Invalid Response from Payment Method Provider | The payment method provider returned a malformed or unparseable response. |\n| `PAYMENT_METHOD/SYSTEM_ERROR` | ERROR | System Error | The authorization process could not be completed due to a system malfunction at the payment provider or along the authorization path. |\n| `PAYMENT_METHOD/ROUTING_ERROR` | ERROR | Routing Error | The financial institution cannot be found for routing. |\n| `PAYMENT_METHOD/AML_VIOLATION` | DECLINED | AML Violation | The transaction does not fulfill anti-money laundering requirements. |\n| `PAYMENT_METHOD/NETWORK_TOKEN_SERVICE_ERROR` | ERROR | Network Token Detokenization Failed | The request to detokenize a network token and retrieve a scheme cryptogram failed or timed out. This may occur when processing network tokens originating from digital wallets such as Google Pay or Apple Pay. |\n| `PAYMENT_METHOD/NETWORK_TOKEN_UNAVAILABLE` | DECLINED | Network Token Unavailable | The network token cannot be used for this transaction because it is suspended, deactivated, or could not be found by the scheme or token service. |\n| `PAYMENT_METHOD/VIOLATION_OF_LAW` | DECLINED | Violation of Law | The transaction cannot be completed due to a legal violation. |\n| `PAYMENT_METHOD/SURCHARGE_NOT_ALLOWED` | DECLINED | Surcharge Not Allowed | The surcharge amount is not permitted on this card or by scheme rules (common in US debit/acquirer environments). Visa codes: B1, B2. |\n| `PAYMENT_METHOD/AUTHORIZING_INSTITUTION_NOT_FOUND` | DECLINED | Authorizing Institution Not Found | The institution required to authorize this payment instrument could not be identified, so the transaction could not be routed for authorization. |\n| `PAYMENT_METHOD/AUTHORIZING_INSTITUTION_NOT_FOUND/ISSUER` | DECLINED | Issuer Not Found | The card's BIN does not correspond to any known issuer, so the transaction could not be routed to an issuer. |\n| `PAYMENT_METHOD/INVALID_TRANSACTION_FORMAT` | DECLINED | Invalid Transaction Format | The issuer or network rejected the transaction because the message format was invalid or not compliant (e.g. malformed message or invalid data elements). |\n\n### Authentication\nExternal customer authentication flows (e.g. 3DS, SCA).\n\n| Code | State | Name | Description |\n|---|---|---|---|\n| `AUTH/DECLINED` | DECLINED | Authentication Declined | The issuer processed the authentication but rejected it (e.g. risk rules, flagged account), including when the challenge was completed. |\n| `AUTH/INVALID_PROVIDER_RESPONSE` | ERROR | Invalid Response from Authentication Provider | The authentication provider returned a malformed or unparseable response. |\n| `AUTH/3DS_REDUCED_CONFIDENCE` | DECLINED | Reduced Authentication Confidence | The cardholder or device context produced signals that lowered trust in the authentication attempt. |\n| `AUTH/3DS_HOLDER_NOT_ENROLLED` | DECLINED | Cardholder Not Enrolled in 3DS | The cardholder is not enrolled in 3D Secure with the issuer or scheme. |\n| `AUTH/3DS_EXCEEDS_FREQUENCY_LIMIT` | DECLINED | Authentication Frequency Limit Exceeded | The issuer or provider rejected the request because challenge or authentication attempts exceeded an allowed frequency threshold. |\n| `AUTH/3DS_UNSUPPORTED_OR_UNKNOWN_DEVICE` | DECLINED | Unsupported or Unknown Device | The device could not be confidently recognized or is not supported for the required 3D Secure flow. |\n| `AUTH/INITIATED` | PROCESSING | Authentication Initiated | The authentication process has started. |\n| `AUTH/3DS_TECHNICAL_ERROR` | ERROR | 3DS Technical Error | A technical issue prevented the 3D Secure authentication flow from completing. |\n| `AUTH/3DS_AUTHENTICATION_TIMEOUT` | ERROR | 3DS Authentication Timeout | The 3D Secure challenge or frictionless authentication timed out before completion. |\n| `AUTH/3DS_IN_PROGRESS` | PROCESSING | 3DS Authentication In Progress | A 3D Secure challenge has been initiated and is still in progress. |\n| `AUTH/3DS_CHALLENGE_FAILED` | DECLINED | 3DS Challenge Failed | A 3D Secure challenge was presented to the cardholder but was explicitly failed or canceled. |\n| `AUTH/3DS_AUTHENTICATION_UNAVAILABLE` | ERROR | 3DS Authentication Unavailable | The issuer or access control server was unable to complete 3D Secure authentication (card not enrolled, technical error, or ACS temporarily unavailable). |\n| `AUTH/MANUAL_AUTHENTICATION_REQUIRED` | DECLINED | Manual Authentication Required | The issuer requires the cardholder to complete a manual (offline) authentication process before the transaction can proceed. |\n\n### Validation\nInternal request validation and input checks performed by the platform.\n\n| Code | State | Name | Description |\n|---|---|---|---|\n| `VALIDATION/INVALID_FIELD` | ERROR | Invalid Field | The provided field value is not valid or exceeds the allowed format/length. |\n| `VALIDATION/INVALID_FIELD/SHIPPING_ADDRESS_LINE_1` | ERROR | Invalid Shipping Address Line 1 | Shipping Address Line 1 is not valid or exceeds the allowed format/length. |\n| `VALIDATION/INVALID_FIELD/SHIPPING_ADDRESS_LINE_2` | ERROR | Invalid Shipping Address Line 2 | Shipping Address Line 2 is not valid or exceeds the allowed format/length. |\n| `VALIDATION/INVALID_FIELD/SHIPPING_APARTMENT_SUITE` | ERROR | Invalid Shipping Apartment/Suite | Shipping Apartment/Suite is not valid or exceeds the allowed format/length. |\n| `VALIDATION/INVALID_FIELD/SHIPPING_FLOOR` | ERROR | Invalid Shipping Floor | Shipping Floor is not valid or exceeds the allowed format/length. |\n| `VALIDATION/INVALID_FIELD/SHIPPING_ENTRANCE_NUMBER` | ERROR | Invalid Shipping Entrance Number | Shipping Entrance Number is not valid or exceeds the allowed format/length. |\n| `VALIDATION/INVALID_FIELD/SHIPPING_BUILDING_NUMBER` | ERROR | Invalid Shipping Building Number | Shipping Building Number is not valid or exceeds the allowed format/length. |\n| `VALIDATION/INVALID_FIELD/SHIPPING_STREET_NAME` | ERROR | Invalid Shipping Street Name | Shipping Street Name is not valid or exceeds the allowed format/length. |\n| `VALIDATION/INVALID_FIELD/SHIPPING_POSTAL_CODE` | ERROR | Invalid Shipping Postal Code | Shipping Postal Code is not valid or exceeds the allowed format/length. |\n| `VALIDATION/INVALID_FIELD/SHIPPING_CITY` | ERROR | Invalid Shipping City | Shipping City is not valid or exceeds the allowed format/length. |\n| `VALIDATION/INVALID_FIELD/SHIPPING_STATE_PROVINCE` | ERROR | Invalid Shipping State/Province | Shipping State/Province is not valid. The value must conform to the ISO-3166-2 format. |\n| `VALIDATION/INVALID_FIELD/SHIPPING_COUNTRY` | ERROR | Invalid Shipping Country | Shipping Country is not valid or could not be resolved to a supported value. |\n| `VALIDATION/INVALID_FIELD/PAYER_ADDRESS_LINE_1` | ERROR | Invalid Payer Address Line 1 | Payer Address Line 1 is not valid or exceeds the allowed format/length. |\n| `VALIDATION/INVALID_FIELD/PAYER_ADDRESS_LINE_2` | ERROR | Invalid Payer Address Line 2 | Payer Address Line 2 is not valid or exceeds the allowed format/length. |\n| `VALIDATION/INVALID_FIELD/PAYER_APARTMENT_SUITE` | ERROR | Invalid Payer Apartment/Suite | Payer Apartment/Suite is not valid or exceeds the allowed format/length. |\n| `VALIDATION/INVALID_FIELD/PAYER_FLOOR` | ERROR | Invalid Payer Floor | Payer Floor is not valid or exceeds the allowed format/length. |\n| `VALIDATION/INVALID_FIELD/PAYER_ENTRANCE_NUMBER` | ERROR | Invalid Payer Entrance Number | Payer Entrance Number is not valid or exceeds the allowed format/length. |\n| `VALIDATION/INVALID_FIELD/PAYER_BUILDING_NUMBER` | ERROR | Invalid Payer Building Number | Payer Building Number is not valid or exceeds the allowed format/length. |\n| `VALIDATION/INVALID_FIELD/PAYER_STREET_NAME` | ERROR | Invalid Payer Street Name | Payer Street Name is not valid or exceeds the allowed format/length. |\n| `VALIDATION/INVALID_FIELD/PAYER_POSTAL_CODE` | ERROR | Invalid Payer Postal Code | Payer Postal Code is not valid or exceeds the allowed format/length. |\n| `VALIDATION/INVALID_FIELD/PAYER_CITY` | ERROR | Invalid Payer City | Payer City is not valid or exceeds the allowed format/length. |\n| `VALIDATION/INVALID_FIELD/PAYER_STATE_PROVINCE` | ERROR | Invalid Payer State/Province | Payer State/Province is not valid. The value must conform to the ISO-3166-2 format. |\n| `VALIDATION/INVALID_FIELD/PAYER_COUNTRY` | ERROR | Invalid Payer Country | Payer Country is not valid. The value must conform to the ISO-3166-1 alpha-2 format. |\n| `VALIDATION/INVALID_FIELD/PAYMENT_INSTRUMENT_IDENTIFIER` | ERROR | Invalid Payment Instrument Identifier | The payment instrument identifier provided is not valid or does not conform to the expected format. |\n| `VALIDATION/INVALID_FIELD/PAYMENT_CARD_NUMBER` | ERROR | Invalid Payment Card Number | The payment card number provided is not valid. |\n| `VALIDATION/INVALID_FIELD/PAYMENT_CARD_SECURITY_CODE` | ERROR | Invalid Payment Card Security Code (CVV) | The payment card security code (CVV) provided is not valid. |\n| `VALIDATION/INVALID_FIELD/PAYMENT_CARD_EXPIRY_MONTH` | ERROR | Invalid Payment Card Expiry Month | The payment card expiry month provided is not valid. |\n| `VALIDATION/INVALID_FIELD/PAYMENT_CARD_EXPIRY_YEAR` | ERROR | Invalid Payment Card Expiry Year | The payment card expiry year provided is not valid or has already passed. |\n| `VALIDATION/INVALID_FIELD/PAYMENT_CARD_PIN` | ERROR | Invalid Payment Card PIN | The payment card PIN provided is not valid. |\n| `VALIDATION/INVALID_FIELD/PAYER_FULL_NAME` | ERROR | Invalid Payer Full Name | The payer full name was sent in an invalid format. |\n| `VALIDATION/INVALID_FIELD/PAYER_FIRST_NAME` | ERROR | Invalid Payer First Name | Payer first name is not valid or exceeds the allowed format or length. |\n| `VALIDATION/INVALID_FIELD/PAYER_LAST_NAME` | ERROR | Invalid Payer Last Name | Payer last name is not valid or exceeds the allowed format or length. |\n| `VALIDATION/INVALID_FIELD/PAYER_IDENTITY` | ERROR | Invalid Payer Identity | The payer identity information (ID, SSN) was sent in an invalid format. |\n| `VALIDATION/INVALID_FIELD/PAYER_EMAIL` | ERROR | Invalid Payer Email | The payer email address is not in a valid format. A valid email must follow the standard format (e.g., name@example.com). |\n| `VALIDATION/INVALID_FIELD/PAYER_PHONE` | ERROR | Invalid Payer Phone | The payer phone number is not in a valid format. A valid phone number must be in international format (E.164), for example: +14155552671. |\n| `VALIDATION/INVALID_FIELD/PAYER_BIRTHDATE` | ERROR | Invalid Payer Birthdate | Payer birthdate is not valid or does not conform to the required date format. |\n| `VALIDATION/INVALID_FIELD/3DS_CAVV` | ERROR | Invalid 3DS CAVV | The 3DS CAVV value is not in a valid or supported format. |\n| `VALIDATION/INVALID_FIELD/3DS_PROTOCOL_VERSION` | ERROR | Invalid 3DS Protocol Version | The 3DS protocol version or sub-version is not supported or not recognized. |\n| `VALIDATION/INVALID_FIELD/3DS_DIRECTORY_SERVER_ID` | ERROR | Invalid 3DS Directory Server ID | The 3DS directory server identifier is not in a valid format. |\n| `VALIDATION/INVALID_FIELD/3DS_ACS_TRANSACTION_ID` | ERROR | Invalid 3DS ACS Transaction ID | The 3DS ACS transaction identifier is not in a valid format. |\n| `VALIDATION/INVALID_FIELD/IP_ADDRESS` | ERROR | Invalid IP Address | The IP address provided is in an invalid format. |\n| `VALIDATION/INVALID_FIELD/PAYMENT_TOKEN` | ERROR | Payment Token Not Found or Invalid | The provided payment token is invalid in format or could not be resolved to a valid or active payment instrument. The token may be malformed, unknown, expired, inactive, or no longer available. |\n| `VALIDATION/INVALID_FIELD/CURRENCY` | ERROR | Invalid Currency | The currency specified is not valid or not supported. |\n| `VALIDATION/INVALID_FIELD/AMOUNT` | ERROR | Invalid Amount | The payment amount is invalid. |\n| `VALIDATION/INVALID_FIELD/ORDER_DESCRIPTION` | ERROR | Invalid Order Description | The order description was sent in an invalid format. |\n| `VALIDATION/INVALID_FIELD/ORDER_ID_REFERENCE` | ERROR | Invalid Order ID Reference | The Order ID reference is not valid or exceeds the allowed format or length. |\n| `VALIDATION/INVALID_FIELD/TRANSACTION_DESCRIPTION` | ERROR | Invalid Transaction Description | The transaction description is not valid or exceeds the allowed format or length. |\n| `VALIDATION/INVALID_FIELD/TRANSACTION_ID_REFERENCE` | ERROR | Invalid Transaction ID Reference | The Transaction ID reference was sent in an invalid format. |\n| `VALIDATION/INVALID_FIELD/MERCHANT_TRANSACTION_ID` | ERROR | Invalid Merchant Transaction ID | The merchant transaction identifier is not valid or exceeds the allowed format or length. |\n| `VALIDATION/INVALID_FIELD/MERCHANT_ORDER_ID` | ERROR | Invalid Merchant Order ID | The merchant order identifier is not valid or exceeds the allowed format or length. |\n| `VALIDATION/INVALID_FIELD/TERMINAL` | ERROR | Invalid Terminal | The request was sent with an invalid terminal. |\n| `VALIDATION/INVALID_FIELD/RECURRING_DATE_TYPE` | ERROR | Invalid Recurring Date Type | The recurring date type is not supported. Allowed values are: daily, weekly, monthly, yearly. |\n| `VALIDATION/INVALID_FIELD/RECURRING_FIRST_PAYMENT_DATE` | ERROR | Invalid Recurring First Payment Date | The recurring first payment date is not in a valid or supported format. |\n| `VALIDATION/INVALID_FIELD/RECURRING_TIME_INTERVAL` | ERROR | Invalid Recurring Time Interval | The recurring time interval value is outside the allowed range or format. |\n| `VALIDATION/INVALID_FIELD/RECURRING_NUMBER_OF_PAYMENTS` | ERROR | Invalid Recurring Number of Payments | The recurring number of payments is not valid or not within allowed limits. If provided, it must not exceed the maximum allowed value based on the selected interval, capped at a 5-year duration. |\n| `VALIDATION/INVALID_FIELD/RECURRING_CANCELLATION_DATE` | ERROR | Invalid Recurring Cancellation Date | The recurring cancellation date is not in a valid or supported format. If provided, it must not exceed five years from the first payment date. |\n| `VALIDATION/INVALID_FIELD/CARD_NUMBER` | ERROR | Invalid Card Number | The card number provided does not conform to the expected format or failed validation checks. |\n| `VALIDATION/INVALID_FIELD/PAYMENT_INSTRUMENT_TOKEN` | ERROR | Invalid Payment Instrument Token | The provided payment instrument token is invalid or does not correspond to any existing payment instrument. Please verify the token and try again. |\n| `VALIDATION/INVALID_FIELD/FUTURE_TRANSACTION_SCHEDULED_DATE` | ERROR | Invalid Future Transaction Scheduled Date | The future transaction scheduled date is not in a valid or supported format. |\n| `VALIDATION/INVALID_FIELD/PAYER` | ERROR | Invalid Payer | The payer object is not valid or contains fields in an unsupported format. |\n| `VALIDATION/INVALID_FIELD/TERMINAL_MERCHANT_ID` | ERROR | Invalid Terminal Merchant ID | The terminal merchant ID is not valid or does not match an active merchant account. |\n| `VALIDATION/MISSING_FIELD` | ERROR | Missing Field | A required field was not provided. |\n| `VALIDATION/MISSING_FIELD/SHIPPING_ADDRESS_LINE_1` | ERROR | Missing Shipping Address Line 1 | Shipping Address Line 1 is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/SHIPPING_ADDRESS_LINE_2` | ERROR | Missing Shipping Address Line 2 | Shipping Address Line 2 is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/SHIPPING_APARTMENT_SUITE` | ERROR | Missing Shipping Apartment/Suite | Shipping Apartment/Suite is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/SHIPPING_FLOOR` | ERROR | Missing Shipping Floor | Shipping Floor is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/SHIPPING_ENTRANCE_NUMBER` | ERROR | Missing Shipping Entrance Number | Shipping Entrance Number is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/SHIPPING_BUILDING_NUMBER` | ERROR | Missing Shipping Building Number | Shipping Building Number is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/SHIPPING_STREET_NAME` | ERROR | Missing Shipping Street Name | Shipping Street Name is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/SHIPPING_POSTAL_CODE` | ERROR | Missing Shipping Postal Code | Shipping Postal Code is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/SHIPPING_CITY` | ERROR | Missing Shipping City | Shipping City is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/SHIPPING_STATE_PROVINCE` | ERROR | Missing Shipping State/Province | Shipping State/Province is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/SHIPPING_COUNTRY` | ERROR | Missing Shipping Country | Shipping Country is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/PAYER_ADDRESS_LINE_1` | ERROR | Missing Payer Address Line 1 | Payer Address Line 1 is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/PAYER_ADDRESS_LINE_2` | ERROR | Missing Payer Address Line 2 | Payer Address Line 2 is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/PAYER_APARTMENT_SUITE` | ERROR | Missing Payer Apartment/Suite | Payer Apartment/Suite is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/PAYER_FLOOR` | ERROR | Missing Payer Floor | Payer Floor is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/PAYER_ENTRANCE_NUMBER` | ERROR | Missing Payer Entrance Number | Payer Entrance Number is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/PAYER_BUILDING_NUMBER` | ERROR | Missing Payer Building Number | Payer Building Number is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/PAYER_STREET_NAME` | ERROR | Missing Payer Street Name | Payer Street Name is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/PAYER_POSTAL_CODE` | ERROR | Missing Payer Postal Code | Payer Postal Code is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/PAYER_CITY` | ERROR | Missing Payer City | Payer City is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/PAYER_STATE_PROVINCE` | ERROR | Missing Payer State/Province | Payer State/Province is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/PAYER_COUNTRY` | ERROR | Missing Payer Country | Payer Country is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/PAYMENT_INSTRUMENT_IDENTIFIER` | ERROR | Missing Payment Instrument Identifier | A payment instrument identifier is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/PAYMENT_CARD_NUMBER` | ERROR | Missing Payment Card Number | A payment card number is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/PAYMENT_CARD_SECURITY_CODE` | ERROR | Missing Payment Card Security Code (CVV) | A payment card security code (CVV) is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/PAYMENT_CARD_EXPIRY_MONTH` | ERROR | Missing Payment Card Expiry Month | A payment card expiry month is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/PAYMENT_CARD_EXPIRY_YEAR` | ERROR | Missing Payment Card Expiry Year | A payment card expiry year is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/PAYMENT_CARD_PIN` | ERROR | Missing Payment Card PIN | A payment card PIN is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/PAYMENT_CARD_HOLDER_NAME` | ERROR | Missing Payment Card Holder Name | A payment card holder name is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/PAYER_FULL_NAME` | ERROR | Missing Payer Full Name | A payer full name is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/PAYER_FIRST_NAME` | ERROR | Missing Payer First Name | Payer first name is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/PAYER_LAST_NAME` | ERROR | Missing Payer Last Name | Payer last name is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/PAYER_IDENTITY` | ERROR | Missing Payer Identity | A payer identity value is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/PAYER_EMAIL` | ERROR | Missing Payer Email | A payer email address is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/PAYER_PHONE` | ERROR | Missing Payer Phone | A payer phone number is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/PAYER_BIRTHDATE` | ERROR | Missing Payer Birthdate | Payer birthdate is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/3DS_CAVV` | ERROR | Missing 3DS CAVV | A 3DS CAVV value is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/3DS_PROTOCOL_VERSION` | ERROR | Missing 3DS Protocol Version | A 3DS protocol version or sub-version is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/3DS_DIRECTORY_SERVER_ID` | ERROR | Missing 3DS Directory Server ID | A 3DS directory server identifier is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/3DS_ACS_TRANSACTION_ID` | ERROR | Missing 3DS ACS Transaction ID | A 3DS ACS transaction identifier is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/IP_ADDRESS` | ERROR | Missing IP Address | A required IP address was not provided for the operation. |\n| `VALIDATION/MISSING_FIELD/PAYMENT_TOKEN` | ERROR | Missing Payment Token | A Payment token parameter is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/CURRENCY` | ERROR | Missing Currency | A required currency value was not provided for the operation. |\n| `VALIDATION/MISSING_FIELD/AMOUNT` | ERROR | Missing Amount | An amount value is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/RECURRING_FUTURE_AMOUNT` | ERROR | Missing Amount | An amount value is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/FUTURE_TRANSACTION_AMOUNT` | ERROR | Missing Amount | An amount value is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/ORDER_DESCRIPTION` | ERROR | Missing Order Description | An order description is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/ORDER_ID_REFERENCE` | ERROR | Missing Order ID Reference | An Order ID reference is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/TRANSACTION_DESCRIPTION` | ERROR | Missing Transaction Description | A transaction description is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/TRANSACTION_ID_REFERENCE` | ERROR | Missing Transaction ID Reference | A Transaction ID reference is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/MERCHANT_TRANSACTION_ID` | ERROR | Missing Merchant Transaction ID | A merchant transaction identifier is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/MERCHANT_ORDER_ID` | ERROR | Missing Merchant Order ID | A merchant order identifier is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/TERMINAL` | ERROR | Missing Terminal | A terminal is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/RECURRING_DATE_TYPE` | ERROR | Missing Recurring Date Type | A recurring date type is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/RECURRING_FIRST_PAYMENT_DATE` | ERROR | Missing Recurring First Payment Date | A recurring first payment date is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/RECURRING_TIME_INTERVAL` | ERROR | Missing Recurring Time Interval | A recurring time interval value is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/RECURRING_NUMBER_OF_PAYMENTS` | ERROR | Missing Recurring Number of Payments | The recurring number of payments is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/RECURRING_CANCELLATION_DATE` | ERROR | Missing Recurring Cancellation Date | A recurring cancellation date is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/RECURRING_MANAGED_BY` | ERROR | Missing Recurring Managed By | The recurring managed-by field is required but was not provided. |\n| `VALIDATION/MISSING_FIELD/CARD_NUMBER` | ERROR | Missing Card Number | The card number is required but was not provided in the request. |\n| `VALIDATION/MISSING_FIELD/PAYER_INFORMATION` | ERROR | Missing Payer Information | Required payer information is missing. Please provide the necessary details to process the recurring transaction. |\n| `VALIDATION/MISSING_FIELD/PAYMENT_INSTRUMENT` | ERROR | Missing Payment Instrument | No payment instrument was provided for the recurring transaction. |\n| `VALIDATION/MISSING_FIELD/FUTURE_TRANSACTION` | ERROR | Missing Future Transaction | A future transaction reference is required but was not provided. |\n| `VALIDATION/UNKNOWN_FIELD` | ERROR | Unknown Field | The request contains a field that is not recognized, or a recognized field placed in the wrong location. |\n| `VALIDATION/REFUND_AMOUNT_EXCEEDED` | ERROR | Refund Amount Exceeded | Not allowed by the transaction lifecycle: The attempted refund amount is higher than the original transaction amount. |\n| `VALIDATION/CAPTURE_AMOUNT_EXCEEDED` | ERROR | Capture Amount Exceeded | Not allowed by the transaction lifecycle: The attempted capture amount is higher than the original pre-authorisation amount. |\n| `VALIDATION/REFUND_NOT_ALLOWED_CHARGEBACK` | ERROR | Refund Not Allowed Due to Chargeback | Not allowed by the transaction lifecycle: A refund cannot be processed because a chargeback already exists for this transaction. |\n| `VALIDATION/ALREADY_FULLY_CAPTURED` | ERROR | Capture Not Allowed – Already Fully Captured | Not allowed by the transaction lifecycle: The transaction has already been fully captured and cannot be captured again. |\n| `VALIDATION/CAPTURE_NOT_ALLOWED_VOIDED` | ERROR | Capture Not Allowed – Transaction Voided | Not allowed by the transaction lifecycle: The transaction was voided and therefore cannot be captured. |\n| `VALIDATION/TRANSACTION_ALREADY_VOIDED` | ERROR | Transaction Already Voided | Not allowed by the transaction lifecycle: The transaction has already been voided and cannot be acted upon. |\n| `VALIDATION/ORIGINAL_TRANSACTION_NOT_APPROVED` | ERROR | Original Transaction Not Approved | Not allowed by the transaction lifecycle: The requested operation cannot be performed because the original transaction was not successfully approved. |\n| `VALIDATION/PUBLIC_IP_REQUIRED` | ERROR | Public IP Address Required | A public IP address is required. Private or internal IP addresses are not supported. |\n| `VALIDATION/SHIPPING_LINE_2_REQUIRES_LINE_1` | ERROR | Shipping Address Line 2 Requires Address Line 1 | Shipping Address Line 2 was provided, but Shipping Address Line 1 is missing. Address Line 1 is required when Address Line 2 is present. |\n| `VALIDATION/SHIPPING_LINE_1_NOT_ALLOWED` | ERROR | Shipping Address Line 1 Not Allowed With Structured Fields | Structured shipping address fields were provided, so Shipping Address Line 1 must not be provided. |\n| `VALIDATION/SHIPPING_MIN_ADDRESS_NOT_PROVIDED` | ERROR | Shipping Minimum Address Not Provided | No shipping address details were provided. Provide either Shipping Address Line 1, or structured shipping address fields. |\n| `VALIDATION/PAYER_LINE_2_REQUIRES_LINE_1` | ERROR | Payer Address Line 2 Requires Address Line 1 | Payer Address Line 2 was provided, but Payer Address Line 1 is missing. Address Line 1 is required when Address Line 2 is present. |\n| `VALIDATION/PAYER_LINE_1_NOT_ALLOWED` | ERROR | Payer Address Line 1 Not Allowed With Structured Fields | Structured payer address fields were provided, so Payer Address Line 1 must not be provided. |\n| `VALIDATION/PAYER_MIN_ADDRESS_NOT_PROVIDED` | ERROR | Payer Minimum Address Not Provided | No payer address details were provided. Provide either Payer Address Line 1, or structured payer address fields. |\n| `VALIDATION/UNAUTHORIZED_PAYMENT_METHOD` | ERROR | Unauthorized Payment Method | The payment method is not allowed for the merchant. |\n| `VALIDATION/UNAUTHORIZED_CURRENCY` | ERROR | Unauthorized Currency | The currency type is not supported or not authorized for the merchant. |\n| `VALIDATION/UNRECOGNIZED_PAYMENT_INSTRUMENT` | ERROR | Unrecognized Payment Instrument | The payment instrument is well-formed but could not be matched to a known provider, so its provider could not be identified. |\n| `VALIDATION/INVALID_AMOUNT` | ERROR | Invalid Amount | The transaction amount failed validation before submission (e.g. negative, zero, or outside the allowed range). |\n| `VALIDATION/UNSUPPORTED_TRANSACTION_TYPE` | ERROR | Unsupported Transaction Type | The requested transaction type is not supported. |\n| `VALIDATION/UNRECOGNIZED_PAYMENT_INSTRUMENT/CARD_BIN` | ERROR | Unrecognized Card BIN | The card is well-formed but its BIN could not be matched to a known issuer, so the issuer/scheme could not be identified. |\n| `VALIDATION/API_KEY_ENVIRONMENT_MISMATCH` | ERROR | API Key Environment Mismatch | The API key prefix does not match the current environment. Live API keys (live_) must be used in production, and test API keys (test_) must be used in sandbox. |\n| `VALIDATION/MISSING_CREDENTIALS` | ERROR | Missing Credentials | Credentials are required but were not provided. |\n| `VALIDATION/INVALID_CREDENTIALS` | ERROR | Invalid Credentials | The provided credentials or configuration parameters are invalid or malformed. |\n| `VALIDATION/INVALID_TRANSACTION_TYPE_FOR_REFUND` | ERROR | Invalid Transaction Type for Refund | Refund is only supported for sale, preauthorization, or payout transactions. |\n| `VALIDATION/FULL_REFUND_ALREADY_PROCESSED` | ERROR | Full Refund Already Processed | Not allowed by the transaction lifecycle: A full refund has already been processed for this transaction. |\n| `VALIDATION/CURRENCY_DID_NOT_MATCH_REFERENCED_TRANSACTION_CURRENCY` | ERROR | Currency Mismatch with Referenced Transaction | The currency provided does not match the currency of the referenced transaction. Please use the same currency as the original transaction. |\n| `VALIDATION/ORDER_ID_DID_NOT_MATCH_REFERENCED_TRANSACTION_ORDER_ID` | ERROR | Order ID Mismatch with Referenced Transaction | The provided order ID does not match the order ID of the referenced transaction. |\n| `VALIDATION/INVALID_TRANSACTION_TYPE_FOR_VOID` | ERROR | Invalid Transaction Type for Void | Void is only supported for sale, preauthorization, or payout transactions. |\n| `VALIDATION/INVALID_TRANSACTION_TYPE_FOR_CAPTURE` | ERROR | Invalid Transaction Type for Capture | Capture is only supported for preauthorization transactions. |\n| `VALIDATION/TRANSACTION_NOT_APPROVED` | ERROR | Invalid Transaction State for Operation | Capture, refund, and void operations are only allowed for transactions with an approved status. The current transaction state does not meet this requirement. |\n| `VALIDATION/TRANSACTION_NOT_FOUND` | ERROR | Transaction Not Found | Referenced transaction does not exist or could not be found. |\n| `VALIDATION/INVALID_SCHEDULED_DATE` | ERROR | Invalid Scheduled Date | The scheduled date provided is not valid or does not conform to the required date format. |\n| `VALIDATION/INVALID_START_DATE` | ERROR | Invalid Start Date | The start date provided is not valid. It must be today or a future date. |\n| `VALIDATION/TERMINAL_MERCHANT_ACCOUNT_NOT_FOUND` | ERROR | Merchant account not found | No merchant account found for terminal. |\n| `VALIDATION/RECURRING_NOT_MANAGED_BY_MERCHANT` | ERROR | Recurring Not Managed by Merchant | This action is not allowed because the recurring record is not managed by the merchant. |\n| `VALIDATION/FUTURE_TRANSACTION_NOT_FOUND` | ERROR | Future Transaction Not Found | The specified future transaction could not be found. The future transaction ID may be invalid, does not exist, or is not associated with the given recurring record. |\n| `VALIDATION/INVALID_IDEMPOTENCY_KEY` | ERROR | Invalid Idempotency Key | The provided idempotency key is invalid. It must be no longer than 255 characters and may only contain alphanumeric characters, underscores (_), and hyphens (-). |\n| `VALIDATION/INVALID_FLOW_STATE` | ERROR | Invalid Flow State | The operation cannot be performed because the resource is currently being processed and has not reached a final state. Please try again once processing is complete. |\n| `VALIDATION/RETRY_REQUEST_MISMATCH` | ERROR | Retry Request Mismatch | A supplied retry field does not match the originating transaction. |\n| `VALIDATION/FUTURE_TRANSACTION_AMOUNT_INVALID` | ERROR | Invalid Future Transaction Amount | The provided amount for the future transaction is invalid. Please ensure the amount is correctly formatted and meets the required constraints. This field is required when the transaction is managed by the platform. |\n| `VALIDATION/RECURRING_ID_DID_NOT_MATCH_REFERENCED_FUTURE_TRANSACTION` | ERROR | Recurring ID Mismatch with Referenced Future Transaction | The provided recurring ID does not match the recurring ID of the referenced future transaction. |\n| `VALIDATION/FUTURE_TRANSACTION_ALREADY_EXECUTED` | ERROR | Future Transaction Already Executed | The scheduled future transaction has already been processed and cannot be executed again. |\n| `VALIDATION/FUTURE_TRANSACTION_ALREADY_CANCELLED` | ERROR | Future Transaction Already Cancelled | The scheduled future transaction has already been cancelled and cannot be modified or executed. |\n| `VALIDATION/RECURRING_ALREADY_CANCELLED` | ERROR | Recurring Already Cancelled | The recurring record has already been cancelled and cannot be cancelled again or modified. No further actions are allowed on a cancelled recurring. |\n| `VALIDATION/RECURRING_NOT_ACTIVE` | ERROR | Recurring Not Active | This action cannot be performed because the recurring record is not in an active state. |\n| `VALIDATION/RECURRING_NOT_READY` | ERROR | Recurring Not Ready | The recurring initialization has not completed successfully, so a recurring charge cannot be created yet. |\n| `VALIDATION/RECURRING_NOT_FOUND` | ERROR | Recurring Not Found | The specified recurring record could not be found. The recurring ID may be invalid, does not exist, or is not associated with the given merchant or order. |\n| `VALIDATION/UNSUPPORTED_PROVIDER_TRANSACTION_LOOKUP` | ERROR | Unsupported Provider Transaction Lookup | The selected provider is not supported for provider-transaction retry lookup. |\n| `VALIDATION/INVALID_PROVIDER_TRANSACTION_CURRENCY` | ERROR | Invalid Provider Transaction Currency | The provider transaction lookup did not return a valid normalized currency. |\n| `VALIDATION/UNSUPPORTED_PROVIDER_INTERACTION_IMPORT` | ERROR | Unsupported Provider Interaction Import | The selected provider is not supported for interaction-only retry import. |\n\n### Routing\nInternal routing and provider selection logic.\n\n| Code | State | Name | Description |\n|---|---|---|---|\n| `ROUTING/REFUND_PENDING_APPROVAL` | PROCESSING | Refund Pending Manual Approval | The refund request is pending manual approval by a system administrator before it can be processed. |\n| `ROUTING/MID_INVALID_OR_INACTIVE` | ERROR | Merchant Account Not Available | The merchant account (MID/terminal) is invalid, inactive, or not configured for this transaction. |\n| `ROUTING/RECORD_NOT_FOUND` | ERROR | Transaction Not Found | The requested transaction could not be found. The reference provided does not correspond to any record in the system. |\n| `ROUTING/RESOURCE_LOCKED` | ERROR | Resource Locked | The requested resource is currently locked because another process is operating on it. Please try again later. |\n| `ROUTING/IDEMPOTENCY_CONFLICT` | ERROR | Idempotency Conflict | The provided idempotency key has already been used with a different request. Reusing the same key requires the request parameters to be identical. |\n| `ROUTING/TERMINAL_RESOURCE_ACCESS_DENIED` | ERROR | Terminal Resource Access Denied | The requested resource does not belong to the specified terminal. This terminal is not authorized to access or perform actions on resources owned by another terminal. |\n| `ROUTING/PROVIDER_NOT_FOUND` | ERROR | Provider Not Found | No processor was found for the merchant account configuration. |\n| `ROUTING/PROVIDER_HANDLER_MISSING` | ERROR | Provider Handler Missing | The processor does not implement a handler for the requested operation. |\n| `ROUTING/INVALID_TRANSACTION` | DECLINED | Invalid Transaction | The transaction is missing required fields for processing. |\n| `ROUTING/NOT_SUPPORTED` | ERROR | Operation Not Supported | The requested operation is not supported by this processor. |\n| `ROUTING/PROCESSING_ERROR` | ERROR | Processing Error | An unexpected error occurred while dispatching the transaction to the processor. |\n| `ROUTING/NO_MERCHANT_ACCOUNTS_TO_ROUTE` | DECLINED | No Merchant Accounts To Route | The order had no merchant accounts to build a candidate routing pool from. |\n| `ROUTING/NO_MERCHANT_ACCOUNT_SELECTED` | DECLINED | No Merchant Account Selected | The candidate merchant account pool was filtered down to zero during selection. |",
+        "x-enumDescriptions": {
+          "SYSTEM/SUCCESSFUL": "Transaction Approved: The transaction was successfully processed and approved.",
+          "SYSTEM/PARTIAL_APPROVAL": "Partial Approval: The transaction was approved for a lower amount than requested (partial approval).",
+          "SYSTEM/ZERO_AMOUNT_AUTHORIZATION_ONLY": "Zero-Amount Authorization Only: The authorization succeeded for zero-amount verification only; the card is valid but nothing was charged.",
+          "SYSTEM/PROCESSING": "Transaction Processing: Transaction is currently being processed by the system.",
+          "SYSTEM/CREATED": "Transaction Created: A new transaction has been initiated in the system and is awaiting customer input to provide the required details in order to proceed.",
+          "SYSTEM/TIMEOUT": "System Timeout: The system timed out while processing the transaction.",
+          "SYSTEM/INTERNAL_ERROR": "Internal System Error: An unexpected internal system error occurred.",
+          "SYSTEM/UNKNOWN": "Unmapped Status: The received status could not be mapped to a known internal state.",
+          "VALIDATION/INVALID_FIELD": "Invalid Field: The provided field value is not valid or exceeds the allowed format/length.",
+          "VALIDATION/INVALID_FIELD/SHIPPING_ADDRESS_LINE_1": "Invalid Shipping Address Line 1: Shipping Address Line 1 is not valid or exceeds the allowed format/length.",
+          "VALIDATION/INVALID_FIELD/SHIPPING_ADDRESS_LINE_2": "Invalid Shipping Address Line 2: Shipping Address Line 2 is not valid or exceeds the allowed format/length.",
+          "VALIDATION/INVALID_FIELD/SHIPPING_APARTMENT_SUITE": "Invalid Shipping Apartment/Suite: Shipping Apartment/Suite is not valid or exceeds the allowed format/length.",
+          "VALIDATION/INVALID_FIELD/SHIPPING_FLOOR": "Invalid Shipping Floor: Shipping Floor is not valid or exceeds the allowed format/length.",
+          "VALIDATION/INVALID_FIELD/SHIPPING_ENTRANCE_NUMBER": "Invalid Shipping Entrance Number: Shipping Entrance Number is not valid or exceeds the allowed format/length.",
+          "VALIDATION/INVALID_FIELD/SHIPPING_BUILDING_NUMBER": "Invalid Shipping Building Number: Shipping Building Number is not valid or exceeds the allowed format/length.",
+          "VALIDATION/INVALID_FIELD/SHIPPING_STREET_NAME": "Invalid Shipping Street Name: Shipping Street Name is not valid or exceeds the allowed format/length.",
+          "VALIDATION/INVALID_FIELD/SHIPPING_POSTAL_CODE": "Invalid Shipping Postal Code: Shipping Postal Code is not valid or exceeds the allowed format/length.",
+          "VALIDATION/INVALID_FIELD/SHIPPING_CITY": "Invalid Shipping City: Shipping City is not valid or exceeds the allowed format/length.",
+          "VALIDATION/INVALID_FIELD/SHIPPING_STATE_PROVINCE": "Invalid Shipping State/Province: Shipping State/Province is not valid. The value must conform to the ISO-3166-2 format.",
+          "VALIDATION/INVALID_FIELD/SHIPPING_COUNTRY": "Invalid Shipping Country: Shipping Country is not valid or could not be resolved to a supported value.",
+          "VALIDATION/INVALID_FIELD/PAYER_ADDRESS_LINE_1": "Invalid Payer Address Line 1: Payer Address Line 1 is not valid or exceeds the allowed format/length.",
+          "VALIDATION/INVALID_FIELD/PAYER_ADDRESS_LINE_2": "Invalid Payer Address Line 2: Payer Address Line 2 is not valid or exceeds the allowed format/length.",
+          "VALIDATION/INVALID_FIELD/PAYER_APARTMENT_SUITE": "Invalid Payer Apartment/Suite: Payer Apartment/Suite is not valid or exceeds the allowed format/length.",
+          "VALIDATION/INVALID_FIELD/PAYER_FLOOR": "Invalid Payer Floor: Payer Floor is not valid or exceeds the allowed format/length.",
+          "VALIDATION/INVALID_FIELD/PAYER_ENTRANCE_NUMBER": "Invalid Payer Entrance Number: Payer Entrance Number is not valid or exceeds the allowed format/length.",
+          "VALIDATION/INVALID_FIELD/PAYER_BUILDING_NUMBER": "Invalid Payer Building Number: Payer Building Number is not valid or exceeds the allowed format/length.",
+          "VALIDATION/INVALID_FIELD/PAYER_STREET_NAME": "Invalid Payer Street Name: Payer Street Name is not valid or exceeds the allowed format/length.",
+          "VALIDATION/INVALID_FIELD/PAYER_POSTAL_CODE": "Invalid Payer Postal Code: Payer Postal Code is not valid or exceeds the allowed format/length.",
+          "VALIDATION/INVALID_FIELD/PAYER_CITY": "Invalid Payer City: Payer City is not valid or exceeds the allowed format/length.",
+          "VALIDATION/INVALID_FIELD/PAYER_STATE_PROVINCE": "Invalid Payer State/Province: Payer State/Province is not valid. The value must conform to the ISO-3166-2 format.",
+          "VALIDATION/INVALID_FIELD/PAYER_COUNTRY": "Invalid Payer Country: Payer Country is not valid. The value must conform to the ISO-3166-1 alpha-2 format.",
+          "VALIDATION/INVALID_FIELD/PAYMENT_INSTRUMENT_IDENTIFIER": "Invalid Payment Instrument Identifier: The payment instrument identifier provided is not valid or does not conform to the expected format.",
+          "VALIDATION/INVALID_FIELD/PAYMENT_CARD_NUMBER": "Invalid Payment Card Number: The payment card number provided is not valid.",
+          "VALIDATION/INVALID_FIELD/PAYMENT_CARD_SECURITY_CODE": "Invalid Payment Card Security Code (CVV): The payment card security code (CVV) provided is not valid.",
+          "VALIDATION/INVALID_FIELD/PAYMENT_CARD_EXPIRY_MONTH": "Invalid Payment Card Expiry Month: The payment card expiry month provided is not valid.",
+          "VALIDATION/INVALID_FIELD/PAYMENT_CARD_EXPIRY_YEAR": "Invalid Payment Card Expiry Year: The payment card expiry year provided is not valid or has already passed.",
+          "VALIDATION/INVALID_FIELD/PAYMENT_CARD_PIN": "Invalid Payment Card PIN: The payment card PIN provided is not valid.",
+          "VALIDATION/INVALID_FIELD/PAYER_FULL_NAME": "Invalid Payer Full Name: The payer full name was sent in an invalid format.",
+          "VALIDATION/INVALID_FIELD/PAYER_FIRST_NAME": "Invalid Payer First Name: Payer first name is not valid or exceeds the allowed format or length.",
+          "VALIDATION/INVALID_FIELD/PAYER_LAST_NAME": "Invalid Payer Last Name: Payer last name is not valid or exceeds the allowed format or length.",
+          "VALIDATION/INVALID_FIELD/PAYER_IDENTITY": "Invalid Payer Identity: The payer identity information (ID, SSN) was sent in an invalid format.",
+          "VALIDATION/INVALID_FIELD/PAYER_EMAIL": "Invalid Payer Email: The payer email address is not in a valid format. A valid email must follow the standard format (e.g., name@example.com).",
+          "VALIDATION/INVALID_FIELD/PAYER_PHONE": "Invalid Payer Phone: The payer phone number is not in a valid format. A valid phone number must be in international format (E.164), for example: +14155552671.",
+          "VALIDATION/INVALID_FIELD/PAYER_BIRTHDATE": "Invalid Payer Birthdate: Payer birthdate is not valid or does not conform to the required date format.",
+          "VALIDATION/INVALID_FIELD/3DS_CAVV": "Invalid 3DS CAVV: The 3DS CAVV value is not in a valid or supported format.",
+          "VALIDATION/INVALID_FIELD/3DS_PROTOCOL_VERSION": "Invalid 3DS Protocol Version: The 3DS protocol version or sub-version is not supported or not recognized.",
+          "VALIDATION/INVALID_FIELD/3DS_DIRECTORY_SERVER_ID": "Invalid 3DS Directory Server ID: The 3DS directory server identifier is not in a valid format.",
+          "VALIDATION/INVALID_FIELD/3DS_ACS_TRANSACTION_ID": "Invalid 3DS ACS Transaction ID: The 3DS ACS transaction identifier is not in a valid format.",
+          "VALIDATION/INVALID_FIELD/IP_ADDRESS": "Invalid IP Address: The IP address provided is in an invalid format.",
+          "VALIDATION/INVALID_FIELD/PAYMENT_TOKEN": "Payment Token Not Found or Invalid: The provided payment token is invalid in format or could not be resolved to a valid or active payment instrument. The token may be malformed, unknown, expired, inactive, or no longer available.",
+          "VALIDATION/INVALID_FIELD/CURRENCY": "Invalid Currency: The currency specified is not valid or not supported.",
+          "VALIDATION/INVALID_FIELD/AMOUNT": "Invalid Amount: The payment amount is invalid.",
+          "VALIDATION/INVALID_FIELD/ORDER_DESCRIPTION": "Invalid Order Description: The order description was sent in an invalid format.",
+          "VALIDATION/INVALID_FIELD/ORDER_ID_REFERENCE": "Invalid Order ID Reference: The Order ID reference is not valid or exceeds the allowed format or length.",
+          "VALIDATION/INVALID_FIELD/TRANSACTION_DESCRIPTION": "Invalid Transaction Description: The transaction description is not valid or exceeds the allowed format or length.",
+          "VALIDATION/INVALID_FIELD/TRANSACTION_ID_REFERENCE": "Invalid Transaction ID Reference: The Transaction ID reference was sent in an invalid format.",
+          "VALIDATION/INVALID_FIELD/MERCHANT_TRANSACTION_ID": "Invalid Merchant Transaction ID: The merchant transaction identifier is not valid or exceeds the allowed format or length.",
+          "VALIDATION/INVALID_FIELD/MERCHANT_ORDER_ID": "Invalid Merchant Order ID: The merchant order identifier is not valid or exceeds the allowed format or length.",
+          "VALIDATION/INVALID_FIELD/TERMINAL": "Invalid Terminal: The request was sent with an invalid terminal.",
+          "VALIDATION/INVALID_FIELD/RECURRING_DATE_TYPE": "Invalid Recurring Date Type: The recurring date type is not supported. Allowed values are: daily, weekly, monthly, yearly.",
+          "VALIDATION/INVALID_FIELD/RECURRING_FIRST_PAYMENT_DATE": "Invalid Recurring First Payment Date: The recurring first payment date is not in a valid or supported format.",
+          "VALIDATION/INVALID_FIELD/RECURRING_TIME_INTERVAL": "Invalid Recurring Time Interval: The recurring time interval value is outside the allowed range or format.",
+          "VALIDATION/INVALID_FIELD/RECURRING_NUMBER_OF_PAYMENTS": "Invalid Recurring Number of Payments: The recurring number of payments is not valid or not within allowed limits. If provided, it must not exceed the maximum allowed value based on the selected interval, capped at a 5-year duration.",
+          "VALIDATION/INVALID_FIELD/RECURRING_CANCELLATION_DATE": "Invalid Recurring Cancellation Date: The recurring cancellation date is not in a valid or supported format. If provided, it must not exceed five years from the first payment date.",
+          "VALIDATION/INVALID_FIELD/CARD_NUMBER": "Invalid Card Number: The card number provided does not conform to the expected format or failed validation checks.",
+          "VALIDATION/INVALID_FIELD/PAYMENT_INSTRUMENT_TOKEN": "Invalid Payment Instrument Token: The provided payment instrument token is invalid or does not correspond to any existing payment instrument. Please verify the token and try again.",
+          "VALIDATION/INVALID_FIELD/FUTURE_TRANSACTION_SCHEDULED_DATE": "Invalid Future Transaction Scheduled Date: The future transaction scheduled date is not in a valid or supported format.",
+          "VALIDATION/INVALID_FIELD/PAYER": "Invalid Payer: The payer object is not valid or contains fields in an unsupported format.",
+          "VALIDATION/INVALID_FIELD/TERMINAL_MERCHANT_ID": "Invalid Terminal Merchant ID: The terminal merchant ID is not valid or does not match an active merchant account.",
+          "VALIDATION/MISSING_FIELD": "Missing Field: A required field was not provided.",
+          "VALIDATION/MISSING_FIELD/SHIPPING_ADDRESS_LINE_1": "Missing Shipping Address Line 1: Shipping Address Line 1 is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/SHIPPING_ADDRESS_LINE_2": "Missing Shipping Address Line 2: Shipping Address Line 2 is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/SHIPPING_APARTMENT_SUITE": "Missing Shipping Apartment/Suite: Shipping Apartment/Suite is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/SHIPPING_FLOOR": "Missing Shipping Floor: Shipping Floor is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/SHIPPING_ENTRANCE_NUMBER": "Missing Shipping Entrance Number: Shipping Entrance Number is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/SHIPPING_BUILDING_NUMBER": "Missing Shipping Building Number: Shipping Building Number is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/SHIPPING_STREET_NAME": "Missing Shipping Street Name: Shipping Street Name is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/SHIPPING_POSTAL_CODE": "Missing Shipping Postal Code: Shipping Postal Code is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/SHIPPING_CITY": "Missing Shipping City: Shipping City is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/SHIPPING_STATE_PROVINCE": "Missing Shipping State/Province: Shipping State/Province is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/SHIPPING_COUNTRY": "Missing Shipping Country: Shipping Country is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/PAYER_ADDRESS_LINE_1": "Missing Payer Address Line 1: Payer Address Line 1 is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/PAYER_ADDRESS_LINE_2": "Missing Payer Address Line 2: Payer Address Line 2 is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/PAYER_APARTMENT_SUITE": "Missing Payer Apartment/Suite: Payer Apartment/Suite is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/PAYER_FLOOR": "Missing Payer Floor: Payer Floor is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/PAYER_ENTRANCE_NUMBER": "Missing Payer Entrance Number: Payer Entrance Number is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/PAYER_BUILDING_NUMBER": "Missing Payer Building Number: Payer Building Number is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/PAYER_STREET_NAME": "Missing Payer Street Name: Payer Street Name is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/PAYER_POSTAL_CODE": "Missing Payer Postal Code: Payer Postal Code is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/PAYER_CITY": "Missing Payer City: Payer City is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/PAYER_STATE_PROVINCE": "Missing Payer State/Province: Payer State/Province is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/PAYER_COUNTRY": "Missing Payer Country: Payer Country is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/PAYMENT_INSTRUMENT_IDENTIFIER": "Missing Payment Instrument Identifier: A payment instrument identifier is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/PAYMENT_CARD_NUMBER": "Missing Payment Card Number: A payment card number is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/PAYMENT_CARD_SECURITY_CODE": "Missing Payment Card Security Code (CVV): A payment card security code (CVV) is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/PAYMENT_CARD_EXPIRY_MONTH": "Missing Payment Card Expiry Month: A payment card expiry month is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/PAYMENT_CARD_EXPIRY_YEAR": "Missing Payment Card Expiry Year: A payment card expiry year is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/PAYMENT_CARD_PIN": "Missing Payment Card PIN: A payment card PIN is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/PAYMENT_CARD_HOLDER_NAME": "Missing Payment Card Holder Name: A payment card holder name is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/PAYER_FULL_NAME": "Missing Payer Full Name: A payer full name is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/PAYER_FIRST_NAME": "Missing Payer First Name: Payer first name is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/PAYER_LAST_NAME": "Missing Payer Last Name: Payer last name is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/PAYER_IDENTITY": "Missing Payer Identity: A payer identity value is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/PAYER_EMAIL": "Missing Payer Email: A payer email address is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/PAYER_PHONE": "Missing Payer Phone: A payer phone number is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/PAYER_BIRTHDATE": "Missing Payer Birthdate: Payer birthdate is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/3DS_CAVV": "Missing 3DS CAVV: A 3DS CAVV value is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/3DS_PROTOCOL_VERSION": "Missing 3DS Protocol Version: A 3DS protocol version or sub-version is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/3DS_DIRECTORY_SERVER_ID": "Missing 3DS Directory Server ID: A 3DS directory server identifier is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/3DS_ACS_TRANSACTION_ID": "Missing 3DS ACS Transaction ID: A 3DS ACS transaction identifier is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/IP_ADDRESS": "Missing IP Address: A required IP address was not provided for the operation.",
+          "VALIDATION/MISSING_FIELD/PAYMENT_TOKEN": "Missing Payment Token: A Payment token parameter is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/CURRENCY": "Missing Currency: A required currency value was not provided for the operation.",
+          "VALIDATION/MISSING_FIELD/AMOUNT": "Missing Amount: An amount value is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/RECURRING_FUTURE_AMOUNT": "Missing Amount: An amount value is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/FUTURE_TRANSACTION_AMOUNT": "Missing Amount: An amount value is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/ORDER_DESCRIPTION": "Missing Order Description: An order description is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/ORDER_ID_REFERENCE": "Missing Order ID Reference: An Order ID reference is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/TRANSACTION_DESCRIPTION": "Missing Transaction Description: A transaction description is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/TRANSACTION_ID_REFERENCE": "Missing Transaction ID Reference: A Transaction ID reference is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/MERCHANT_TRANSACTION_ID": "Missing Merchant Transaction ID: A merchant transaction identifier is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/MERCHANT_ORDER_ID": "Missing Merchant Order ID: A merchant order identifier is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/TERMINAL": "Missing Terminal: A terminal is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/RECURRING_DATE_TYPE": "Missing Recurring Date Type: A recurring date type is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/RECURRING_FIRST_PAYMENT_DATE": "Missing Recurring First Payment Date: A recurring first payment date is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/RECURRING_TIME_INTERVAL": "Missing Recurring Time Interval: A recurring time interval value is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/RECURRING_NUMBER_OF_PAYMENTS": "Missing Recurring Number of Payments: The recurring number of payments is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/RECURRING_CANCELLATION_DATE": "Missing Recurring Cancellation Date: A recurring cancellation date is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/RECURRING_MANAGED_BY": "Missing Recurring Managed By: The recurring managed-by field is required but was not provided.",
+          "VALIDATION/MISSING_FIELD/CARD_NUMBER": "Missing Card Number: The card number is required but was not provided in the request.",
+          "VALIDATION/MISSING_FIELD/PAYER_INFORMATION": "Missing Payer Information: Required payer information is missing. Please provide the necessary details to process the recurring transaction.",
+          "VALIDATION/MISSING_FIELD/PAYMENT_INSTRUMENT": "Missing Payment Instrument: No payment instrument was provided for the recurring transaction.",
+          "VALIDATION/MISSING_FIELD/FUTURE_TRANSACTION": "Missing Future Transaction: A future transaction reference is required but was not provided.",
+          "VALIDATION/UNKNOWN_FIELD": "Unknown Field: The request contains a field that is not recognized, or a recognized field placed in the wrong location.",
+          "VALIDATION/REFUND_AMOUNT_EXCEEDED": "Refund Amount Exceeded: Not allowed by the transaction lifecycle: The attempted refund amount is higher than the original transaction amount.",
+          "VALIDATION/CAPTURE_AMOUNT_EXCEEDED": "Capture Amount Exceeded: Not allowed by the transaction lifecycle: The attempted capture amount is higher than the original pre-authorisation amount.",
+          "VALIDATION/REFUND_NOT_ALLOWED_CHARGEBACK": "Refund Not Allowed Due to Chargeback: Not allowed by the transaction lifecycle: A refund cannot be processed because a chargeback already exists for this transaction.",
+          "VALIDATION/ALREADY_FULLY_CAPTURED": "Capture Not Allowed – Already Fully Captured: Not allowed by the transaction lifecycle: The transaction has already been fully captured and cannot be captured again.",
+          "VALIDATION/CAPTURE_NOT_ALLOWED_VOIDED": "Capture Not Allowed – Transaction Voided: Not allowed by the transaction lifecycle: The transaction was voided and therefore cannot be captured.",
+          "VALIDATION/TRANSACTION_ALREADY_VOIDED": "Transaction Already Voided: Not allowed by the transaction lifecycle: The transaction has already been voided and cannot be acted upon.",
+          "VALIDATION/ORIGINAL_TRANSACTION_NOT_APPROVED": "Original Transaction Not Approved: Not allowed by the transaction lifecycle: The requested operation cannot be performed because the original transaction was not successfully approved.",
+          "VALIDATION/PUBLIC_IP_REQUIRED": "Public IP Address Required: A public IP address is required. Private or internal IP addresses are not supported.",
+          "VALIDATION/SHIPPING_LINE_2_REQUIRES_LINE_1": "Shipping Address Line 2 Requires Address Line 1: Shipping Address Line 2 was provided, but Shipping Address Line 1 is missing. Address Line 1 is required when Address Line 2 is present.",
+          "VALIDATION/SHIPPING_LINE_1_NOT_ALLOWED": "Shipping Address Line 1 Not Allowed With Structured Fields: Structured shipping address fields were provided, so Shipping Address Line 1 must not be provided.",
+          "VALIDATION/SHIPPING_MIN_ADDRESS_NOT_PROVIDED": "Shipping Minimum Address Not Provided: No shipping address details were provided. Provide either Shipping Address Line 1, or structured shipping address fields.",
+          "VALIDATION/PAYER_LINE_2_REQUIRES_LINE_1": "Payer Address Line 2 Requires Address Line 1: Payer Address Line 2 was provided, but Payer Address Line 1 is missing. Address Line 1 is required when Address Line 2 is present.",
+          "VALIDATION/PAYER_LINE_1_NOT_ALLOWED": "Payer Address Line 1 Not Allowed With Structured Fields: Structured payer address fields were provided, so Payer Address Line 1 must not be provided.",
+          "VALIDATION/PAYER_MIN_ADDRESS_NOT_PROVIDED": "Payer Minimum Address Not Provided: No payer address details were provided. Provide either Payer Address Line 1, or structured payer address fields.",
+          "VALIDATION/UNAUTHORIZED_PAYMENT_METHOD": "Unauthorized Payment Method: The payment method is not allowed for the merchant.",
+          "VALIDATION/UNAUTHORIZED_CURRENCY": "Unauthorized Currency: The currency type is not supported or not authorized for the merchant.",
+          "VALIDATION/UNRECOGNIZED_PAYMENT_INSTRUMENT": "Unrecognized Payment Instrument: The payment instrument is well-formed but could not be matched to a known provider, so its provider could not be identified.",
+          "VALIDATION/INVALID_AMOUNT": "Invalid Amount: The transaction amount failed validation before submission (e.g. negative, zero, or outside the allowed range).",
+          "VALIDATION/UNSUPPORTED_TRANSACTION_TYPE": "Unsupported Transaction Type: The requested transaction type is not supported.",
+          "VALIDATION/UNRECOGNIZED_PAYMENT_INSTRUMENT/CARD_BIN": "Unrecognized Card BIN: The card is well-formed but its BIN could not be matched to a known issuer, so the issuer/scheme could not be identified.",
+          "VALIDATION/API_KEY_ENVIRONMENT_MISMATCH": "API Key Environment Mismatch: The API key prefix does not match the current environment. Live API keys (live_) must be used in production, and test API keys (test_) must be used in sandbox.",
+          "VALIDATION/MISSING_CREDENTIALS": "Missing Credentials: Credentials are required but were not provided.",
+          "VALIDATION/INVALID_CREDENTIALS": "Invalid Credentials: The provided credentials or configuration parameters are invalid or malformed.",
+          "VALIDATION/INVALID_TRANSACTION_TYPE_FOR_REFUND": "Invalid Transaction Type for Refund: Refund is only supported for sale, preauthorization, or payout transactions.",
+          "VALIDATION/FULL_REFUND_ALREADY_PROCESSED": "Full Refund Already Processed: Not allowed by the transaction lifecycle: A full refund has already been processed for this transaction.",
+          "VALIDATION/CURRENCY_DID_NOT_MATCH_REFERENCED_TRANSACTION_CURRENCY": "Currency Mismatch with Referenced Transaction: The currency provided does not match the currency of the referenced transaction. Please use the same currency as the original transaction.",
+          "VALIDATION/ORDER_ID_DID_NOT_MATCH_REFERENCED_TRANSACTION_ORDER_ID": "Order ID Mismatch with Referenced Transaction: The provided order ID does not match the order ID of the referenced transaction.",
+          "VALIDATION/INVALID_TRANSACTION_TYPE_FOR_VOID": "Invalid Transaction Type for Void: Void is only supported for sale, preauthorization, or payout transactions.",
+          "VALIDATION/INVALID_TRANSACTION_TYPE_FOR_CAPTURE": "Invalid Transaction Type for Capture: Capture is only supported for preauthorization transactions.",
+          "VALIDATION/TRANSACTION_NOT_APPROVED": "Invalid Transaction State for Operation: Capture, refund, and void operations are only allowed for transactions with an approved status. The current transaction state does not meet this requirement.",
+          "VALIDATION/TRANSACTION_NOT_FOUND": "Transaction Not Found: Referenced transaction does not exist or could not be found.",
+          "VALIDATION/INVALID_SCHEDULED_DATE": "Invalid Scheduled Date: The scheduled date provided is not valid or does not conform to the required date format.",
+          "VALIDATION/INVALID_START_DATE": "Invalid Start Date: The start date provided is not valid. It must be today or a future date.",
+          "VALIDATION/TERMINAL_MERCHANT_ACCOUNT_NOT_FOUND": "Merchant account not found: No merchant account found for terminal.",
+          "VALIDATION/RECURRING_NOT_MANAGED_BY_MERCHANT": "Recurring Not Managed by Merchant: This action is not allowed because the recurring record is not managed by the merchant.",
+          "VALIDATION/FUTURE_TRANSACTION_NOT_FOUND": "Future Transaction Not Found: The specified future transaction could not be found. The future transaction ID may be invalid, does not exist, or is not associated with the given recurring record.",
+          "VALIDATION/INVALID_IDEMPOTENCY_KEY": "Invalid Idempotency Key: The provided idempotency key is invalid. It must be no longer than 255 characters and may only contain alphanumeric characters, underscores (_), and hyphens (-).",
+          "VALIDATION/INVALID_FLOW_STATE": "Invalid Flow State: The operation cannot be performed because the resource is currently being processed and has not reached a final state. Please try again once processing is complete.",
+          "VALIDATION/RETRY_REQUEST_MISMATCH": "Retry Request Mismatch: A supplied retry field does not match the originating transaction.",
+          "VALIDATION/FUTURE_TRANSACTION_AMOUNT_INVALID": "Invalid Future Transaction Amount: The provided amount for the future transaction is invalid. Please ensure the amount is correctly formatted and meets the required constraints. This field is required when the transaction is managed by the platform.",
+          "VALIDATION/RECURRING_ID_DID_NOT_MATCH_REFERENCED_FUTURE_TRANSACTION": "Recurring ID Mismatch with Referenced Future Transaction: The provided recurring ID does not match the recurring ID of the referenced future transaction.",
+          "VALIDATION/FUTURE_TRANSACTION_ALREADY_EXECUTED": "Future Transaction Already Executed: The scheduled future transaction has already been processed and cannot be executed again.",
+          "VALIDATION/FUTURE_TRANSACTION_ALREADY_CANCELLED": "Future Transaction Already Cancelled: The scheduled future transaction has already been cancelled and cannot be modified or executed.",
+          "VALIDATION/RECURRING_ALREADY_CANCELLED": "Recurring Already Cancelled: The recurring record has already been cancelled and cannot be cancelled again or modified. No further actions are allowed on a cancelled recurring.",
+          "VALIDATION/RECURRING_NOT_ACTIVE": "Recurring Not Active: This action cannot be performed because the recurring record is not in an active state.",
+          "VALIDATION/RECURRING_NOT_READY": "Recurring Not Ready: The recurring initialization has not completed successfully, so a recurring charge cannot be created yet.",
+          "VALIDATION/RECURRING_NOT_FOUND": "Recurring Not Found: The specified recurring record could not be found. The recurring ID may be invalid, does not exist, or is not associated with the given merchant or order.",
+          "VALIDATION/UNSUPPORTED_PROVIDER_TRANSACTION_LOOKUP": "Unsupported Provider Transaction Lookup: The selected provider is not supported for provider-transaction retry lookup.",
+          "VALIDATION/INVALID_PROVIDER_TRANSACTION_CURRENCY": "Invalid Provider Transaction Currency: The provider transaction lookup did not return a valid normalized currency.",
+          "VALIDATION/UNSUPPORTED_PROVIDER_INTERACTION_IMPORT": "Unsupported Provider Interaction Import: The selected provider is not supported for interaction-only retry import.",
+          "AUTH/DECLINED": "Authentication Declined: The issuer processed the authentication but rejected it (e.g. risk rules, flagged account), including when the challenge was completed.",
+          "AUTH/INVALID_PROVIDER_RESPONSE": "Invalid Response from Authentication Provider: The authentication provider returned a malformed or unparseable response.",
+          "AUTH/3DS_REDUCED_CONFIDENCE": "Reduced Authentication Confidence: The cardholder or device context produced signals that lowered trust in the authentication attempt.",
+          "AUTH/3DS_HOLDER_NOT_ENROLLED": "Cardholder Not Enrolled in 3DS: The cardholder is not enrolled in 3D Secure with the issuer or scheme.",
+          "AUTH/3DS_EXCEEDS_FREQUENCY_LIMIT": "Authentication Frequency Limit Exceeded: The issuer or provider rejected the request because challenge or authentication attempts exceeded an allowed frequency threshold.",
+          "AUTH/3DS_UNSUPPORTED_OR_UNKNOWN_DEVICE": "Unsupported or Unknown Device: The device could not be confidently recognized or is not supported for the required 3D Secure flow.",
+          "AUTH/INITIATED": "Authentication Initiated: The authentication process has started.",
+          "AUTH/3DS_TECHNICAL_ERROR": "3DS Technical Error: A technical issue prevented the 3D Secure authentication flow from completing.",
+          "AUTH/3DS_AUTHENTICATION_TIMEOUT": "3DS Authentication Timeout: The 3D Secure challenge or frictionless authentication timed out before completion.",
+          "AUTH/3DS_IN_PROGRESS": "3DS Authentication In Progress: A 3D Secure challenge has been initiated and is still in progress.",
+          "AUTH/3DS_CHALLENGE_FAILED": "3DS Challenge Failed: A 3D Secure challenge was presented to the cardholder but was explicitly failed or canceled.",
+          "AUTH/3DS_AUTHENTICATION_UNAVAILABLE": "3DS Authentication Unavailable: The issuer or access control server was unable to complete 3D Secure authentication (card not enrolled, technical error, or ACS temporarily unavailable).",
+          "AUTH/MANUAL_AUTHENTICATION_REQUIRED": "Manual Authentication Required: The issuer requires the cardholder to complete a manual (offline) authentication process before the transaction can proceed.",
+          "RISK/DECLINED": "Risk Declined: The transaction was declined by the risk engine.",
+          "RISK/BLOCK_LISTED": "Blocklisted Transaction: The transaction was rejected because one or more of its attributes match a value that has been blocklisted by SmartRetry’s risk management system.",
+          "RISK/VELOCITY_BLOCKED": "Velocity Limit Exceeded: The transaction was blocked due to velocity checks enforced by SmartRetry’s risk management system or the merchant’s configured rules, indicating that activity thresholds (e.g., frequency or volume) have been exceeded.",
+          "RISK/NO_ELIGIBLE_MERCHANT_ACCOUNTS": "No Eligible Merchant Accounts: No candidate merchant accounts remained after filtering by the payment providers allowed under risk policy.",
+          "PROCESSOR/DECLINED": "Transaction Declined: The transaction was declined by the payment processor.",
+          "PROCESSOR/INVALID_RESPONSE": "Invalid Response from Payment Provider: The payment provider returned a malformed or unparseable response.",
+          "PROCESSOR/NO_ACCOUNT_RECORD": "No Account Record: No account record found by the verifying party.",
+          "PROCESSOR/TIMEOUT": "Payment Processor Timeout: The payment processor did not respond within the expected time.",
+          "PROCESSOR/VALIDATION_INVALID_FIELD": "Invalid Field: The request contains a field value that could not be validated by the payment processor due to an invalid format or length.",
+          "PROCESSOR/VALIDATION_MISSING_FIELD": "Missing Field: The request is missing a required field needed by the payment processor to proceed.",
+          "PROCESSOR/PRE_CHECK_MISSING_FIELD": "Missing Field: A required field was not provided before the request could be sent to the payment processor.",
+          "PROCESSOR/PRE_CHECK_MISSING_FIELD/AMOUNT": "Missing Amount: An amount value is required but was not provided before sending the request to the payment processor.",
+          "PROCESSOR/PRE_CHECK_MISSING_FIELD/CURRENCY": "Missing Currency: A required currency value was not provided before sending the request to the payment processor.",
+          "PROCESSOR/PRE_CHECK_MISSING_FIELD/PAYMENT_CARD_NUMBER": "Missing Payment Card Number: A payment card number is required but was not provided before sending the request to the payment processor.",
+          "PROCESSOR/PRE_CHECK_MISSING_FIELD/PAYMENT_CARD_EXPIRY_MONTH": "Missing Payment Card Expiry Month: A payment card expiry month is required but was not provided before sending the request to the payment processor.",
+          "PROCESSOR/PRE_CHECK_MISSING_FIELD/PAYMENT_CARD_EXPIRY_YEAR": "Missing Payment Card Expiry Year: A payment card expiry year is required but was not provided before sending the request to the payment processor.",
+          "PROCESSOR/PRE_CHECK_MISSING_FIELD/PAYMENT_CARD_SECURITY_CODE": "Missing Payment Card Security Code (CVV): A payment card security code (CVV) is required but was not provided before sending the request to the payment processor.",
+          "PROCESSOR/PRE_CHECK_MISSING_FIELD/PAYMENT_CARD_HOLDER_NAME": "Missing Payment Card Holder Name: A payment card holder name is required but was not provided before sending the request to the payment processor.",
+          "PROCESSOR/PRE_CHECK_INVALID_FIELD": "Invalid Field: A field value did not pass format validation before the request could be sent to the payment processor.",
+          "PROCESSOR/PRE_CHECK_INVALID_FIELD/CURRENCY": "Invalid Currency: The currency specified is not valid or not supported by the payment processor.",
+          "PROCESSOR/RISK": "Declined by Processor Risk Controls: The transaction was declined by the payment processor based on internal risk assessment and controls.",
+          "PROCESSOR/NO_STATUS_RETURNED": "No Status Returned by Payment Provider: The payment provider did not include a status/reason code in its response.",
+          "PROCESSOR/UNSUPPORTED_TRANSACTION_TYPE": "Unsupported Transaction Type: The processor or provider does not support the requested transaction type.",
+          "PROCESSOR/ZERO_VALUE_AUTH_NOT_SUPPORTED": "Zero-Value Authorization Not Supported: The provider or issuer does not support zero-value (account verification) authorization for this transaction.",
+          "PAYER_ACCOUNT/TRANSACTION_REJECTED_AS_INVALID": "Invalid Transaction: The transaction was rejected as invalid by the payment provider managing the payer’s account.",
+          "PAYER_ACCOUNT/REENTER_TRANSACTION": "Transaction Must Be Resubmitted: The payment provider managing the payer’s account requires the transaction to be resubmitted.",
+          "PAYER_ACCOUNT/NO_ACTION_TAKEN": "No Action Taken: No action was taken on this transaction request.",
+          "PAYER_ACCOUNT/RECORD_NOT_FOUND": "Record Not Found: Unable to locate the requested record.",
+          "PAYER_ACCOUNT/TEMPORARILY_UNAVAILABLE": "Temporarily Unavailable: The service is temporarily unavailable for processing.",
+          "PAYER_ACCOUNT/EXCEEDS_PREAUTHORIZED_AMOUNT": "Exceeds Pre-authorized Amount: The transaction amount exceeds the pre-authorized approval amount.",
+          "PAYER_ACCOUNT/INVALID_ACCOUNT_IDENTIFIER": "Invalid Account Identifier: The account identifier provided for the customer’s payment method is invalid.",
+          "PAYER_ACCOUNT/INVALID_ACCOUNT_IDENTIFIER/CARD_NUMBER": "Invalid Card Number: The card number (PAN) is invalid or unrecognized by the issuer.",
+          "PAYER_ACCOUNT/NOT_PERMITTED_TO_HOLDER": "Transaction Not Permitted to Holder: This transaction type is not permitted for the account holder.",
+          "PAYER_ACCOUNT/SECURITY_VIOLATION": "Security Violation: A security violation was detected by the issuer.",
+          "PAYER_ACCOUNT/INVALID_SECURITY_CODE": "Invalid or Missing Security Code: The security code provided for the customer's payment instrument is invalid or missing.",
+          "PAYER_ACCOUNT/INVALID_SECURITY_CODE/CARD_SECURITY_CODE": "Invalid or Missing Card Security Code: The card security code (CVV/CVC) provided is invalid or missing.",
+          "PAYER_ACCOUNT/INVALID_EXPIRY_DATE": "Invalid or Incorrect Expiry Date: The expiry date provided for the customer's payment instrument is invalid or does not match the provider's records.",
+          "PAYER_ACCOUNT/INVALID_EXPIRY_DATE/CARD_EXPIRY_DATE": "Invalid or Incorrect Card Expiry Date: The card expiry date provided is invalid or does not match the issuer's records.",
+          "PAYER_ACCOUNT/INVALID_EFFECTIVE_DATE": "Invalid or Incorrect Effective Date: The effective (\"valid from\") date for the customer's payment instrument is invalid, or the instrument is not yet active.",
+          "PAYER_ACCOUNT/INVALID_EFFECTIVE_DATE/CARD_EFFECTIVE_DATE": "Invalid or Incorrect Card Effective Date: The card effective (\"valid from\") date is invalid, or the card is not yet active.",
+          "PAYER_ACCOUNT/INSTRUMENT_REPLACED": "Instrument Replaced: The payment instrument has been replaced by a newly issued one; the current instrument is no longer valid.",
+          "PAYER_ACCOUNT/INSTRUMENT_REPLACED/REPLACED_CARD": "Card Replaced: A new card has been issued (reissue or renewal); the current card is no longer valid and should not be used.",
+          "PAYER_ACCOUNT/CARD_ACTIVATION_REQUIRED": "Card Activation Required: The card has not been activated. The issuer requires an activation step (e.g. PIN transaction or ATM use) before it can be used.",
+          "PAYER_ACCOUNT/CARD_LIFECYCLE_DECLINE": "Card Lifecycle Decline: The issuer declined for an unspecified card lifecycle reason (e.g. expiry, replacement, migration, or closure) without indicating which.",
+          "PAYER_ACCOUNT/INVALID_AMOUNT": "Invalid Amount: The issuer rejected the transaction because the amount value is invalid or unacceptable (e.g. negative or zero).",
+          "PAYER_ACCOUNT/EXCEEDS_CUMULATIVE_AMOUNT_LIMIT": "Exceeds Cumulative Amount Limit: The cumulative transaction amount over a defined period (e.g. daily or monthly) has exceeded the cardholder's limit.",
+          "PAYER_ACCOUNT/INVALID_INSTALLMENT_PLAN": "Invalid Installment Plan: The selected installment plan is invalid, unsupported, or not permitted for this card or transaction type.",
+          "PAYER_ACCOUNT/INVALID_INSTALLMENT_COUNT": "Invalid Installment Count: The requested number of installment payments is invalid or outside the allowed range.",
+          "PAYER_ACCOUNT/RELATED_TRANSACTION_LOCKED": "Related Transaction Locked: The referenced transaction or issuer record is currently locked and cannot be modified (e.g. an update is in progress or restricted by issuer policy).",
+          "PAYER_ACCOUNT/CASH_BACK_NOT_ALLOWED": "Cash Back Not Allowed: The issuer declined the cash-back request because the card or transaction type permits purchase transactions only.",
+          "PAYER_ACCOUNT/CANCELLED": "Transaction Cancelled: Transaction was cancelled before completion.",
+          "PAYER_ACCOUNT/INSUFFICIENT_FUNDS": "Insufficient Funds: The holder account has insufficient funds to complete the purchase.",
+          "PAYER_ACCOUNT/LOST_INSTRUMENT": "Lost Instrument: The payment instrument has been reported as lost.",
+          "PAYER_ACCOUNT/LOST_INSTRUMENT/LOST_CARD": "Lost Card: The payment card has been reported as lost by the cardholder or the issuing bank.",
+          "PAYER_ACCOUNT/STOLEN_INSTRUMENT": "Stolen Instrument: The payment instrument has been reported as stolen.",
+          "PAYER_ACCOUNT/STOLEN_INSTRUMENT/STOLEN_CARD": "Stolen Card: The payment card has been reported as stolen by the cardholder or the issuing bank.",
+          "PAYER_ACCOUNT/INSTRUMENT_NOT_AVAILABLE": "Payment Instrument Unavailable: The payer’s account payment provider declined the transaction because the payment instrument is not available for use (e.g., inactive, suspended, or revoked).",
+          "PAYER_ACCOUNT/CONTACT_PAYER_PAYMENT_PROVIDER": "Contact Payer Payment Provider: The customer must contact their payment provider that manages their account (e.g., issuing bank, wallet provider) to proceed with the transaction.",
+          "PAYER_ACCOUNT/CONTACT_PAYER_PAYMENT_PROVIDER/REFER_TO_CARD_ISSUER": "Refer to Card Issuer: The card issuer requests the cardholder to contact them directly.",
+          "PAYER_ACCOUNT/DO_NOT_HONOR": "Do Not Honor: The issuer declined the transaction without providing a specific reason.",
+          "PAYER_ACCOUNT/PICKUP_CARD": "Pick Up Card: The issuer requests that the card be retained.",
+          "PAYER_ACCOUNT/NO_CREDIT_ACCOUNT": "No Credit Account: The holder does not have a credit account associated with the card.",
+          "PAYER_ACCOUNT/NO_CHECKING_ACCOUNT": "No Checking Account: The holder does not have a checking account associated with the card.",
+          "PAYER_ACCOUNT/NO_SAVINGS_ACCOUNT": "No Savings Account: The holder does not have a savings account associated with the card.",
+          "PAYER_ACCOUNT/INCORRECT_PIN": "Incorrect PIN: The PIN entered is incorrect.",
+          "PAYER_ACCOUNT/PIN_TRIES_EXCEEDED": "PIN Tries Exceeded: The allowable number of PIN entry attempts has been exceeded.",
+          "PAYER_ACCOUNT/PIN_MANAGEMENT_DENIED": "PIN Management Denied: The issuer declined a request to change or unblock the card PIN.",
+          "PAYER_ACCOUNT/PIN_REQUIRED": "PIN Required by Payer’s Payment Provider: The payer’s payment provider requires a PIN (online or offline) to authorize this transaction, but no PIN was provided.",
+          "PAYER_ACCOUNT/PIN_VERIFICATION_ERROR": "PIN Verification Error: The issuing bank could not validate your PIN.",
+          "PAYER_ACCOUNT/OFFLINE_PIN_REQUIRED": "Offline PIN Required by Payer’s Payment Provider: The payer’s payment provider requires an offline PIN for this transaction. The provided authentication method does not meet this requirement.",
+          "PAYER_ACCOUNT/EXCEEDS_AMOUNT_LIMIT": "Exceeds Amount Limit: The transaction amount exceeds the cardholder's approval limit.",
+          "PAYER_ACCOUNT/EXCEEDS_WITHDRAWAL_FREQUENCY_LIMIT": "Exceeds Withdrawal Frequency Limit: The cardholder has exceeded the allowed number of withdrawals.",
+          "PAYER_ACCOUNT/RESTRICTED_CARD": "Restricted Card: The card is restricted and cannot be used for this transaction or region.",
+          "PAYER_ACCOUNT/DOMESTIC_DEBIT_NOT_ALLOWED": "Domestic Debit Not Allowed: The debit card is not permitted for domestic transactions due to issuer, scheme, or regulatory restrictions (common in markets such as India or Russia where certain cards are valid only for international or specific channels).",
+          "PAYER_ACCOUNT/INVALID_DESTINATION_ACCOUNT": "Invalid Destination Account: The destination (\"to\") account is invalid, non-existent, or restricted, so the transfer could not be completed.",
+          "PAYER_ACCOUNT/INVALID_SOURCE_ACCOUNT": "Invalid Source Account: The source (\"from\") funding account is invalid, missing, or not supported for this transaction.",
+          "PAYER_ACCOUNT/ACCOUNT_CLOSED": "Account Closed: The underlying account is no longer active — permanently closed or deactivated by the cardholder or issuer (e.g. voluntary closure, issuer policy, or long-term inactivity) — and cannot be used again.",
+          "PAYER_ACCOUNT/CARD_BLOCKED": "Card Blocked: The card is blocked, possibly due to first use or security restrictions.",
+          "PAYER_ACCOUNT/STOP_PAYMENT_ORDER": "Stop Payment Order: A stop payment order has been placed on this transaction.",
+          "PAYER_ACCOUNT/AUTHORIZATION_REVOKED": "Authorization Revoked: All authorizations for this account have been revoked.",
+          "PAYER_ACCOUNT/SUSPECTED_FRAUD": "Transaction Declined Due to Suspected Fraud: The transaction was declined by the payer’s account payment provider due to suspected fraudulent activity or exceeding internal fraud risk thresholds.",
+          "PAYER_ACCOUNT/DUPLICATE_TRANSACTION": "Duplicate Transaction Detected: The transaction was declined by the payer’s account payment provider because a duplicate transaction was detected within a short time window.",
+          "PAYER_ACCOUNT/OPERATION_NOT_ALLOWED_UNAUTHENTICATED_ORIGINAL": "Operation Not Allowed Without Authentication: The requested operation is not permitted because the original transaction did not include the required customer authentication.",
+          "PAYER_ACCOUNT/STRONG_AUTHENTICATION_REQUIRED": "Additional Authentication Required by Issuer: The issuer requires additional customer authentication (e.g., 3DS) to proceed with the transaction. The attempt did not include the required authentication and was soft declined.",
+          "PAYMENT_METHOD/ALREADY_REVERSED": "Already Reversed: This transaction has already been reversed.",
+          "PAYMENT_METHOD/INELIGIBLE_FOR_RESUBMISSION": "Ineligible for Resubmission: This transaction is not eligible for resubmission.",
+          "PAYMENT_METHOD/DECLINED": "Payment Method Declined: The payment method was declined.",
+          "PAYMENT_METHOD/NOT_ALLOWED_AT_TERMINAL": "Not Allowed at Terminal: This transaction type is not allowed at this terminal.",
+          "PAYMENT_METHOD/INVALID_MERCHANT": "Invalid Merchant: The merchant is not valid or not authorized for this transaction.",
+          "PAYMENT_METHOD/UNABLE_TO_ROUTE_OR_AUTHORIZE": "Unable to Reach Issuer for Authorization: The payment method could not be authorized because the issuer could not be reached, could not be identified, or because offline authorization is not permitted when online authorization is unavailable.",
+          "PAYMENT_METHOD/INVALID_PROVIDER_RESPONSE": "Invalid Response from Payment Method Provider: The payment method provider returned a malformed or unparseable response.",
+          "PAYMENT_METHOD/SYSTEM_ERROR": "System Error: The authorization process could not be completed due to a system malfunction at the payment provider or along the authorization path.",
+          "PAYMENT_METHOD/ROUTING_ERROR": "Routing Error: The financial institution cannot be found for routing.",
+          "PAYMENT_METHOD/AML_VIOLATION": "AML Violation: The transaction does not fulfill anti-money laundering requirements.",
+          "PAYMENT_METHOD/NETWORK_TOKEN_SERVICE_ERROR": "Network Token Detokenization Failed: The request to detokenize a network token and retrieve a scheme cryptogram failed or timed out. This may occur when processing network tokens originating from digital wallets such as Google Pay or Apple Pay.",
+          "PAYMENT_METHOD/NETWORK_TOKEN_UNAVAILABLE": "Network Token Unavailable: The network token cannot be used for this transaction because it is suspended, deactivated, or could not be found by the scheme or token service.",
+          "PAYMENT_METHOD/VIOLATION_OF_LAW": "Violation of Law: The transaction cannot be completed due to a legal violation.",
+          "PAYMENT_METHOD/SURCHARGE_NOT_ALLOWED": "Surcharge Not Allowed: The surcharge amount is not permitted on this card or by scheme rules (common in US debit/acquirer environments). Visa codes: B1, B2.",
+          "PAYMENT_METHOD/AUTHORIZING_INSTITUTION_NOT_FOUND": "Authorizing Institution Not Found: The institution required to authorize this payment instrument could not be identified, so the transaction could not be routed for authorization.",
+          "PAYMENT_METHOD/AUTHORIZING_INSTITUTION_NOT_FOUND/ISSUER": "Issuer Not Found: The card's BIN does not correspond to any known issuer, so the transaction could not be routed to an issuer.",
+          "PAYMENT_METHOD/INVALID_TRANSACTION_FORMAT": "Invalid Transaction Format: The issuer or network rejected the transaction because the message format was invalid or not compliant (e.g. malformed message or invalid data elements).",
+          "ROUTING/REFUND_PENDING_APPROVAL": "Refund Pending Manual Approval: The refund request is pending manual approval by a system administrator before it can be processed.",
+          "ROUTING/MID_INVALID_OR_INACTIVE": "Merchant Account Not Available: The merchant account (MID/terminal) is invalid, inactive, or not configured for this transaction.",
+          "ROUTING/RECORD_NOT_FOUND": "Transaction Not Found: The requested transaction could not be found. The reference provided does not correspond to any record in the system.",
+          "ROUTING/RESOURCE_LOCKED": "Resource Locked: The requested resource is currently locked because another process is operating on it. Please try again later.",
+          "ROUTING/IDEMPOTENCY_CONFLICT": "Idempotency Conflict: The provided idempotency key has already been used with a different request. Reusing the same key requires the request parameters to be identical.",
+          "ROUTING/TERMINAL_RESOURCE_ACCESS_DENIED": "Terminal Resource Access Denied: The requested resource does not belong to the specified terminal. This terminal is not authorized to access or perform actions on resources owned by another terminal.",
+          "ROUTING/PROVIDER_NOT_FOUND": "Provider Not Found: No processor was found for the merchant account configuration.",
+          "ROUTING/PROVIDER_HANDLER_MISSING": "Provider Handler Missing: The processor does not implement a handler for the requested operation.",
+          "ROUTING/INVALID_TRANSACTION": "Invalid Transaction: The transaction is missing required fields for processing.",
+          "ROUTING/NOT_SUPPORTED": "Operation Not Supported: The requested operation is not supported by this processor.",
+          "ROUTING/PROCESSING_ERROR": "Processing Error: An unexpected error occurred while dispatching the transaction to the processor.",
+          "ROUTING/NO_MERCHANT_ACCOUNTS_TO_ROUTE": "No Merchant Accounts To Route: The order had no merchant accounts to build a candidate routing pool from.",
+          "ROUTING/NO_MERCHANT_ACCOUNT_SELECTED": "No Merchant Account Selected: The candidate merchant account pool was filtered down to zero during selection."
+        },
+        "type": "string",
+        "enum": [
+          "SYSTEM/SUCCESSFUL",
+          "SYSTEM/PROCESSING",
+          "SYSTEM/CREATED",
+          "SYSTEM/TIMEOUT",
+          "SYSTEM/INTERNAL_ERROR",
+          "SYSTEM/UNKNOWN",
+          "SYSTEM/PARTIAL_APPROVAL",
+          "SYSTEM/ZERO_AMOUNT_AUTHORIZATION_ONLY",
+          "VALIDATION/INVALID_FIELD",
+          "VALIDATION/INVALID_FIELD/SHIPPING_ADDRESS_LINE_1",
+          "VALIDATION/INVALID_FIELD/SHIPPING_ADDRESS_LINE_2",
+          "VALIDATION/INVALID_FIELD/SHIPPING_APARTMENT_SUITE",
+          "VALIDATION/INVALID_FIELD/SHIPPING_FLOOR",
+          "VALIDATION/INVALID_FIELD/SHIPPING_ENTRANCE_NUMBER",
+          "VALIDATION/INVALID_FIELD/SHIPPING_BUILDING_NUMBER",
+          "VALIDATION/INVALID_FIELD/SHIPPING_STREET_NAME",
+          "VALIDATION/INVALID_FIELD/SHIPPING_POSTAL_CODE",
+          "VALIDATION/INVALID_FIELD/SHIPPING_CITY",
+          "VALIDATION/INVALID_FIELD/SHIPPING_STATE_PROVINCE",
+          "VALIDATION/INVALID_FIELD/SHIPPING_COUNTRY",
+          "VALIDATION/INVALID_FIELD/PAYER_ADDRESS_LINE_1",
+          "VALIDATION/INVALID_FIELD/PAYER_ADDRESS_LINE_2",
+          "VALIDATION/INVALID_FIELD/PAYER_APARTMENT_SUITE",
+          "VALIDATION/INVALID_FIELD/PAYER_FLOOR",
+          "VALIDATION/INVALID_FIELD/PAYER_ENTRANCE_NUMBER",
+          "VALIDATION/INVALID_FIELD/PAYER_BUILDING_NUMBER",
+          "VALIDATION/INVALID_FIELD/PAYER_STREET_NAME",
+          "VALIDATION/INVALID_FIELD/PAYER_POSTAL_CODE",
+          "VALIDATION/INVALID_FIELD/PAYER_CITY",
+          "VALIDATION/INVALID_FIELD/PAYER_STATE_PROVINCE",
+          "VALIDATION/INVALID_FIELD/PAYER_COUNTRY",
+          "VALIDATION/INVALID_FIELD/PAYMENT_INSTRUMENT_IDENTIFIER",
+          "VALIDATION/INVALID_FIELD/PAYMENT_CARD_NUMBER",
+          "VALIDATION/INVALID_FIELD/PAYMENT_CARD_SECURITY_CODE",
+          "VALIDATION/INVALID_FIELD/PAYMENT_CARD_EXPIRY_MONTH",
+          "VALIDATION/INVALID_FIELD/PAYMENT_CARD_EXPIRY_YEAR",
+          "VALIDATION/INVALID_FIELD/PAYMENT_CARD_PIN",
+          "VALIDATION/INVALID_FIELD/PAYER_FULL_NAME",
+          "VALIDATION/INVALID_FIELD/PAYER_FIRST_NAME",
+          "VALIDATION/INVALID_FIELD/PAYER_LAST_NAME",
+          "VALIDATION/INVALID_FIELD/PAYER_IDENTITY",
+          "VALIDATION/INVALID_FIELD/PAYER_EMAIL",
+          "VALIDATION/INVALID_FIELD/PAYER_PHONE",
+          "VALIDATION/INVALID_FIELD/PAYER_BIRTHDATE",
+          "VALIDATION/INVALID_FIELD/3DS_CAVV",
+          "VALIDATION/INVALID_FIELD/3DS_PROTOCOL_VERSION",
+          "VALIDATION/INVALID_FIELD/3DS_DIRECTORY_SERVER_ID",
+          "VALIDATION/INVALID_FIELD/3DS_ACS_TRANSACTION_ID",
+          "VALIDATION/INVALID_FIELD/IP_ADDRESS",
+          "VALIDATION/INVALID_FIELD/PAYMENT_TOKEN",
+          "VALIDATION/INVALID_FIELD/CURRENCY",
+          "VALIDATION/INVALID_FIELD/AMOUNT",
+          "VALIDATION/INVALID_FIELD/ORDER_DESCRIPTION",
+          "VALIDATION/INVALID_FIELD/ORDER_ID_REFERENCE",
+          "VALIDATION/INVALID_FIELD/TRANSACTION_DESCRIPTION",
+          "VALIDATION/INVALID_FIELD/TRANSACTION_ID_REFERENCE",
+          "VALIDATION/INVALID_FIELD/MERCHANT_TRANSACTION_ID",
+          "VALIDATION/INVALID_FIELD/MERCHANT_ORDER_ID",
+          "VALIDATION/INVALID_FIELD/TERMINAL",
+          "VALIDATION/INVALID_FIELD/RECURRING_DATE_TYPE",
+          "VALIDATION/INVALID_FIELD/RECURRING_FIRST_PAYMENT_DATE",
+          "VALIDATION/INVALID_FIELD/RECURRING_TIME_INTERVAL",
+          "VALIDATION/INVALID_FIELD/RECURRING_NUMBER_OF_PAYMENTS",
+          "VALIDATION/INVALID_FIELD/RECURRING_CANCELLATION_DATE",
+          "VALIDATION/INVALID_FIELD/CARD_NUMBER",
+          "VALIDATION/INVALID_FIELD/PAYMENT_INSTRUMENT_TOKEN",
+          "VALIDATION/INVALID_FIELD/FUTURE_TRANSACTION_SCHEDULED_DATE",
+          "VALIDATION/INVALID_FIELD/PAYER",
+          "VALIDATION/INVALID_FIELD/TERMINAL_MERCHANT_ID",
+          "VALIDATION/MISSING_FIELD",
+          "VALIDATION/MISSING_FIELD/SHIPPING_ADDRESS_LINE_1",
+          "VALIDATION/MISSING_FIELD/SHIPPING_ADDRESS_LINE_2",
+          "VALIDATION/MISSING_FIELD/SHIPPING_APARTMENT_SUITE",
+          "VALIDATION/MISSING_FIELD/SHIPPING_FLOOR",
+          "VALIDATION/MISSING_FIELD/SHIPPING_ENTRANCE_NUMBER",
+          "VALIDATION/MISSING_FIELD/SHIPPING_BUILDING_NUMBER",
+          "VALIDATION/MISSING_FIELD/SHIPPING_STREET_NAME",
+          "VALIDATION/MISSING_FIELD/SHIPPING_POSTAL_CODE",
+          "VALIDATION/MISSING_FIELD/SHIPPING_CITY",
+          "VALIDATION/MISSING_FIELD/SHIPPING_STATE_PROVINCE",
+          "VALIDATION/MISSING_FIELD/SHIPPING_COUNTRY",
+          "VALIDATION/MISSING_FIELD/PAYER_ADDRESS_LINE_1",
+          "VALIDATION/MISSING_FIELD/PAYER_ADDRESS_LINE_2",
+          "VALIDATION/MISSING_FIELD/PAYER_APARTMENT_SUITE",
+          "VALIDATION/MISSING_FIELD/PAYER_FLOOR",
+          "VALIDATION/MISSING_FIELD/PAYER_ENTRANCE_NUMBER",
+          "VALIDATION/MISSING_FIELD/PAYER_BUILDING_NUMBER",
+          "VALIDATION/MISSING_FIELD/PAYER_STREET_NAME",
+          "VALIDATION/MISSING_FIELD/PAYER_POSTAL_CODE",
+          "VALIDATION/MISSING_FIELD/PAYER_CITY",
+          "VALIDATION/MISSING_FIELD/PAYER_STATE_PROVINCE",
+          "VALIDATION/MISSING_FIELD/PAYER_COUNTRY",
+          "VALIDATION/MISSING_FIELD/PAYMENT_INSTRUMENT_IDENTIFIER",
+          "VALIDATION/MISSING_FIELD/PAYMENT_CARD_NUMBER",
+          "VALIDATION/MISSING_FIELD/PAYMENT_CARD_SECURITY_CODE",
+          "VALIDATION/MISSING_FIELD/PAYMENT_CARD_EXPIRY_MONTH",
+          "VALIDATION/MISSING_FIELD/PAYMENT_CARD_EXPIRY_YEAR",
+          "VALIDATION/MISSING_FIELD/PAYMENT_CARD_PIN",
+          "VALIDATION/MISSING_FIELD/PAYMENT_CARD_HOLDER_NAME",
+          "VALIDATION/MISSING_FIELD/PAYER_FULL_NAME",
+          "VALIDATION/MISSING_FIELD/PAYER_FIRST_NAME",
+          "VALIDATION/MISSING_FIELD/PAYER_LAST_NAME",
+          "VALIDATION/MISSING_FIELD/PAYER_IDENTITY",
+          "VALIDATION/MISSING_FIELD/PAYER_EMAIL",
+          "VALIDATION/MISSING_FIELD/PAYER_PHONE",
+          "VALIDATION/MISSING_FIELD/PAYER_BIRTHDATE",
+          "VALIDATION/MISSING_FIELD/3DS_CAVV",
+          "VALIDATION/MISSING_FIELD/3DS_PROTOCOL_VERSION",
+          "VALIDATION/MISSING_FIELD/3DS_DIRECTORY_SERVER_ID",
+          "VALIDATION/MISSING_FIELD/3DS_ACS_TRANSACTION_ID",
+          "VALIDATION/MISSING_FIELD/IP_ADDRESS",
+          "VALIDATION/MISSING_FIELD/PAYMENT_TOKEN",
+          "VALIDATION/MISSING_FIELD/CURRENCY",
+          "VALIDATION/MISSING_FIELD/AMOUNT",
+          "VALIDATION/MISSING_FIELD/RECURRING_FUTURE_AMOUNT",
+          "VALIDATION/MISSING_FIELD/FUTURE_TRANSACTION_AMOUNT",
+          "VALIDATION/MISSING_FIELD/ORDER_DESCRIPTION",
+          "VALIDATION/MISSING_FIELD/ORDER_ID_REFERENCE",
+          "VALIDATION/MISSING_FIELD/TRANSACTION_DESCRIPTION",
+          "VALIDATION/MISSING_FIELD/TRANSACTION_ID_REFERENCE",
+          "VALIDATION/MISSING_FIELD/MERCHANT_TRANSACTION_ID",
+          "VALIDATION/MISSING_FIELD/MERCHANT_ORDER_ID",
+          "VALIDATION/MISSING_FIELD/TERMINAL",
+          "VALIDATION/MISSING_FIELD/RECURRING_DATE_TYPE",
+          "VALIDATION/MISSING_FIELD/RECURRING_FIRST_PAYMENT_DATE",
+          "VALIDATION/MISSING_FIELD/RECURRING_TIME_INTERVAL",
+          "VALIDATION/MISSING_FIELD/RECURRING_NUMBER_OF_PAYMENTS",
+          "VALIDATION/MISSING_FIELD/RECURRING_CANCELLATION_DATE",
+          "VALIDATION/MISSING_FIELD/RECURRING_MANAGED_BY",
+          "VALIDATION/MISSING_FIELD/CARD_NUMBER",
+          "VALIDATION/MISSING_FIELD/PAYER_INFORMATION",
+          "VALIDATION/MISSING_FIELD/PAYMENT_INSTRUMENT",
+          "VALIDATION/MISSING_FIELD/FUTURE_TRANSACTION",
+          "VALIDATION/UNKNOWN_FIELD",
+          "VALIDATION/REFUND_AMOUNT_EXCEEDED",
+          "VALIDATION/CAPTURE_AMOUNT_EXCEEDED",
+          "VALIDATION/REFUND_NOT_ALLOWED_CHARGEBACK",
+          "VALIDATION/ALREADY_FULLY_CAPTURED",
+          "VALIDATION/CAPTURE_NOT_ALLOWED_VOIDED",
+          "VALIDATION/TRANSACTION_ALREADY_VOIDED",
+          "VALIDATION/ORIGINAL_TRANSACTION_NOT_APPROVED",
+          "VALIDATION/PUBLIC_IP_REQUIRED",
+          "VALIDATION/SHIPPING_LINE_2_REQUIRES_LINE_1",
+          "VALIDATION/SHIPPING_LINE_1_NOT_ALLOWED",
+          "VALIDATION/SHIPPING_MIN_ADDRESS_NOT_PROVIDED",
+          "VALIDATION/PAYER_LINE_2_REQUIRES_LINE_1",
+          "VALIDATION/PAYER_LINE_1_NOT_ALLOWED",
+          "VALIDATION/PAYER_MIN_ADDRESS_NOT_PROVIDED",
+          "VALIDATION/UNAUTHORIZED_PAYMENT_METHOD",
+          "VALIDATION/UNAUTHORIZED_CURRENCY",
+          "VALIDATION/UNRECOGNIZED_PAYMENT_INSTRUMENT",
+          "VALIDATION/INVALID_AMOUNT",
+          "VALIDATION/UNSUPPORTED_TRANSACTION_TYPE",
+          "VALIDATION/UNRECOGNIZED_PAYMENT_INSTRUMENT/CARD_BIN",
+          "VALIDATION/API_KEY_ENVIRONMENT_MISMATCH",
+          "VALIDATION/MISSING_CREDENTIALS",
+          "VALIDATION/INVALID_CREDENTIALS",
+          "VALIDATION/INVALID_TRANSACTION_TYPE_FOR_REFUND",
+          "VALIDATION/FULL_REFUND_ALREADY_PROCESSED",
+          "VALIDATION/CURRENCY_DID_NOT_MATCH_REFERENCED_TRANSACTION_CURRENCY",
+          "VALIDATION/ORDER_ID_DID_NOT_MATCH_REFERENCED_TRANSACTION_ORDER_ID",
+          "VALIDATION/INVALID_TRANSACTION_TYPE_FOR_VOID",
+          "VALIDATION/INVALID_TRANSACTION_TYPE_FOR_CAPTURE",
+          "VALIDATION/TRANSACTION_NOT_APPROVED",
+          "VALIDATION/TRANSACTION_NOT_FOUND",
+          "VALIDATION/INVALID_SCHEDULED_DATE",
+          "VALIDATION/INVALID_START_DATE",
+          "VALIDATION/TERMINAL_MERCHANT_ACCOUNT_NOT_FOUND",
+          "VALIDATION/RECURRING_NOT_MANAGED_BY_MERCHANT",
+          "VALIDATION/FUTURE_TRANSACTION_NOT_FOUND",
+          "VALIDATION/INVALID_IDEMPOTENCY_KEY",
+          "VALIDATION/INVALID_FLOW_STATE",
+          "VALIDATION/RETRY_REQUEST_MISMATCH",
+          "VALIDATION/FUTURE_TRANSACTION_AMOUNT_INVALID",
+          "VALIDATION/RECURRING_ID_DID_NOT_MATCH_REFERENCED_FUTURE_TRANSACTION",
+          "VALIDATION/FUTURE_TRANSACTION_ALREADY_EXECUTED",
+          "VALIDATION/FUTURE_TRANSACTION_ALREADY_CANCELLED",
+          "VALIDATION/RECURRING_ALREADY_CANCELLED",
+          "VALIDATION/RECURRING_NOT_ACTIVE",
+          "VALIDATION/RECURRING_NOT_READY",
+          "VALIDATION/RECURRING_NOT_FOUND",
+          "VALIDATION/UNSUPPORTED_PROVIDER_TRANSACTION_LOOKUP",
+          "VALIDATION/INVALID_PROVIDER_TRANSACTION_CURRENCY",
+          "VALIDATION/UNSUPPORTED_PROVIDER_INTERACTION_IMPORT",
+          "AUTH/DECLINED",
+          "AUTH/INVALID_PROVIDER_RESPONSE",
+          "AUTH/3DS_REDUCED_CONFIDENCE",
+          "AUTH/3DS_HOLDER_NOT_ENROLLED",
+          "AUTH/3DS_EXCEEDS_FREQUENCY_LIMIT",
+          "AUTH/3DS_UNSUPPORTED_OR_UNKNOWN_DEVICE",
+          "AUTH/INITIATED",
+          "AUTH/3DS_TECHNICAL_ERROR",
+          "AUTH/3DS_AUTHENTICATION_TIMEOUT",
+          "AUTH/3DS_IN_PROGRESS",
+          "AUTH/3DS_CHALLENGE_FAILED",
+          "AUTH/3DS_AUTHENTICATION_UNAVAILABLE",
+          "AUTH/MANUAL_AUTHENTICATION_REQUIRED",
+          "RISK/DECLINED",
+          "RISK/BLOCK_LISTED",
+          "RISK/VELOCITY_BLOCKED",
+          "RISK/NO_ELIGIBLE_MERCHANT_ACCOUNTS",
+          "PROCESSOR/DECLINED",
+          "PROCESSOR/INVALID_RESPONSE",
+          "PROCESSOR/NO_ACCOUNT_RECORD",
+          "PROCESSOR/TIMEOUT",
+          "PROCESSOR/VALIDATION_INVALID_FIELD",
+          "PROCESSOR/VALIDATION_MISSING_FIELD",
+          "PROCESSOR/PRE_CHECK_MISSING_FIELD",
+          "PROCESSOR/PRE_CHECK_MISSING_FIELD/AMOUNT",
+          "PROCESSOR/PRE_CHECK_MISSING_FIELD/CURRENCY",
+          "PROCESSOR/PRE_CHECK_MISSING_FIELD/PAYMENT_CARD_NUMBER",
+          "PROCESSOR/PRE_CHECK_MISSING_FIELD/PAYMENT_CARD_EXPIRY_MONTH",
+          "PROCESSOR/PRE_CHECK_MISSING_FIELD/PAYMENT_CARD_EXPIRY_YEAR",
+          "PROCESSOR/PRE_CHECK_MISSING_FIELD/PAYMENT_CARD_SECURITY_CODE",
+          "PROCESSOR/PRE_CHECK_MISSING_FIELD/PAYMENT_CARD_HOLDER_NAME",
+          "PROCESSOR/PRE_CHECK_INVALID_FIELD",
+          "PROCESSOR/PRE_CHECK_INVALID_FIELD/CURRENCY",
+          "PROCESSOR/RISK",
+          "PROCESSOR/NO_STATUS_RETURNED",
+          "PROCESSOR/UNSUPPORTED_TRANSACTION_TYPE",
+          "PROCESSOR/ZERO_VALUE_AUTH_NOT_SUPPORTED",
+          "PAYER_ACCOUNT/TRANSACTION_REJECTED_AS_INVALID",
+          "PAYER_ACCOUNT/REENTER_TRANSACTION",
+          "PAYER_ACCOUNT/NO_ACTION_TAKEN",
+          "PAYER_ACCOUNT/RECORD_NOT_FOUND",
+          "PAYER_ACCOUNT/TEMPORARILY_UNAVAILABLE",
+          "PAYER_ACCOUNT/EXCEEDS_PREAUTHORIZED_AMOUNT",
+          "PAYER_ACCOUNT/INVALID_ACCOUNT_IDENTIFIER",
+          "PAYER_ACCOUNT/INVALID_ACCOUNT_IDENTIFIER/CARD_NUMBER",
+          "PAYER_ACCOUNT/NOT_PERMITTED_TO_HOLDER",
+          "PAYER_ACCOUNT/SECURITY_VIOLATION",
+          "PAYER_ACCOUNT/INVALID_SECURITY_CODE",
+          "PAYER_ACCOUNT/INVALID_SECURITY_CODE/CARD_SECURITY_CODE",
+          "PAYER_ACCOUNT/INVALID_EXPIRY_DATE",
+          "PAYER_ACCOUNT/INVALID_EXPIRY_DATE/CARD_EXPIRY_DATE",
+          "PAYER_ACCOUNT/INVALID_EFFECTIVE_DATE",
+          "PAYER_ACCOUNT/INVALID_EFFECTIVE_DATE/CARD_EFFECTIVE_DATE",
+          "PAYER_ACCOUNT/INSTRUMENT_REPLACED",
+          "PAYER_ACCOUNT/INSTRUMENT_REPLACED/REPLACED_CARD",
+          "PAYER_ACCOUNT/CARD_ACTIVATION_REQUIRED",
+          "PAYER_ACCOUNT/CARD_LIFECYCLE_DECLINE",
+          "PAYER_ACCOUNT/INVALID_AMOUNT",
+          "PAYER_ACCOUNT/EXCEEDS_CUMULATIVE_AMOUNT_LIMIT",
+          "PAYER_ACCOUNT/INVALID_INSTALLMENT_PLAN",
+          "PAYER_ACCOUNT/INVALID_INSTALLMENT_COUNT",
+          "PAYER_ACCOUNT/RELATED_TRANSACTION_LOCKED",
+          "PAYER_ACCOUNT/CASH_BACK_NOT_ALLOWED",
+          "PAYER_ACCOUNT/CANCELLED",
+          "PAYER_ACCOUNT/INSUFFICIENT_FUNDS",
+          "PAYER_ACCOUNT/LOST_INSTRUMENT",
+          "PAYER_ACCOUNT/LOST_INSTRUMENT/LOST_CARD",
+          "PAYER_ACCOUNT/STOLEN_INSTRUMENT",
+          "PAYER_ACCOUNT/STOLEN_INSTRUMENT/STOLEN_CARD",
+          "PAYER_ACCOUNT/INSTRUMENT_NOT_AVAILABLE",
+          "PAYER_ACCOUNT/CONTACT_PAYER_PAYMENT_PROVIDER",
+          "PAYER_ACCOUNT/CONTACT_PAYER_PAYMENT_PROVIDER/REFER_TO_CARD_ISSUER",
+          "PAYER_ACCOUNT/DO_NOT_HONOR",
+          "PAYER_ACCOUNT/PICKUP_CARD",
+          "PAYER_ACCOUNT/NO_CREDIT_ACCOUNT",
+          "PAYER_ACCOUNT/NO_CHECKING_ACCOUNT",
+          "PAYER_ACCOUNT/NO_SAVINGS_ACCOUNT",
+          "PAYER_ACCOUNT/INCORRECT_PIN",
+          "PAYER_ACCOUNT/PIN_TRIES_EXCEEDED",
+          "PAYER_ACCOUNT/PIN_MANAGEMENT_DENIED",
+          "PAYER_ACCOUNT/PIN_REQUIRED",
+          "PAYER_ACCOUNT/PIN_VERIFICATION_ERROR",
+          "PAYER_ACCOUNT/OFFLINE_PIN_REQUIRED",
+          "PAYER_ACCOUNT/EXCEEDS_AMOUNT_LIMIT",
+          "PAYER_ACCOUNT/EXCEEDS_WITHDRAWAL_FREQUENCY_LIMIT",
+          "PAYER_ACCOUNT/RESTRICTED_CARD",
+          "PAYER_ACCOUNT/DOMESTIC_DEBIT_NOT_ALLOWED",
+          "PAYER_ACCOUNT/INVALID_DESTINATION_ACCOUNT",
+          "PAYER_ACCOUNT/INVALID_SOURCE_ACCOUNT",
+          "PAYER_ACCOUNT/ACCOUNT_CLOSED",
+          "PAYER_ACCOUNT/CARD_BLOCKED",
+          "PAYER_ACCOUNT/STOP_PAYMENT_ORDER",
+          "PAYER_ACCOUNT/AUTHORIZATION_REVOKED",
+          "PAYER_ACCOUNT/SUSPECTED_FRAUD",
+          "PAYER_ACCOUNT/DUPLICATE_TRANSACTION",
+          "PAYER_ACCOUNT/OPERATION_NOT_ALLOWED_UNAUTHENTICATED_ORIGINAL",
+          "PAYER_ACCOUNT/STRONG_AUTHENTICATION_REQUIRED",
+          "PAYMENT_METHOD/ALREADY_REVERSED",
+          "PAYMENT_METHOD/INELIGIBLE_FOR_RESUBMISSION",
+          "PAYMENT_METHOD/DECLINED",
+          "PAYMENT_METHOD/NOT_ALLOWED_AT_TERMINAL",
+          "PAYMENT_METHOD/INVALID_MERCHANT",
+          "PAYMENT_METHOD/UNABLE_TO_ROUTE_OR_AUTHORIZE",
+          "PAYMENT_METHOD/INVALID_PROVIDER_RESPONSE",
+          "PAYMENT_METHOD/SYSTEM_ERROR",
+          "PAYMENT_METHOD/ROUTING_ERROR",
+          "PAYMENT_METHOD/AML_VIOLATION",
+          "PAYMENT_METHOD/NETWORK_TOKEN_SERVICE_ERROR",
+          "PAYMENT_METHOD/NETWORK_TOKEN_UNAVAILABLE",
+          "PAYMENT_METHOD/VIOLATION_OF_LAW",
+          "PAYMENT_METHOD/SURCHARGE_NOT_ALLOWED",
+          "PAYMENT_METHOD/AUTHORIZING_INSTITUTION_NOT_FOUND",
+          "PAYMENT_METHOD/AUTHORIZING_INSTITUTION_NOT_FOUND/ISSUER",
+          "PAYMENT_METHOD/INVALID_TRANSACTION_FORMAT",
+          "ROUTING/REFUND_PENDING_APPROVAL",
+          "ROUTING/MID_INVALID_OR_INACTIVE",
+          "ROUTING/RECORD_NOT_FOUND",
+          "ROUTING/RESOURCE_LOCKED",
+          "ROUTING/IDEMPOTENCY_CONFLICT",
+          "ROUTING/TERMINAL_RESOURCE_ACCESS_DENIED",
+          "ROUTING/PROVIDER_NOT_FOUND",
+          "ROUTING/PROVIDER_HANDLER_MISSING",
+          "ROUTING/INVALID_TRANSACTION",
+          "ROUTING/NOT_SUPPORTED",
+          "ROUTING/PROCESSING_ERROR",
+          "ROUTING/NO_MERCHANT_ACCOUNTS_TO_ROUTE",
+          "ROUTING/NO_MERCHANT_ACCOUNT_SELECTED"
+        ]
+      },
       "EndCustomerAddressRequest": {
         "additionalProperties": false,
         "type": "object",
@@ -812,56 +1462,111 @@
         }
       },
       "PaymentInstrumentRequest": {
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "card_number",
-          "expiry_month",
-          "expiry_year",
-          "payment_method"
-        ],
-        "properties": {
-          "card_cardholder_name": {
-            "description": "The name of the card holder as it appears on the card.",
-            "minLength": 1,
-            "maxLength": 100,
-            "type": "string"
-          },
-          "card_number": {
-            "description": "The card number, which must be between 13 and 19 digits.",
-            "minLength": 13,
-            "maxLength": 19,
-            "pattern": "^[0-9]{13,19}$",
-            "type": "string"
-          },
-          "expiry_month": {
-            "description": "The expiration month of the card.",
-            "minimum": 1,
-            "maximum": 12,
-            "type": "integer"
-          },
-          "expiry_year": {
-            "description": "The expiration year of the card.",
-            "minimum": 2024,
-            "maximum": 2099,
-            "type": "integer"
-          },
-          "payment_method": {
-            "$ref": "#/components/schemas/PaymentMethodType"
-          },
-          "card_profile": {
+        "anyOf": [
+          {
             "additionalProperties": false,
             "type": "object",
+            "required": [
+              "card_number",
+              "expiry_month",
+              "expiry_year",
+              "payment_method"
+            ],
             "properties": {
-              "fingerprint": {
-                "description": "A unique identifier for the card profile, generated by SmartRetry.",
+              "card_cardholder_name": {
+                "description": "The name of the card holder as it appears on the card.",
+                "minLength": 1,
+                "maxLength": 100,
+                "type": "string"
+              },
+              "card_number": {
+                "description": "The card number, which must be between 13 and 19 digits.",
+                "minLength": 13,
+                "maxLength": 19,
+                "pattern": "^[0-9]{13,19}$",
+                "type": "string"
+              },
+              "expiry_month": {
+                "description": "The expiration month of the card.",
+                "minimum": 1,
+                "maximum": 12,
+                "type": "integer"
+              },
+              "expiry_year": {
+                "description": "The expiration year of the card.",
+                "minimum": 2024,
+                "maximum": 2099,
+                "type": "integer"
+              },
+              "payment_method": {
+                "$ref": "#/components/schemas/PaymentMethodType"
+              },
+              "card_profile": {
+                "additionalProperties": false,
+                "type": "object",
+                "properties": {
+                  "fingerprint": {
+                    "description": "A unique identifier for the card profile, generated by SmartRetry.",
+                    "minLength": 88,
+                    "maxLength": 88,
+                    "type": "string"
+                  }
+                }
+              },
+              "cvv": {
+                "description": "CVV/CVC of the card. Optional for added security (cannot be stored).",
+                "minLength": 3,
+                "maxLength": 4,
+                "pattern": "^[0-9]{3,4}$",
+                "type": "string"
+              }
+            }
+          },
+          {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "token"
+            ],
+            "properties": {
+              "token": {
+                "description": "A stored payment token from the merchant's Payment Instruments.",
                 "minLength": 88,
                 "maxLength": 88,
+                "type": "string"
+              },
+              "cvv": {
+                "description": "CVV/CVC of the card. Optional for added security (cannot be stored).",
+                "minLength": 3,
+                "maxLength": 4,
+                "pattern": "^[0-9]{3,4}$",
+                "type": "string"
+              }
+            }
+          },
+          {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "provider_token"
+            ],
+            "properties": {
+              "provider_token": {
+                "description": "A tokenized payment method reference issued directly by the payment provider (e.g. a Stripe payment_method or Adyen storedPaymentMethodId), forwarded to the processor as-is. Distinct from `token`, which is a SmartRetry Payment Instrument token.",
+                "minLength": 1,
+                "maxLength": 255,
+                "type": "string"
+              },
+              "cvv": {
+                "description": "CVV/CVC of the card. Optional for added security (cannot be stored).",
+                "minLength": 3,
+                "maxLength": 4,
+                "pattern": "^[0-9]{3,4}$",
                 "type": "string"
               }
             }
           }
-        }
+        ]
       },
       "PaymentInstrumentResponse": {
         "type": "object",
@@ -1057,20 +1762,6 @@
           }
         }
       },
-      "DeviceProfileRequest": {
-        "additionalProperties": false,
-        "type": "object",
-        "properties": {
-          "os_name": {
-            "maxLength": 50,
-            "type": "string"
-          },
-          "os_version": {
-            "maxLength": 20,
-            "type": "string"
-          }
-        }
-      },
       "BrowserProfileRequest": {
         "additionalProperties": false,
         "type": "object",
@@ -1103,10 +1794,19 @@
           }
         }
       },
-      "SessionRequest": {
+      "SubmissionSessionRequest": {
         "additionalProperties": false,
         "type": "object",
         "properties": {
+          "request_ip_address": {
+            "description": "The IP address of the payer making the request. IPv4 or IPv6.",
+            "maxLength": 45,
+            "pattern": "^(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|(?:(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,7}:|(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}|(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}|(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}|(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:(?:(?::[0-9a-fA-F]{1,4}){1,6})|:(?:(?::[0-9a-fA-F]{1,4}){1,7}|:)|::(?:ffff(?::0{1,4})?:)?((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|(?:[0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)))$",
+            "type": "string"
+          },
+          "browser_profile": {
+            "$ref": "#/components/schemas/BrowserProfileRequest"
+          },
           "screen_width": {
             "minimum": 0,
             "maximum": 65535,
@@ -1260,7 +1960,7 @@
             "type": "string"
           },
           "reason_code": {
-            "type": "string"
+            "$ref": "#/components/schemas/StatusReasonCode"
           },
           "context": {
             "type": "object",
@@ -1458,7 +2158,7 @@
         "anyOf": [
           {
             "additionalProperties": false,
-            "description": "Exactly one of `token`, `provider_token`, or `order.payment_instrument` must be supplied, unless `payment_collection` is `hosted_page`.",
+            "description": "`order.payment_instrument` must be supplied, as a raw card, a SmartRetry `token`, or a `provider_token`, unless `payment_collection` is `hosted_page`.",
             "type": "object",
             "required": [
               "merchant_transaction_id",
@@ -1480,14 +2180,8 @@
               "currency": {
                 "$ref": "#/components/schemas/CurrencyCode"
               },
-              "device_profile": {
-                "$ref": "#/components/schemas/DeviceProfileRequest"
-              },
-              "browser_profile": {
-                "$ref": "#/components/schemas/BrowserProfileRequest"
-              },
-              "session": {
-                "$ref": "#/components/schemas/SessionRequest"
+              "submission_session": {
+                "$ref": "#/components/schemas/SubmissionSessionRequest"
               },
               "order_id": {
                 "description": "A unique identifier for the order generated by SmartRetry. Additional notes internally this \n    is friendly_id for order and not the actual order_id in the database.",
@@ -1498,11 +2192,6 @@
               },
               "order": {
                 "$ref": "#/components/schemas/OrderRequest"
-              },
-              "payer_request_ip_address": {
-                "description": "The IP address of the payer making the request.",
-                "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
-                "type": "string"
               },
               "ship_indicator": {
                 "$ref": "#/components/schemas/ShipIndicator"
@@ -1523,25 +2212,6 @@
                 "maxLength": 500,
                 "type": "string"
               },
-              "token": {
-                "description": "A stored payment token from the merchant's Payment Instruments.",
-                "minLength": 88,
-                "maxLength": 88,
-                "type": "string"
-              },
-              "provider_token": {
-                "description": "A tokenized payment method reference issued directly by the payment provider (e.g. a Stripe payment_method or Adyen storedPaymentMethodId), forwarded to the processor as-is. Distinct from `token`, which is a SmartRetry Payment Instrument token.",
-                "minLength": 1,
-                "maxLength": 255,
-                "type": "string"
-              },
-              "cvv": {
-                "description": "CVV/CVC of the card. Optional for added security (cannot be stored).",
-                "minLength": 3,
-                "maxLength": 4,
-                "pattern": "^[0-9]{3,4}$",
-                "type": "string"
-              },
               "payment_collection": {
                 "$ref": "#/components/schemas/PaymentCollection"
               }
@@ -1556,7 +2226,7 @@
         "anyOf": [
           {
             "additionalProperties": false,
-            "description": "Exactly one of `token`, `provider_token`, or `order.payment_instrument` must be supplied, unless `payment_collection` is `hosted_page`.",
+            "description": "`order.payment_instrument` must be supplied, as a raw card, a SmartRetry `token`, or a `provider_token`, unless `payment_collection` is `hosted_page`.",
             "type": "object",
             "required": [
               "merchant_transaction_id",
@@ -1578,14 +2248,8 @@
               "currency": {
                 "$ref": "#/components/schemas/CurrencyCode"
               },
-              "device_profile": {
-                "$ref": "#/components/schemas/DeviceProfileRequest"
-              },
-              "browser_profile": {
-                "$ref": "#/components/schemas/BrowserProfileRequest"
-              },
-              "session": {
-                "$ref": "#/components/schemas/SessionRequest"
+              "submission_session": {
+                "$ref": "#/components/schemas/SubmissionSessionRequest"
               },
               "order_id": {
                 "description": "A unique identifier for the order generated by SmartRetry. Internally this\n    is the friendly_id for the order and not the actual order_id in the database.",
@@ -1596,11 +2260,6 @@
               },
               "order": {
                 "$ref": "#/components/schemas/OrderRequest"
-              },
-              "payer_request_ip_address": {
-                "description": "The IP address of the payer making the request.",
-                "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
-                "type": "string"
               },
               "ship_indicator": {
                 "$ref": "#/components/schemas/ShipIndicator"
@@ -1619,25 +2278,6 @@
               "description": {
                 "description": "A description of the pre-authorization.",
                 "maxLength": 500,
-                "type": "string"
-              },
-              "token": {
-                "description": "A stored payment token from the merchant's Payment Instruments.",
-                "minLength": 88,
-                "maxLength": 88,
-                "type": "string"
-              },
-              "provider_token": {
-                "description": "A tokenized payment method reference issued directly by the payment provider (e.g. a Stripe payment_method or Adyen storedPaymentMethodId), forwarded to the processor as-is. Distinct from `token`, which is a SmartRetry Payment Instrument token.",
-                "minLength": 1,
-                "maxLength": 255,
-                "type": "string"
-              },
-              "cvv": {
-                "description": "CVV/CVC of the card. Optional for added security (cannot be stored).",
-                "minLength": 3,
-                "maxLength": 4,
-                "pattern": "^[0-9]{3,4}$",
                 "type": "string"
               },
               "payment_collection": {
@@ -1698,7 +2338,7 @@
         "anyOf": [
           {
             "additionalProperties": false,
-            "description": "Exactly one of `token`, `provider_token`, or `payment_instrument` must be supplied, unless `payment_collection` is `hosted_page`.",
+            "description": "`payment_instrument` must be supplied, as a raw card, a SmartRetry `token`, or a `provider_token`, unless `payment_collection` is `hosted_page`.",
             "type": "object",
             "required": [
               "amount",
@@ -1759,25 +2399,6 @@
               "payer_fingerprint": {
                 "description": "Pre-computed payer fingerprint from an existing transaction. Mutually exclusive with payer.",
                 "minLength": 88,
-                "type": "string"
-              },
-              "token": {
-                "description": "A stored payment token from the merchant's Payment Instruments.",
-                "minLength": 88,
-                "maxLength": 88,
-                "type": "string"
-              },
-              "provider_token": {
-                "description": "A tokenized payment method reference issued directly by the payment provider (e.g. a Stripe payment_method or Adyen storedPaymentMethodId), forwarded to the processor as-is. Distinct from `token`, which is a SmartRetry Payment Instrument token.",
-                "minLength": 1,
-                "maxLength": 255,
-                "type": "string"
-              },
-              "cvv": {
-                "description": "CVV/CVC of the card. Optional for added security (cannot be stored).",
-                "minLength": 3,
-                "maxLength": 4,
-                "pattern": "^[0-9]{3,4}$",
                 "type": "string"
               },
               "payment_collection": {
@@ -3821,50 +4442,7 @@
                       ],
                       "properties": {
                         "status": {
-                          "anyOf": [
-                            {
-                              "type": "string",
-                              "enum": [
-                                "APPROVED"
-                              ]
-                            },
-                            {
-                              "type": "string",
-                              "enum": [
-                                "PROCESSING"
-                              ]
-                            },
-                            {
-                              "type": "string",
-                              "enum": [
-                                "DECLINED"
-                              ]
-                            },
-                            {
-                              "type": "string",
-                              "enum": [
-                                "ERROR"
-                              ]
-                            },
-                            {
-                              "type": "string",
-                              "enum": [
-                                "CANCELLED"
-                              ]
-                            },
-                            {
-                              "type": "string",
-                              "enum": [
-                                "INFO"
-                              ]
-                            },
-                            {
-                              "type": "string",
-                              "enum": [
-                                "UNKNOWN"
-                              ]
-                            }
-                          ]
+                          "$ref": "#/components/schemas/TransactionStatus"
                         },
                         "reasonCode": {
                           "type": "string"
