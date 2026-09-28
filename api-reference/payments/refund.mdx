@@ -4,9 +4,10 @@ description: Return funds to a customer for a completed sale or capture.
 openapi: "/api-reference/openapi.json POST /v1/payments/refund/{terminal_friendly_id}"
 ---
 
-A refund submits a reversal against a previous sale or capture. Identify both the originating
-transaction and its order in the request body. Provide `amount` for a partial refund, or omit it to
-use the remaining refundable amount.
+A refund submits a reversal against a previous sale, capture, recurring initialization, recurring
+charge, or payout. Identify both the originating transaction and its order in the request body.
+Provide `amount` for a partial refund, or omit it to use the remaining refundable amount (the
+original amount minus any amount already refunded).
 
 <Note>
   Safe retries for this POST endpoint use the `Idempotency-Key` header. Reuse the same key only when retrying the exact same request body. See [Idempotency](/api-reference/idempotency).

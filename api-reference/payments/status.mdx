@@ -6,15 +6,16 @@ openapi: "/api-reference/openapi.json GET /v1/payments/status/{terminal_friendly
 
 Fetch the current transaction record by its `transaction_id`.
 
-## Status values
+See [Transaction status](/api-reference/transaction-status) for the full set of `status.status`
+values, the status object shape, and how to interpret `reasonCode` and `domain`. See
+[Status reason codes](/api-reference/status-reason-codes) for the complete reason-code catalog.
 
-The `status.status` field indicates the current state of the transaction:
+## Additional response context
 
-`APPROVED`, `PROCESSING`, `DECLINED`, `ERROR`, `CANCELLED`, `INFO`, or `UNKNOWN`.
+Beyond `status`, the response can include:
 
-## Status domains
-
-The `status.domain` field identifies which system was responsible for the status outcome:
-
-`SYSTEM`, `VALIDATION`, `RISK`, `ROUTING`, `AUTH`, `PROCESSOR`, `PAYMENT_METHOD`, or
-`PAYER_ACCOUNT`.
+- `retry` — present while a failed transaction has an automatic retry scheduled.
+- `pending_payer_actions` — present when the payer must take an action (such as entering a security
+  code or confirming a currency change) before the transaction can proceed.
+- `risk_decision` — present when a risk policy evaluated this transaction, including which policies
+  ran and whether any blocked it.

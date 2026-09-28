@@ -16,7 +16,13 @@ SmartRetry supports the full range of payment transaction types. Understanding w
 | Void | `void` | Cancels an authorized or pending transaction |
 | Recurring Init | `recurring_init` | Initializes a recurring series and stores credentials |
 | Recurring | `recurring` | Subsequent charge in a recurring series |
+| Account Verification | `account_verification` | Verifies a payment instrument without moving funds |
 | Payout | `payout` | Transfers funds out to the payer |
+
+<Note>
+  `account_verification` and `payout` are valid `type` values on the transaction record, but no
+  Terminal API endpoint currently creates a transaction of either type directly.
+</Note>
 
 ## Transaction lifecycles
 
@@ -60,7 +66,7 @@ Recurring Init
 
     **Use for:** Completing a pre-auth once the final transaction amount is confirmed.
 
-    **Requirements:** The capture must reference the original pre-auth transaction ID. The capture amount cannot exceed the authorized amount.
+    **Requirements:** The capture must reference the original pre-auth transaction ID. The capture amount cannot exceed the remaining capturable amount (the authorized amount minus any amount already captured).
   </Accordion>
 
   <Accordion title="Refund">
@@ -68,19 +74,19 @@ Recurring Init
 
     **Use for:** Order cancellations, returns, or partial refunds after settlement.
 
-    **Requirements:** The refund must reference the original completed transaction. Partial refunds are supported up to the original transaction amount.
+    **Requirements:** The refund must reference an original sale, capture, recurring init, recurring charge, or payout. Partial refunds are supported up to the remaining refundable amount (the original amount minus any amount already refunded).
 
     <Warning>
-      Refunds apply to settled transactions. To cancel a transaction before settlement, use a **Void** instead.
+      Refunds apply to settled transactions. To cancel a pre-authorization before settlement, use a **Void** instead.
     </Warning>
   </Accordion>
 
   <Accordion title="Void">
-    A void cancels an authorized or pending transaction before it settles. Unlike a refund, no funds are moved - the authorization hold is simply released.
+    A void cancels an approved pre-authorization before it is captured. No funds are moved - the authorization hold is simply released.
 
-    **Use for:** Cancelling an order or pre-auth before the capture step, or reversing a sale that has not yet settled.
+    **Use for:** Cancelling a pre-auth before the capture step.
 
-    **Requirements:** The void must reference the original transaction ID. Voiding is only possible while the transaction is in an authorized or pending state.
+    **Requirements:** The void must reference the original pre-authorization transaction ID, and that transaction must be approved. Use **Refund** to reverse a completed sale or capture instead.
   </Accordion>
 
   <Accordion title="Recurring Init">

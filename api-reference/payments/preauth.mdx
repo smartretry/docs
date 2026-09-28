@@ -8,6 +8,21 @@ A pre-authorization submits a payment for authorization without capturing it. Us
 [capture](/api-reference/payments/capture) or [void](/api-reference/payments/void) for a subsequent
 operation against the authorized transaction.
 
+## Payment instrument
+
+`order.payment_instrument` accepts exactly one credential source: raw card details, a SmartRetry
+`token`, or a processor `provider_token`. An optional `cvv` can accompany any of them. See
+[Payment methods](/integration/payment-methods) for the full field reference.
+
+Provide either `order.payer` or `order.payer_fingerprint` — not both. `payer_fingerprint` is a
+pre-computed identifier from an earlier transaction for the same payer.
+
+<Note>
+  Setting `payment_collection: hosted_page` makes the credential optional at create time and rejects
+  `token`/`provider_token` — the payer supplies a fresh credential later through the hosted payment
+  page, and the transaction is persisted awaiting that submission until then.
+</Note>
+
 ## Retry a previous pre-authorization
 
 Use this same endpoint to create a new retry attempt. In the request body, provide

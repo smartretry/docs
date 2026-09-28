@@ -14,7 +14,8 @@ Use this same endpoint to create a new retry attempt. In the request body, provi
 `retry.originating_id` for the previous SmartRetry capture transaction.
 
 <Note>
-  The capture amount must not exceed the originally authorized amount. If you omit `amount`, the full authorized amount is captured.
+  The capture amount must not exceed the remaining capturable amount (the authorized amount minus any
+  amount already captured). If you omit `amount`, the full remaining capturable amount is captured.
 </Note>
 
 <Note>

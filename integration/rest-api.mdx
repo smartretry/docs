@@ -55,7 +55,11 @@ See [Idempotency](/api-reference/idempotency) for the full contract and response
 
 ### Token-based payments
 
-When SmartRetry processes a transaction, it can return a `token` - an 88-character stored payment token that represents the card. On future charges for the same customer, you can pass this `token` instead of sending raw card data again. This simplifies repeat billing and reduces PCI scope.
+SmartRetry generates an 88-character `token` that represents a stored payment instrument. No
+submission response returns it directly - retrieve it from `order.payment_instrument.token` on a
+[transaction status](/api-reference/payments/status) response after the transaction completes. On
+future charges for the same payer, you can pass this `token` instead of sending raw card data again.
+This simplifies repeat billing and reduces PCI scope.
 
 ### Payer fingerprint
 
@@ -174,19 +178,27 @@ data = response.json()
 
 ## Response format
 
-All responses return JSON. Successful payment responses include an `accepted` boolean, the `transaction_id` and `order_id` assigned by SmartRetry, and your original `merchant_transaction_id` for reconciliation. A `200 OK` with `"accepted": false` means the transaction was declined - not an error. Use the [status endpoint](/api-reference/payments/status) to get the full transaction outcome.
+All responses return JSON. A submission response's `accepted: true` means SmartRetry accepted the
+transaction for processing - it does not mean the issuer approved it. `order_id`, when returned, and
+your original `merchant_transaction_id` are included for reconciliation. Use the
+[status endpoint](/api-reference/payments/status) to get the actual transaction outcome, including
+`APPROVED` or `DECLINED`.
 
 ## Error format
 
-When a request fails, SmartRetry returns a JSON error object using the [RFC 7807 Problem Details](https://datatracker.ietf.org/doc/html/rfc7807) format.
+When a request fails, SmartRetry returns a JSON error object using the [RFC 9457 Problem Details](https://datatracker.ietf.org/doc/html/rfc9457) format.
 
 ```json
 {
-  "type": "https://terminal.smartretry.com/errors/invalid-request",
-  "title": "Invalid request",
+  "type": "https://terminal.smartretry.com/errors/VALIDATION/INVALID_AMOUNT",
+  "title": "Validation Error",
   "status": 400,
   "detail": "The field 'amount' must be a positive number in major currency units.",
-  "reason_code": "VALIDATION/INVALID_AMOUNT"
+  "instance": "/v1/payments/sale/TERM01",
+  "reason_code": "VALIDATION/INVALID_AMOUNT",
+  "context": {
+    "field": "/amount"
+  }
 }
 ```
 
@@ -196,7 +208,9 @@ When a request fails, SmartRetry returns a JSON error object using the [RFC 7807
 | `title` | string | Short, human-readable summary |
 | `status` | number | HTTP status code |
 | `detail` | string | Detailed explanation of the error |
+| `instance` | string | The request path associated with this occurrence, when available |
 | `reason_code` | string | Machine-readable code for programmatic handling |
+| `context` | object | Optional error-specific data, such as the offending field |
 
 ## Best practices
 
@@ -206,6 +220,6 @@ When a request fails, SmartRetry returns a JSON error object using the [RFC 7807
 
 - Always use a unique `merchant_transaction_id` per transaction so reconciliation back to your own system stays unambiguous.
 - Use a new `Idempotency-Key` for each new POST request, and reuse it only when retrying the exact same request body.
-- Store the `token` and `payer_fingerprint` from successful responses to speed up future requests for returning customers.
+- Fetch [transaction status](/api-reference/payments/status) after a successful submission to retrieve `order.payment_instrument.token` - store it to speed up future requests for a returning payer. Submission responses do not include it.
 - Validate `amount` and `currency` on your side before sending - `amount` must be a positive number in major currency units.
 - Use the [sandbox environment](/integration/sandbox) to test your integration before going live.
