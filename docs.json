@@ -10,6 +10,13 @@
   "contextual": {
     "options": ["copy", "view", "chatgpt", "claude","download-spec"]
   },
+  "errors": {
+    "404": {
+      "redirect": false,
+      "title": "Page not found",
+      "description": "This page doesn't exist or was moved. Try the search or go back to the [docs home](/)."
+    }
+  },
   "favicon": "/favicon.svg",
   "logo": {
     "light": "/images/logo.svg",
