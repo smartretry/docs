@@ -236,7 +236,7 @@
     "#sr-consent-actions{display:flex;flex-direction:column;gap:8px}",
     "@media(min-width:640px){#sr-consent-actions{flex-direction:row;flex-wrap:wrap}}",
     "@media(min-width:768px){#sr-consent-actions{flex-wrap:nowrap}}",
-    ".sr-consent-btn{border-radius:9999px;padding:8px 20px;font-size:14px;font-weight:500;cursor:pointer;border:1px solid rgba(255,255,255,0.3);background:transparent;color:#fff;transition:background-color .15s}",
+    ".sr-consent-btn{border-radius:9999px;padding:8px 20px;font-size:14px;line-height:20px;font-weight:500;cursor:pointer;border:1px solid rgba(255,255,255,0.3);background:transparent;color:#fff;transition:background-color .15s}",
     ".sr-consent-btn:hover{background:rgba(255,255,255,0.1)}",
     ".sr-consent-btn-primary{border:none;font-weight:600;background:#D01A87;color:#fff}",
     ".sr-consent-btn-primary:hover{background:#FE37A2}",
@@ -250,7 +250,7 @@
     "#sr-consent-modal-close{position:absolute;top:16px;right:16px;width:16px;height:16px;background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;padding:0;line-height:16px;font-size:16px;opacity:.7}",
     "#sr-consent-modal-close:hover{opacity:1}",
     ".sr-consent-rows{display:flex;flex-direction:column;gap:12px}",
-    ".sr-consent-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);padding:16px}",
+    ".sr-consent-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;border-radius:14px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);padding:16px}",
     ".sr-consent-row>div:first-child{flex:1}",
     ".sr-consent-row-title{margin:0;font-size:14px;font-weight:600}",
     "@media(min-width:640px){.sr-consent-row-title{font-size:16px}}",
@@ -264,6 +264,15 @@
     ".sr-consent-switch[data-checked=\"true\"] .sr-consent-switch-thumb{transform:translateX(16px)}",
     "#sr-consent-modal-actions{display:flex;flex-direction:column-reverse;gap:8px}",
     "@media(min-width:640px){#sr-consent-modal-actions{flex-direction:row;justify-content:flex-end}}",
+    // Footer Legal block. Colors are inherited from the Mintlify footer so it
+    // stays readable on light and dark themes. Sizes mirror marketing's footer.
+    "#sr-footer-legal{flex-basis:100%;display:flex;flex-direction:column;gap:8px}",
+    "#sr-footer-legal-title{margin:0;display:flex;align-items:center;gap:4px;font-size:16px;line-height:24px;font-weight:600}",
+    "#sr-footer-legal ul{margin:0;padding:0;list-style:none}",
+    "#sr-footer-legal li{margin:0;padding:0}",
+    ".sr-footer-legal-link{display:inline-flex;align-items:center;min-height:44px;padding:10px 0;margin:0;border:0;background:transparent;font:inherit;font-size:16px;line-height:24px;font-weight:500;color:inherit;text-decoration:none;cursor:pointer}",
+    ".sr-footer-legal-link:hover{text-decoration:underline;text-underline-offset:2px}",
+    "@media(min-width:768px){#sr-footer-legal-title,.sr-footer-legal-link{font-size:12px;line-height:16px}}",
   ].join("");
 
   var FONT_LINK_ID = "sr-consent-font";
@@ -394,15 +403,16 @@
     var button = el("button", {
       type: "button",
       class: "sr-consent-switch",
+      role: "switch",
       "data-checked": checked ? "true" : "false",
-      "aria-pressed": checked ? "true" : "false",
+      "aria-checked": checked ? "true" : "false",
       "aria-label": labelText,
     });
     button.appendChild(thumb);
     button.addEventListener("click", function () {
       var next = button.getAttribute("data-checked") !== "true";
       button.setAttribute("data-checked", next ? "true" : "false");
-      button.setAttribute("aria-pressed", next ? "true" : "false");
+      button.setAttribute("aria-checked", next ? "true" : "false");
       if (onToggle) onToggle(next);
     });
     return button;
@@ -413,6 +423,27 @@
   // reset choices the user already flipped, matching the marketing dialog's
   // behavior of only re-syncing from stored consent, never from defaults, on
   // every open.
+  var scrollLockPrev = null;
+
+  // Mirrors Radix's scroll lock on marketing. Mintlify scrolls the document
+  // (html), so lock html, and pad by the scrollbar width to avoid a layout jump.
+  function lockScroll() {
+    if (scrollLockPrev) return;
+    var root = document.documentElement;
+    scrollLockPrev = { overflow: root.style.overflow, paddingRight: root.style.paddingRight };
+    var scrollbarWidth = window.innerWidth - root.clientWidth;
+    root.style.overflow = "hidden";
+    if (scrollbarWidth > 0) root.style.paddingRight = scrollbarWidth + "px";
+  }
+
+  function unlockScroll() {
+    if (!scrollLockPrev) return;
+    var root = document.documentElement;
+    root.style.overflow = scrollLockPrev.overflow;
+    root.style.paddingRight = scrollLockPrev.paddingRight;
+    scrollLockPrev = null;
+  }
+
   var modalChoices = { analytics: true, advertising: true };
   var modalLastFocused = null;
   var modalKeydownHandler = null;
@@ -477,7 +508,16 @@
       "div",
       { id: "sr-consent-modal-overlay" },
       [
-        el("div", { id: "sr-consent-modal", role: "dialog", "aria-modal": "true", "aria-label": LABELS.modalTitle }, [
+        el(
+          "div",
+          {
+            id: "sr-consent-modal",
+            role: "dialog",
+            "aria-modal": "true",
+            "aria-labelledby": "sr-consent-modal-title",
+            "aria-describedby": "sr-consent-modal-body",
+          },
+          [
           closeBtn,
           el("div", { id: "sr-consent-modal-head" }, [
             el("p", { id: "sr-consent-modal-title", text: LABELS.modalTitle }),
@@ -518,6 +558,7 @@
     });
 
     document.body.appendChild(overlay);
+    lockScroll();
 
     // Mirrors Radix Dialog's keyboard contract: Escape closes, Tab is
     // trapped inside the dialog while it's open. Radix provides both for
@@ -554,6 +595,7 @@
   function closeModal() {
     var overlay = document.getElementById("sr-consent-modal-overlay");
     if (overlay) overlay.remove();
+    unlockScroll();
 
     if (modalKeydownHandler) {
       document.removeEventListener("keydown", modalKeydownHandler);
@@ -578,10 +620,59 @@
   }
 
   // ---------------------------------------------------------------------
+  // Footer Legal section (mirrors the Legal column of marketing's footer)
+  // ---------------------------------------------------------------------
+
+  var FOOTER_LEGAL_ID = "sr-footer-legal";
+  var SITE_ORIGIN = "https://www.smartretry.com";
+  var LEGAL_LINKS = [
+    { label: "Privacy Policy", href: SITE_ORIGIN + "/privacy-policy" },
+    { label: "Terms of Use", href: SITE_ORIGIN + "/terms-of-use" },
+    { label: "Accessibility", href: SITE_ORIGIN + "/accessibility-statement" },
+    { label: "Security", href: SITE_ORIGIN + "/security" },
+  ];
+
+  function buildFooterLegal() {
+    var items = LEGAL_LINKS.map(function (link) {
+      return el("li", {}, [
+        el("a", { class: "sr-footer-legal-link", href: link.href, text: link.label }),
+      ]);
+    });
+    var cookieBtn = el("button", {
+      type: "button",
+      class: "sr-footer-legal-link",
+      text: "Cookie Preferences",
+    });
+    cookieBtn.addEventListener("click", openModal);
+    items.push(el("li", {}, [cookieBtn]));
+
+    return el("div", { id: FOOTER_LEGAL_ID }, [
+      el("p", { id: "sr-footer-legal-title", text: "📄 Legal" }),
+      el("ul", {}, items),
+    ]);
+  }
+
+  // Mintlify renders the footer client-side and re-renders it on navigation,
+  // so the block is re-attached whenever it goes missing. It goes inside the
+  // socials row (full width, so it wraps below the icons) to avoid moving any
+  // node Mintlify owns.
+  function ensureFooterLegal() {
+    if (document.getElementById(FOOTER_LEGAL_ID)) return;
+    var socials = document.querySelector("#footer > div");
+    if (socials) socials.appendChild(buildFooterLegal());
+  }
+
+  // ---------------------------------------------------------------------
   // Boot
   // ---------------------------------------------------------------------
 
   injectStyle();
+
+  ensureFooterLegal();
+  new MutationObserver(ensureFooterLegal).observe(document.body, {
+    childList: true,
+    subtree: true,
+  });
 
   function onReadyOrChange() {
     checkBanner();
