@@ -215,10 +215,10 @@ SmartRetry recomputes the signature using your stored secret and checks the requ
 
 ```json 401 response
 {
-  "type": "https://smartretry.com/errors/unauthorized",
-  "title": "Unauthorized",
+  "type": "https://terminal.smartretry.com/errors/INVALID_SIGNATURE",
+  "title": "Invalid Signature",
   "status": 401,
-  "detail": "Signature does not match.",
+  "detail": "The x-signature header does not match the signature computed for this request.",
   "reason_code": "INVALID_SIGNATURE"
 }
 ```
