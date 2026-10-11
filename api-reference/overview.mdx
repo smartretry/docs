@@ -3,7 +3,7 @@ title: API Overview
 description: Overview of the SmartRetry Terminal API - endpoints, authentication, and request format.
 ---
 
-The SmartRetry Terminal API is a REST API that lets you initiate payments, manage recurring billing, and monitor transaction health. All requests are scoped to a merchant terminal and authenticated with an API key.
+The SmartRetry Terminal API is a REST API that lets you initiate payments, manage recurring billing, and monitor transaction health. All requests are scoped to a merchant terminal and authenticated with an HMAC-SHA256 request signature.
 
 ## Base URL
 
@@ -15,17 +15,18 @@ All endpoints are versioned under `/v1/`.
 
 ## Authentication
 
-Every request must include your API key in the `x-api-key` header.
+Every request must be signed with your API Secret using HMAC-SHA256. Send the signature and a Unix timestamp in headers:
 
 ```bash
-x-api-key: YOUR_API_KEY
+x-timestamp: UNIX_TIMESTAMP
+x-signature: SIGNATURE
 ```
 
 <Warning>
-  Keep your API key secret. Never expose it in client-side code, browser requests, or public repositories. If a key is compromised, contact support to rotate it immediately.
+  Keep your API Secret private. Never expose it in client-side code, browser requests, or public repositories. If it is compromised, contact support to rotate it immediately.
 </Warning>
 
-To obtain an API key, contact [SmartRetry](https://www.smartretry.com/contact). Each key is scoped to one or more terminals - requests to terminals your key cannot access return `403 Forbidden`.
+See [Authentication](/authentication) for how to compute the signature. To obtain an API Secret, contact [SmartRetry](https://www.smartretry.com/contact). Each secret is scoped to one or more terminals - requests to terminals your secret cannot access return `403 Forbidden`. The `UNIX_TIMESTAMP` and `SIGNATURE` values in the examples below are placeholders.
 
 ## Request format
 
@@ -41,7 +42,8 @@ Content-Type: application/json
 curl --request POST \
   --url https://terminal.smartretry.com/v1/payments/sale/ABC123 \
   --header 'Content-Type: application/json' \
-  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'x-timestamp: UNIX_TIMESTAMP' \
+  --header 'x-signature: SIGNATURE' \
   --header 'Idempotency-Key: sale-order-001' \
   --data '{
     "merchant_transaction_id": "txn_001",
@@ -65,7 +67,8 @@ response = requests.post(
     "https://terminal.smartretry.com/v1/payments/sale/ABC123",
     headers={
         "Content-Type": "application/json",
-        "x-api-key": "YOUR_API_KEY",
+        "x-timestamp": "UNIX_TIMESTAMP",
+        "x-signature": "SIGNATURE",
         "Idempotency-Key": "sale-order-001",
     },
     json={
@@ -91,7 +94,8 @@ const response = await fetch(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": "YOUR_API_KEY",
+      "x-timestamp": "UNIX_TIMESTAMP",
+      "x-signature": "SIGNATURE",
       "Idempotency-Key": "sale-order-001",
     },
     body: JSON.stringify({
@@ -124,7 +128,7 @@ POST /v1/payments/sale/{terminal_friendly_id}
                         e.g., ABC123
 ```
 
-You receive your `terminal_friendly_id` when SmartRetry provisions your account. A single API key may have access to multiple terminals.
+You receive your `terminal_friendly_id` when SmartRetry provisions your account. A single API Secret may have access to multiple terminals.
 
 ## Amount and currency
 
@@ -182,7 +186,8 @@ Read the header with any client:
 
 ```bash
 curl -sI https://terminal.smartretry.com/v1/payments/status/ABC123/TX8A3F2C \
-  --header 'x-api-key: YOUR_API_KEY' | grep -i '^link:'
+  --header 'x-timestamp: UNIX_TIMESTAMP' \
+  --header 'x-signature: SIGNATURE' | grep -i '^link:'
 ```
 
 <Tip>

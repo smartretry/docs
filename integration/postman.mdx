@@ -30,7 +30,7 @@ Use our Postman collection to explore the SmartRetry API without writing code. T
   | Variable | Description | Example |
   |----------|-------------|---------|
   | `base_url` | API base URL | `https://terminal.smartretry.com` |
-  | `api_key` | Your API key | `sk_test_...` |
+  | `api_secret` | Your API Secret | `srk_test_...` |
   | `terminal_id` | Your terminal ID | `ABC123` |
 
 </Step>
@@ -78,11 +78,11 @@ The collection uses variables for easy switching between sandbox and production:
 | Variable | Sandbox | Production |
 |----------|---------|------------|
 | `base_url` | `https://terminal.smartretry.com` | `https://terminal.smartretry.com` |
-| `api_key` | `sk_test_...` | `sk_live_...` |
+| `api_secret` | `srk_test_...` | `srk_live_...` |
 | `terminal_id` | Your sandbox terminal | Your production terminal |
 
 <Warning>
-  Never commit your production API key to version control. Use Postman's environment feature to keep credentials separate from the collection.
+  Never commit your production API Secret to version control. Use Postman's environment feature to keep credentials separate from the collection.
 </Warning>
 
 ## Pre-request scripts
@@ -163,5 +163,5 @@ Prefer Insomnia? Import the same collection:
 ## Need help?
 
 - Check the [API reference](/api-reference/overview) for endpoint details
-- Review [authentication](/authentication) for API key setup
+- Review [authentication](/authentication) for request signing
 - [Contact support](https://www.smartretry.com/contact) for collection issues

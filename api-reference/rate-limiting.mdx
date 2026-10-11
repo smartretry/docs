@@ -14,7 +14,7 @@ SmartRetry applies rate limits to ensure fair usage and protect the platform fro
 | Recurring operations | 100 requests | per second |
 | All endpoints combined | 1,000 requests | per second |
 
-Limits are applied per API key. Contact [support@smartretry.com](mailto:support@smartretry.com) if you need higher limits.
+Limits are applied per API Secret. Contact [support@smartretry.com](mailto:support@smartretry.com) if you need higher limits.
 
 ## Rate limit headers
 
@@ -106,7 +106,8 @@ def make_request_with_backoff(url, headers, json_data, max_retries=5):
 response = make_request_with_backoff(
     "https://terminal.smartretry.com/v1/payments/sale/ABC123",
     headers={
-        "x-api-key": "YOUR_API_KEY",
+        "x-timestamp": "UNIX_TIMESTAMP",
+        "x-signature": "SIGNATURE",
         "Content-Type": "application/json",
         "Idempotency-Key": "order-123"
     },
@@ -171,7 +172,8 @@ const response = await makeRequestWithBackoff(
   {
     method: "POST",
     headers: {
-      "x-api-key": "YOUR_API_KEY",
+      "x-timestamp": "UNIX_TIMESTAMP",
+      "x-signature": "SIGNATURE",
       "Content-Type": "application/json",
       "Idempotency-Key": "order-123"
     },
@@ -209,7 +211,7 @@ const response = await makeRequestWithBackoff(
 |-------------|--------|----------|
 | `200` | No | Success |
 | `400` | No | Fix request and resubmit |
-| `401` | No | Check API key |
+| `401` | No | Check signature and timestamp |
 | `404` | No | Check resource ID |
 | `409` | Maybe | Check idempotency; may be success |
 | `429` | Yes | Use `Retry-After` header |

@@ -11,7 +11,7 @@ A **terminal** in SmartRetry is a merchant account configuration that represents
 
 ## Why terminals exist
 
-Terminals let SmartRetry apply the right routing logic, acquirer configuration, and retry strategy for a specific business context. A single API key can be associated with multiple terminals, each with its own settings.
+Terminals let SmartRetry apply the right routing logic, acquirer configuration, and retry strategy for a specific business context. A single API Secret can be associated with multiple terminals, each with its own settings.
 
 You might use separate terminals for:
 
@@ -36,7 +36,8 @@ If your terminal ID is `TERM01`, your sale endpoint is:
 curl --request POST \
   --url https://terminal.smartretry.com/v1/payments/sale/TERM01 \
   --header 'Content-Type: application/json' \
-  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'x-timestamp: UNIX_TIMESTAMP' \
+  --header 'x-signature: SIGNATURE' \
   --data '{
     "merchant_transaction_id": "txn-a1b2c3d4-e5f6-7890-abcd-ef1234567890",
     "amount": 2500,

@@ -1,6 +1,6 @@
 ---
 title: "Securing your integration"
-description: "Handling API keys, verifying webhooks, and keeping card data out of your scope."
+description: "Handling API secrets, verifying webhooks, and keeping card data out of your scope."
 ---
  
 This page covers what you need to get right in your own integration. For certifications, encryption, infrastructure, data residency, retention, and contractual commitments, see the [SmartRetry security page](https://www.smartretry.com/security).
@@ -12,12 +12,12 @@ SmartRetry does not store card numbers. For repeat billing, send a stored paymen
 <Note>
   Because SmartRetry transmits cardholder data on your behalf, your own PCI DSS obligations still apply to how you collect and send that data. Using tokenized flows reduces the scope you have to cover.
 </Note>
-## API keys
+## API secrets
  
-API keys authenticate server-to-server requests only. Never expose a key client-side, keep keys out of source control, and use separate keys per environment. See [Authentication](/authentication) for handling and rotation.
+Every request is signed with your API Secret, which is never sent over the wire. Sign requests from your server only. Never expose the secret client-side, keep it out of source control, and use separate secrets per environment. See [Authentication](/authentication) for handling and rotation.
  
 <Warning>
-  If you believe your API key has been exposed, contact [security@smartretry.com](mailto:security@smartretry.com) immediately so it can be revoked and replaced.
+  If you believe your API Secret has been exposed, contact [security@smartretry.com](mailto:security@smartretry.com) immediately so it can be revoked and replaced.
 </Warning>
 ## Webhooks
  
@@ -29,7 +29,7 @@ TLS 1.3 is negotiated by default and TLS 1.2 is the enforced minimum. Do not dis
  
 <CardGroup cols={3}>
   <Card title="Authentication" icon="key" href="/authentication">
-    API key handling, rotation, and best practices.
+    Request signing, secret handling, and rotation.
   </Card>
   <Card title="Webhooks" icon="webhook" href="/integration/webhooks">
     Verify webhook signatures before trusting a payload.

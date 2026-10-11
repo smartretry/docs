@@ -7,10 +7,17 @@
   },
   "components": {
     "securitySchemes": {
-      "ApiKeyAuth": {
+      "TimestampAuth": {
         "type": "apiKey",
         "in": "header",
-        "name": "x-api-key"
+        "name": "x-timestamp",
+        "description": "Current Unix time in seconds. Must be within 5 minutes of server time. Included in the signed string."
+      },
+      "SignatureAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-signature",
+        "description": "Lowercase hex HMAC-SHA256 of `{timestamp}.{METHOD}.{path_with_query}.{raw_body}`, keyed with your API Secret. See the Authentication guide."
       }
     },
     "schemas": {
@@ -5132,7 +5139,8 @@
   ],
   "security": [
     {
-      "ApiKeyAuth": []
+      "TimestampAuth": [],
+      "SignatureAuth": []
     }
   ],
   "tags": [

@@ -1,52 +1,234 @@
 ---
 title: Authentication
-description: How to authenticate your SmartRetry API requests.
+description: How to sign your SmartRetry API requests with HMAC-SHA256.
 ---
 
-SmartRetry uses API key authentication. Every request to the API must include your API key in the `x-api-key` HTTP header. Requests without a valid key are rejected with a `401 Unauthorized` response.
+import { SignatureCalculator } from "/snippets/signature-calculator.jsx";
 
-## Get your API key
+SmartRetry authenticates every request with an HMAC-SHA256 signature computed from your API Secret. You never send the secret itself. Requests with a missing or invalid signature are rejected with a `401 Unauthorized` response.
 
-SmartRetry provides your API key during onboarding. If you don't have one yet, [contact SmartRetry](https://www.smartretry.com/contact) to get started.
+Signing protects your integration in three ways:
 
-Each API key is scoped to your account. Treat it as a password - it grants full access to your SmartRetry integration.
+- **The secret never travels.** It stays on your server and is used only to compute the signature.
+- **Tampering is detectable.** The signature covers the method, path, query string, and body.
+- **Replay is limited.** The signature includes a timestamp, and requests outside a five-minute window are rejected.
 
-## Include the key in every request
+## Get your credentials
 
-Pass your API key in the `x-api-key` header on every API request:
+SmartRetry provides your credentials during onboarding. If you don't have them yet, [contact SmartRetry](https://www.smartretry.com/contact) to get started.
+
+You receive one credential, your **API Secret**. It starts with `srk_live_` for production or `srk_test_` for the sandbox, and each works only in its own environment. SmartRetry identifies your account from the terminal ID in the request path.
+
+<Warning>
+  Treat your API Secret like a password. Anyone who has it can sign requests on your behalf.
+</Warning>
+
+- **Keep it server-side.** Sign requests on your backend only. Never put the secret in client-side code or call the API directly from a frontend.
+- **Store it safely.** Use a secrets manager or an environment variable (for example, `SMARTRETRY_API_SECRET`). Never commit it to source control.
+- **Limit access.** Restrict who can read your production secret, and use the sandbox secret for development and testing.
+- **Keep it out of logs.** Log request IDs and transaction IDs, never the secret or signing inputs that contain card data.
+- **Rotate if compromised.** [Contact SmartRetry](https://www.smartretry.com/contact) immediately to revoke the secret and issue a new one. To rotate on a schedule, ask for a new secret, deploy it, then have the old one revoked.
+
+## Sign a request
+
+Send these headers on every request:
+
+| Header | Value |
+| --- | --- |
+| `x-timestamp` | Current Unix time in seconds, for example `1700000000` |
+| `x-signature` | Lowercase hex HMAC-SHA256 signature of the request |
+| `Content-Type` | `application/json` (for requests with a body) |
+
+We also recommend an `Idempotency-Key` header on `POST` requests so you can retry safely. It's optional and isn't part of the signature. See [Idempotency](/api-reference/idempotency).
+
+<Steps>
+  <Step title="Build the string to sign">
+    Join four fields with a period (`.`):
+
+    ```text String to sign
+    {timestamp}.{HTTP_METHOD_UPPERCASE}.{path_including_query_string}.{raw_request_body}
+    ```
+
+    - `timestamp` is the current Unix time in seconds. Send the same value in `x-timestamp`.
+    - `HTTP_METHOD_UPPERCASE` is the method in uppercase, such as `POST` or `GET`.
+    - `path_including_query_string` is the path and query string, for example `/v1/payments/sale/ABC123`. Don't include the scheme or host.
+    - `raw_request_body` is the exact bytes you send. For requests with no body, use an empty string, so the string ends with a period.
+  </Step>
+
+  <Step title="Compute the HMAC-SHA256">
+    Use your API Secret as the key and encode the result as lowercase hex:
+
+    ```text Signature
+    signature = hex(HMAC_SHA256(key = API_Secret, message = string_to_sign))
+    ```
+  </Step>
+
+  <Step title="Send the request">
+    Add `x-timestamp` and `x-signature`, and send the same body bytes you signed. Don't parse and re-serialize the JSON after signing.
+  </Step>
+</Steps>
+
+## Try it
+
+Enter your values to see the string to sign and the signature. The defaults are a test vector. With them, `x-signature` must be `a3572da91fd748adefe19333fed189d3e1f228dcd76c0556ec3e038bd7c33e17`. Use it to check your own implementation.
+
+<SignatureCalculator />
+
+## Code examples
+
+Each example signs a sale request and sends the exact body string it signed. Replace `ABC123` with your terminal ID.
+
+<CodeGroup>
 
 ```bash cURL
-curl -X POST https://terminal.smartretry.com/v1/payments/sale/ABC123 \
-  -H "x-api-key: YOUR_API_KEY" \
+#!/usr/bin/env bash
+set -euo pipefail
+
+SECRET="srk_test_YOUR_API_SECRET"
+METHOD="POST"
+URL_PATH="/v1/payments/sale/ABC123"   # path plus query string, no host
+TIMESTAMP="$(date +%s)"
+
+BODY='{"merchant_transaction_id":"order-10042","amount":49.99,"currency":"USD"}'
+
+# String to sign: {timestamp}.{METHOD}.{path}.{body}
+# printf avoids adding a trailing newline.
+SIGNATURE="$(printf '%s.%s.%s.%s' "$TIMESTAMP" "$METHOD" "$URL_PATH" "$BODY" \
+  | openssl dgst -sha256 -hmac "$SECRET" -hex \
+  | sed 's/^.* //')"
+
+curl -X "$METHOD" "https://terminal.smartretry.com$URL_PATH" \
+  -H "x-timestamp: $TIMESTAMP" \
+  -H "x-signature: $SIGNATURE" \
   -H "Content-Type: application/json" \
-  -d '{ ... }'
+  --data-binary "$BODY"
 ```
 
-There is no session-based authentication or OAuth flow. Every request is independently authenticated using the header value.
+```javascript Node.js
+const crypto = require('crypto');
 
-## Failed authentication
+const SECRET = process.env.SMARTRETRY_API_SECRET;
+const BASE_URL = 'https://terminal.smartretry.com';
 
-If your API key is missing or invalid, the API returns a `401` status with a JSON error body:
+function sign(secret, timestamp, method, path, body) {
+  const stringToSign = `${timestamp}.${method.toUpperCase()}.${path}.${body}`;
+  return crypto.createHmac('sha256', secret).update(stringToSign).digest('hex');
+}
+
+async function main() {
+  const method = 'POST';
+  const path = '/v1/payments/sale/ABC123'; // path plus query string, no host
+  const timestamp = Math.floor(Date.now() / 1000).toString();
+
+  // Serialize once. Sign and send this exact string.
+  const body = JSON.stringify({
+    merchant_transaction_id: 'order-10042',
+    amount: 49.99,
+    currency: 'USD',
+  });
+
+  const response = await fetch(`${BASE_URL}${path}`, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'x-timestamp': timestamp,
+      'x-signature': sign(SECRET, timestamp, method, path, body),
+    },
+    body,
+  });
+
+  console.log(response.status, await response.json());
+}
+
+main();
+```
+
+```python Python
+import hashlib
+import hmac
+import json
+import os
+import time
+
+import requests
+
+SECRET = os.environ["SMARTRETRY_API_SECRET"]
+BASE_URL = "https://terminal.smartretry.com"
+
+
+def sign(secret: str, timestamp: str, method: str, path: str, body: str) -> str:
+    string_to_sign = f"{timestamp}.{method.upper()}.{path}.{body}"
+    return hmac.new(
+        secret.encode("utf-8"), string_to_sign.encode("utf-8"), hashlib.sha256
+    ).hexdigest()
+
+
+method = "POST"
+path = "/v1/payments/sale/ABC123"  # path plus query string, no host
+timestamp = str(int(time.time()))
+
+# Serialize once. Sign and send this exact string.
+body = json.dumps(
+    {"merchant_transaction_id": "order-10042", "amount": 49.99, "currency": "USD"},
+    separators=(",", ":"),
+)
+
+response = requests.request(
+    method,
+    BASE_URL + path,
+    headers={
+        "Content-Type": "application/json",
+        "x-timestamp": timestamp,
+        "x-signature": sign(SECRET, timestamp, method, path, body),
+    },
+    data=body.encode("utf-8"),  # send the signed string, not json=
+)
+
+print(response.status_code, response.json())
+```
+
+</CodeGroup>
+
+## Common pitfalls
+
+<AccordionGroup>
+  <Accordion title="Re-serializing the JSON body">
+    Serialize once, sign that string, and send that same string. If your HTTP client serializes the body again, whitespace or key order can change and break the signature. In Python, pass `data=` instead of `json=` to `requests`.
+  </Accordion>
+
+  <Accordion title="Signing the wrong path">
+    Sign the path and query string exactly as you send them, for example `/v1/payments/status/TX8A3F2C?expand=true`. Don't include `https://terminal.smartretry.com`.
+  </Accordion>
+
+  <Accordion title="Lowercase method">
+    The method in the string to sign must be uppercase (`POST`, not `post`).
+  </Accordion>
+
+  <Accordion title="Trailing newline in shell scripts">
+    `echo` adds a newline to the string to sign. Use `printf '%s'` as in the cURL example.
+  </Accordion>
+</AccordionGroup>
+
+## Error responses
+
+SmartRetry recomputes the signature using your stored secret and checks the request in the order below. The first failed check returns a `401` response:
 
 ```json 401 response
 {
   "type": "https://smartretry.com/errors/unauthorized",
   "title": "Unauthorized",
   "status": 401,
-  "detail": "Invalid or missing API key.",
-  "reason_code": "INVALID_API_KEY"
+  "detail": "Signature does not match.",
+  "reason_code": "INVALID_SIGNATURE"
 }
 ```
 
-Check the `reason_code` field to diagnose the issue. `INVALID_API_KEY` means the key was not recognized or has been revoked.
+Check the `reason_code` field to diagnose the issue:
 
-## Security best practices
-
-<Warning>
-  Never expose your API key in client-side code, browser JavaScript, or public repositories. Anyone with your key can make authenticated requests on your behalf.
-</Warning>
-
-- **Keep it server-side.** Only use your API key in server-to-server requests. Your backend should proxy payment requests to SmartRetry - never call the API directly from a frontend.
-- **Use environment variables.** Store your key in an environment variable (e.g., `SMARTRETRY_API_KEY`) rather than hardcoding it in your source code.
-- **Rotate if compromised.** If you suspect your key has been exposed, contact [SmartRetry](https://www.smartretry.com/contact) immediately to revoke it and issue a new one.
-- **Restrict access.** Limit which systems and team members have access to your production API key. Use sandbox credentials for development and testing.
+| `reason_code` | Cause and fix |
+| --- | --- |
+| `MISSING_TIMESTAMP` | `x-timestamp` is missing. Send it on every request. |
+| `MISSING_SIGNATURE` | `x-signature` is missing. Send it on every request. |
+| `INVALID_API_KEY` | No active API Secret for the terminal in the path, for example because it was revoked. Check the terminal ID and environment, or contact SmartRetry. |
+| `TIMESTAMP_EXPIRED` | `x-timestamp` is more than 5 minutes from server time. Sync your clock with NTP and use a fresh timestamp for every request. |
+| `INVALID_SIGNATURE` | The signature doesn't match. Check the string to sign, the secret, the exact body bytes, and compare with the test vector in [Try it](#try-it). |

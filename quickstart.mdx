@@ -6,19 +6,19 @@ description: Make your first payment request with SmartRetry in minutes.
 This guide walks you through making your first API request with SmartRetry. You'll send a sale transaction and handle the response - all in a few minutes.
 
 <Steps>
-  <Step title="Get your API key and terminal ID">
+  <Step title="Get your API Secret and terminal ID">
     [Contact SmartRetry](https://www.smartretry.com/contact) to receive your credentials. You'll get:
 
-    - **API key** - passed in the `x-api-key` header on every request
+    - **API Secret** - used to sign every request. You send the resulting `x-timestamp` and `x-signature` headers, never the secret itself
     - **Terminal ID** (`terminal_friendly_id`) - a 6-character identifier for your merchant terminal, used as a path parameter on every payment endpoint
 
     <Note>
-      Keep both values secure. Your API key authenticates all requests, and your terminal ID identifies the merchant configuration SmartRetry uses for routing and optimization.
+      Keep both values secure. Your API Secret signs all requests, and your terminal ID identifies the merchant configuration SmartRetry uses for routing and optimization.
     </Note>
   </Step>
 
   <Step title="Send your first sale request">
-    Use the `POST /v1/payments/sale/{terminal_friendly_id}` endpoint to charge a card. Replace `ABC123` with your terminal ID and `YOUR_API_KEY` with your API key.
+    Use the `POST /v1/payments/sale/{terminal_friendly_id}` endpoint to charge a card. Replace `ABC123` with your terminal ID. Replace `UNIX_TIMESTAMP` and `SIGNATURE` with the values you compute by following [Authentication](/authentication).
 
     The `amount` field uses major currency units. The example below charges `$49.99` USD.
 
@@ -26,7 +26,8 @@ This guide walks you through making your first API request with SmartRetry. You'
 
     ```bash cURL
     curl -X POST https://terminal.smartretry.com/v1/payments/sale/ABC123 \
-      -H "x-api-key: YOUR_API_KEY" \
+      -H "x-timestamp: UNIX_TIMESTAMP" \
+      -H "x-signature: SIGNATURE" \
       -H "Content-Type: application/json" \
       -d '{
         "merchant_transaction_id": "order-10042",

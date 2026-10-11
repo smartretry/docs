@@ -45,8 +45,8 @@ All error responses share this shape:
 |--------|------|----------------|
 | `200` | OK | The operation completed successfully or a submission was accepted for processing. Retrieve Transaction status for the current payment outcome. |
 | `400` | Bad Request | The request body or parameters failed validation. A required field is missing, a value is the wrong type, or a parameter is out of range. |
-| `401` | Unauthorized | The `x-api-key` header is missing or the key is invalid. |
-| `403` | Forbidden | The API key is valid but does not have access to the requested terminal. |
+| `401` | Unauthorized | The request signature is missing, invalid, or expired, or the API Secret is not active. See [Authentication](/authentication#error-responses). |
+| `403` | Forbidden | The API Secret is valid but does not have access to the requested terminal. |
 | `404` | Not Found | The transaction, recurring plan, or terminal ID does not exist. |
 | `409` | Conflict | The request conflicts with existing state. For idempotency, this happens when the same `Idempotency-Key` is reused with a different request body. |
 | `422` | Unprocessable Entity | The request is structurally valid but was rejected by business logic - for example, attempting to capture an already-captured pre-auth. |
@@ -82,9 +82,15 @@ an operation.
 
 | Reason code | Status | Description |
 |-------------|--------|-------------|
-| `INVALID_API_KEY` | 401 | The `x-api-key` header is missing, malformed, or the key has been revoked. |
+| `MISSING_TIMESTAMP` | 401 | The `x-timestamp` header is missing. |
+| `MISSING_SIGNATURE` | 401 | The `x-signature` header is missing. |
+| `INVALID_TIMESTAMP` | 401 | The `x-timestamp` value is not a valid Unix time in seconds. |
+| `INVALID_SIGNATURE_FORMAT` | 401 | The `x-signature` value is not exactly 64 lowercase hex characters. |
+| `INVALID_API_KEY` | 401 | No active API Secret exists for the terminal in the path, for example because it was revoked. |
+| `TIMESTAMP_EXPIRED` | 401 | The `x-timestamp` value is more than 5 minutes from server time. |
+| `INVALID_SIGNATURE` | 401 | The `x-signature` value does not match the signature SmartRetry computed. |
 | `ROUTING/RECORD_NOT_FOUND` | 404 | The `terminal_friendly_id` in the path does not match any known terminal. |
-| `ROUTING/TERMINAL_RESOURCE_ACCESS_DENIED` | 403 | The referenced resource (transaction, order, recurring series) belongs to a different terminal than your key can access. |
+| `ROUTING/TERMINAL_RESOURCE_ACCESS_DENIED` | 403 | The referenced resource (transaction, order, recurring series) belongs to a different terminal than your API Secret can access. |
 | `VALIDATION/TRANSACTION_NOT_FOUND` | 404 | No transaction with the given ID exists on this terminal. |
 | `VALIDATION/INVALID_IDEMPOTENCY_KEY` | 400 | The `Idempotency-Key` header is malformed, too long, or contains unsupported characters. |
 | `ROUTING/IDEMPOTENCY_CONFLICT` | 409 | The `Idempotency-Key` value was reused with a different request body. Reuse the same key only for an exact retry of the original POST request. |
@@ -111,11 +117,11 @@ The values below illustrate the shared response shape. A specific `detail`, `rea
 
 ```json 401 Unauthorized
 {
-  "type": "https://terminal.smartretry.com/errors/INVALID_API_KEY",
+  "type": "https://smartretry.com/errors/unauthorized",
   "title": "Unauthorized",
   "status": 401,
-  "detail": "The x-api-key header is missing or the provided key is invalid.",
-  "reason_code": "INVALID_API_KEY"
+  "detail": "Signature does not match.",
+  "reason_code": "INVALID_SIGNATURE"
 }
 ```
 
@@ -194,8 +200,8 @@ The values below illustrate the shared response shape. A specific `detail`, `rea
 **Non-retryable errors**
 
 - `400 Bad Request` - fix the request before retrying. Check the `context.field` value to identify which field is invalid.
-- `401 Unauthorized` - verify your API key is correct and present in the `x-api-key` header.
-- `403 Forbidden` - the key is valid but not authorized for this terminal. Check you are using the right `terminal_friendly_id`.
+- `401 Unauthorized` - check the `reason_code`, then verify your `x-timestamp` and `x-signature` headers. See [Authentication](/authentication#error-responses).
+- `403 Forbidden` - the API Secret is valid but not authorized for this terminal. Check you are using the right `terminal_friendly_id`.
 - `409 Conflict` - if the reason code is `ROUTING/IDEMPOTENCY_CONFLICT`, do not retry with the same key and a different body. Generate a new `Idempotency-Key` for a new operation.
 
 **Transaction outcomes**

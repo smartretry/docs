@@ -68,7 +68,8 @@ When a keyed POST request is stored or replayed from cache, SmartRetry returns t
 curl --request POST \
   --url https://terminal.smartretry.com/v1/payments/sale/ABC123 \
   --header 'Content-Type: application/json' \
-  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'x-timestamp: UNIX_TIMESTAMP' \
+  --header 'x-signature: SIGNATURE' \
   --header 'Idempotency-Key: sale-order-20260401-001' \
   --data '{
     "merchant_transaction_id": "order-20260401-001",
