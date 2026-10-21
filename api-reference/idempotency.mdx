@@ -56,6 +56,10 @@ When a keyed POST request is stored or replayed from cache, SmartRetry returns t
 | `409` | `ROUTING/IDEMPOTENCY_CONFLICT` | The same key was reused with a different request body. |
 | `503` | `ROUTING/RESOURCE_LOCKED` | Another request with the same key is still in flight and SmartRetry could not obtain the cached result before the wait timeout. |
 
+<Note>
+  `ROUTING/RESOURCE_LOCKED` also returns `409` when another operation holds the lock on the same order or recurring series. That `409` doesn't come from idempotency and isn't cached. Retry after a short backoff.
+</Note>
+
 <Tip>
   If a duplicate request arrives while the original request is still running, SmartRetry waits briefly for the original result before returning `503 Resource Locked`. The current maximum wait is 10 seconds.
 </Tip>

@@ -1,0 +1,76 @@
+---
+title: Complete payer actions
+description: Submit the payer's responses to the pending actions on a transaction.
+openapi: "/api-reference/openapi.json POST /v1/payments/status/{terminal_friendly_id}/{order_id}/{transaction_id}/payer-actions/{plan_id}/complete"
+---
+
+Use this endpoint when a transaction is waiting for the payer to act and you collect the responses
+yourself. Submitting them resumes the transaction.
+
+## Flow
+
+<Steps>
+  <Step title="Read the pending actions">
+    Call [Transaction status](/api-reference/payments/status). While the payer must act, the response
+    includes `pending_payer_actions`, `retry.plan_id`, and `payer_action_url`.
+  </Step>
+  <Step title="Submit the responses">
+    `POST` to this endpoint with `retry.plan_id` as `plan_id`. Send one entry in `responses` for
+    each pending action, no more and no fewer.
+  </Step>
+  <Step title="Poll status">
+    A `202` means SmartRetry accepted the responses. Call Transaction status again for the outcome.
+  </Step>
+</Steps>
+
+## Actions you can complete
+
+| Pending action | Response |
+|---|---|
+| `UPDATE_EXPIRY_DATE` | `{ "action": "UPDATE_EXPIRY_DATE", "expiry": { "month": "09", "year": "2030" } }`. Send it alone. |
+| `APPROVE_CURRENCY_CHANGE` | `{ "action": "APPROVE_CURRENCY_CHANGE", "approved": true }` |
+| `UPDATE_BILLING_ADDRESS` | `{ "action": "UPDATE_BILLING_ADDRESS", "address": { ... } }` |
+
+`responses` takes a single `UPDATE_EXPIRY_DATE` entry, or one or two entries from
+`APPROVE_CURRENCY_CHANGE` and `UPDATE_BILLING_ADDRESS`. Unknown fields are rejected.
+
+## Actions the payer completes on the hosted page
+
+`ENTER_SECURITY_CODE` and `CONTACT_BANK` can't be completed through this endpoint, because the
+payer must provide the security code and confirm the bank contact themselves. Send the payer to
+`payer_action_url` from the status response.
+
+## Example
+
+```bash
+curl --request POST \
+  --url https://terminal.smartretry.com/v1/payments/status/ABC123/ORD8A3F2/TX8A3F2C/payer-actions/PLAN_ID/complete \
+  --header 'Content-Type: application/json' \
+  --header 'Idempotency-Key: complete-TX8A3F2C-1' \
+  --header 'x-timestamp: 1767225600' \
+  --header 'x-signature: <signature>' \
+  --data '{"responses":[{"action":"UPDATE_EXPIRY_DATE","expiry":{"month":"09","year":"2030"}}]}'
+```
+
+```json 202 Accepted
+{ "accepted": true }
+```
+
+## Errors
+
+| Status | Reason code | When it happens |
+|---|---|---|
+| `400` | `VALIDATION/...` | The body failed validation, for example an invalid expiry or address. The plan stays pending, so you can resubmit. |
+| `401` | See [Authentication](/authentication#error-responses) | The request signature is missing or invalid. |
+| `403` | `ROUTING/TERMINAL_RESOURCE_ACCESS_DENIED` | The transaction belongs to another merchant, or `order_id` doesn't match. |
+| `404` | `ROUTING/RECORD_NOT_FOUND` | The terminal or transaction doesn't exist, or the plan is expired, already completed, or doesn't match `plan_id`, or `responses` doesn't match the pending actions exactly. |
+| `409` | `ROUTING/RESOURCE_LOCKED` | Another operation holds the lock on the order. SmartRetry doesn't wait. Retry after a short backoff. |
+| `409` | `ROUTING/IDEMPOTENCY_CONFLICT` | The `Idempotency-Key` was reused with a different body. |
+| `413` | | The body is larger than 2 KB. |
+| `503` | `ROUTING/RESOURCE_LOCKED` | A duplicate request with the same `Idempotency-Key` is still in flight and the wait timed out. |
+
+<Note>
+  Each plan can be completed once. Without an `Idempotency-Key`, repeating a successful call returns
+  `404`. With the same key and body, SmartRetry replays the original `202`. See
+  [Idempotency](/api-reference/idempotency).
+</Note>

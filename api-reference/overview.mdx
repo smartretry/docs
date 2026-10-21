@@ -185,7 +185,7 @@ Every response includes a `Link` header that points back to this documentation, 
 Read the header with any client:
 
 ```bash
-curl -sI https://terminal.smartretry.com/v1/payments/status/ABC123/TX8A3F2C \
+curl -sI https://terminal.smartretry.com/v1/payments/status/ABC123/ORD8A3F2/TX8A3F2C \
   --header 'x-timestamp: UNIX_TIMESTAMP' \
   --header 'x-signature: SIGNATURE' | grep -i '^link:'
 ```
