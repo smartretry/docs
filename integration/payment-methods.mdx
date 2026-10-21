@@ -88,7 +88,9 @@ as `provider_token` (1–255 characters) instead:
 <Note>
   Setting `payment_collection: hosted_page` on a sale or pre-authorization request makes
   `payment_instrument` optional and rejects `token`/`provider_token` outright - the payer supplies a
-  fresh credential later through the hosted payment page, not at create time.
+  fresh credential later through the hosted payment page, not at create time. Redirect the payer to the
+  `hosted_page_url` returned in the sale or pre-authorization response instead of building the URL
+  yourself.
 </Note>
 
 ## Currency support

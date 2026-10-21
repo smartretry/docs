@@ -131,7 +131,8 @@
               "api-reference/payments/capture",
               "api-reference/payments/refund",
               "api-reference/payments/void",
-              "api-reference/payments/status"
+              "api-reference/payments/status",
+              "api-reference/payments/payer-action-complete"
             ]
           },
           {

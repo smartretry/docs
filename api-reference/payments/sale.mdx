@@ -19,6 +19,8 @@ pre-computed identifier from an earlier transaction for the same payer.
   Setting `payment_collection: hosted_page` makes the credential optional at create time and rejects
   `token`/`provider_token` — the payer supplies a fresh credential later through the hosted payment
   page, and the transaction is persisted awaiting that submission until then.
+
+  The response includes `hosted_page_url`. Redirect the payer to that URL instead of building it yourself.
 </Note>
 
 ## Retry a previous sale

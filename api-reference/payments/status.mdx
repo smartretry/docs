@@ -1,10 +1,12 @@
 ---
 title: Transaction status
 description: Retrieve the current status and details of any transaction.
-openapi: "/api-reference/openapi.json GET /v1/payments/status/{terminal_friendly_id}/{transaction_id}"
+openapi: "/api-reference/openapi.json GET /v1/payments/status/{terminal_friendly_id}/{order_id}/{transaction_id}"
 ---
 
-Fetch the current transaction record by its `transaction_id`.
+Fetch the current transaction record by its `order_id` and `transaction_id`. Both are returned by
+[Sale](/api-reference/payments/sale) and [Pre-authorization](/api-reference/payments/preauth). The
+request returns `403` if `order_id` doesn't belong to the transaction.
 
 See [Transaction status](/api-reference/transaction-status) for the full set of `status.status`
 values, the status object shape, and how to interpret `reasonCode` and `domain`. See
@@ -14,8 +16,19 @@ values, the status object shape, and how to interpret `reasonCode` and `domain`.
 
 Beyond `status`, the response can include:
 
-- `retry` — present while a failed transaction has an automatic retry scheduled.
+- `retry` — present while a failed transaction has an automatic retry scheduled. Its `plan_id` is
+  the identifier you pass to [Complete payer actions](/api-reference/payments/payer-action-complete).
 - `pending_payer_actions` — present when the payer must take an action (such as entering a security
-  code or confirming a currency change) before the transaction can proceed.
-- `risk_decision` — present when a risk policy evaluated this transaction, including which policies
-  ran and whether any blocked it.
+  code or confirming a currency change) before the transaction can proceed. It is always present
+  together with `retry`.
+- `payer_action_url` — present whenever `pending_payer_actions` is present. It opens the hosted page
+  where the payer completes the pending actions. See
+  [Complete payer actions](/api-reference/payments/payer-action-complete) for which actions you can
+  complete yourself.
+- `hosted_page_url` — present only while a `payment_collection: hosted_page` transaction is still
+  waiting for the payer to supply a credential. Redirect the payer to this URL instead of building
+  it yourself.
+- `risk_decision` — present when a risk policy evaluated this transaction. `allowed` says whether it
+  passed, and `blockedBy` lists each blocking policy with its `type` (`blocklist`, `velocity`, or
+  `risk_rules`), `policyId`, `policyName`, and `details`. A blocked transaction carries the status
+  reason `RISK/BLOCKED`.

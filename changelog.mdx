@@ -21,6 +21,17 @@ The SmartRetry API uses date-based versioning. The current version is **2026-04-
 
 ## 2026
 
+### October 2026
+
+**2026-10-21**
+
+- **Breaking path change:** [Transaction status](/api-reference/payments/status) is now `GET /v1/payments/status/{terminal_friendly_id}/{order_id}/{transaction_id}`. The `order_id` is returned by sale and pre-authorization.
+- New [Complete payer actions](/api-reference/payments/payer-action-complete) endpoint to submit the payer's responses to pending actions.
+- Transaction status now returns `payer_action_url` and `hosted_page_url`. Sale and pre-authorization return `hosted_page_url` for `payment_collection: hosted_page`.
+- Renamed the request field `submission_session` to `transaction_session`.
+- Risk blocks now use the single status reason `RISK/BLOCKED`. See `risk_decision` for the blocking policies.
+- Added the status reason `PROCESSOR/UNAVAILABLE`.
+
 ### April 2026
 
 **2026-04-01**

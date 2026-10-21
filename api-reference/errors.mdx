@@ -48,10 +48,10 @@ All error responses share this shape:
 | `401` | Unauthorized | The request signature is missing, invalid, or expired, or the API Secret is not active. See [Authentication](/authentication#error-responses). |
 | `403` | Forbidden | The API Secret is valid but does not have access to the requested terminal. |
 | `404` | Not Found | The transaction, recurring plan, or terminal ID does not exist. |
-| `409` | Conflict | The request conflicts with existing state. For idempotency, this happens when the same `Idempotency-Key` is reused with a different request body. |
+| `409` | Conflict | The request conflicts with existing state. This happens when the same `Idempotency-Key` is reused with a different request body (`ROUTING/IDEMPOTENCY_CONFLICT`), or when another operation holds the lock on the same order or recurring series (`ROUTING/RESOURCE_LOCKED`). |
 | `422` | Unprocessable Entity | The request is structurally valid but was rejected by business logic - for example, attempting to capture an already-captured pre-auth. |
 | `429` | Too Many Requests | Your integration has exceeded the rate limit. Back off and retry after the period indicated in the `Retry-After` response header. |
-| `503` | Service Unavailable | The API could not complete the request right now. For idempotency, this can happen when another request with the same key is still in flight and the replay wait timed out. |
+| `503` | Service Unavailable | The API could not complete the request right now. This happens when another request with the same `Idempotency-Key` is still in flight and the replay wait timed out (`ROUTING/RESOURCE_LOCKED`). |
 | `500` | Internal Server Error | An unexpected error occurred on the SmartRetry side. If this persists, check [status.smartretry.com](https://status.smartretry.com) and contact support. |
 
 ## Status codes by operation
@@ -67,7 +67,7 @@ an operation.
 | Cancel recurring | `POST /v1/payments/recurring/cancel/{terminal_friendly_id}` | `400`, `404`, `409`, `500`, `503` |
 | Charge recurring | `POST /v1/payments/recurring/charge/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `422`, `500`, `503` |
 | Update recurring | `PUT /v1/payments/recurring/update/{terminal_friendly_id}` | `400`, `404`, `409`, `422`, `500` |
-| Future transaction status | `GET /v1/payments/recurring/future-transactions/status/{terminal_friendly_id}` | `400`, `404`, `500` |
+| Future transaction status | `GET /v1/payments/recurring/future-transactions/status/{terminal_friendly_id}` | `400`, `403`, `404`, `500` |
 | Update future transaction | `PUT /v1/payments/recurring/future-transactions/update/{terminal_friendly_id}` | `400`, `404`, `409`, `422`, `500` |
 | Charge future transaction | `POST /v1/payments/recurring/future-transactions/charge/{terminal_friendly_id}` | `400`, `404`, `409`, `422`, `500`, `503` |
 | Cancel future transaction | `POST /v1/payments/recurring/future-transactions/cancel/{terminal_friendly_id}` | `400`, `404`, `409`, `422`, `500`, `503` |
@@ -76,7 +76,8 @@ an operation.
 | Refund | `POST /v1/payments/refund/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `422`, `500`, `503` |
 | Void | `POST /v1/payments/void/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `422`, `500`, `503` |
 | Capture | `POST /v1/payments/capture/{terminal_friendly_id}` | `400`, `403`, `404`, `409`, `422`, `500`, `503` |
-| Transaction status | `GET /v1/payments/status/{terminal_friendly_id}/{transaction_id}` | `400`, `403`, `404`, `500` |
+| Transaction status | `GET /v1/payments/status/{terminal_friendly_id}/{order_id}/{transaction_id}` | `400`, `403`, `404`, `500` |
+| Complete payer actions | `POST /v1/payments/status/{terminal_friendly_id}/{order_id}/{transaction_id}/payer-actions/{plan_id}/complete` | `400`, `403`, `404`, `409`, `500`, `503` |
 
 ## Reason codes
 
@@ -84,8 +85,6 @@ an operation.
 |-------------|--------|-------------|
 | `MISSING_TIMESTAMP` | 401 | The `x-timestamp` header is missing. |
 | `MISSING_SIGNATURE` | 401 | The `x-signature` header is missing. |
-| `INVALID_TIMESTAMP` | 401 | The `x-timestamp` value is not a valid Unix time in seconds. |
-| `INVALID_SIGNATURE_FORMAT` | 401 | The `x-signature` value is not exactly 64 lowercase hex characters. |
 | `INVALID_API_KEY` | 401 | No active API Secret exists for the terminal in the path, for example because it was revoked. |
 | `TIMESTAMP_EXPIRED` | 401 | The `x-timestamp` value is more than 5 minutes from server time. |
 | `INVALID_SIGNATURE` | 401 | The `x-signature` value does not match the signature SmartRetry computed. |
@@ -94,6 +93,7 @@ an operation.
 | `VALIDATION/TRANSACTION_NOT_FOUND` | 404 | No transaction with the given ID exists on this terminal. |
 | `VALIDATION/INVALID_IDEMPOTENCY_KEY` | 400 | The `Idempotency-Key` header is malformed, too long, or contains unsupported characters. |
 | `ROUTING/IDEMPOTENCY_CONFLICT` | 409 | The `Idempotency-Key` value was reused with a different request body. Reuse the same key only for an exact retry of the original POST request. |
+| `ROUTING/RESOURCE_LOCKED` | 409 | Another operation currently holds the lock on the same order or recurring series. SmartRetry does not wait. Retry after a short backoff. |
 | `ROUTING/RESOURCE_LOCKED` | 503 | Another request using the same `Idempotency-Key` is still in flight and SmartRetry could not obtain the cached result before the wait timeout. |
 | `VALIDATION/INVALID_AMOUNT` | 400 | The `amount` value is missing, zero, negative, or not a valid number in major currency units. |
 | `VALIDATION/INVALID_FIELD/CURRENCY` | 400 | The `currency` value is not a supported ISO 4217 currency code, or `VALIDATION/UNAUTHORIZED_CURRENCY` if it isn't enabled for this terminal. |
@@ -145,7 +145,7 @@ The values below illustrate the shared response shape. A specific `detail`, `rea
   "title": "Not Found",
   "status": 404,
   "detail": "No transaction with ID 'txn_001' was found on terminal 'ABC123'.",
-  "instance": "/v1/payments/status/ABC123/txn_001",
+  "instance": "/v1/payments/status/ABC123/ORD8A3F2/TX8A3F2C",
   "reason_code": "VALIDATION/TRANSACTION_NOT_FOUND"
 }
 ```
@@ -203,6 +203,10 @@ The values below illustrate the shared response shape. A specific `detail`, `rea
 - `401 Unauthorized` - check the `reason_code`, then verify your `x-timestamp` and `x-signature` headers. See [Authentication](/authentication#error-responses).
 - `403 Forbidden` - the API Secret is valid but not authorized for this terminal. Check you are using the right `terminal_friendly_id`.
 - `409 Conflict` - if the reason code is `ROUTING/IDEMPOTENCY_CONFLICT`, do not retry with the same key and a different body. Generate a new `Idempotency-Key` for a new operation.
+
+**Retryable conflicts**
+
+- `409 Conflict` with `ROUTING/RESOURCE_LOCKED` - another operation holds the lock on the order or recurring series. Retry after a short backoff.
 
 **Transaction outcomes**
 

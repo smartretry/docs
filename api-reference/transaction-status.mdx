@@ -47,7 +47,7 @@ are all final — none of them transition to another status on their own.
 
 ## The status object
 
-`GET /v1/payments/status/{terminal_friendly_id}/{transaction_id}` returns `status` as a structured
+`GET /v1/payments/status/{terminal_friendly_id}/{order_id}/{transaction_id}` returns `status` as a structured
 object, not a plain string:
 
 ```json
