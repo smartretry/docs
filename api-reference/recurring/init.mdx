@@ -12,7 +12,7 @@ Save the returned `recurring_id` for later recurring and future-transaction oper
 `payment_instrument` is required — unlike sale and pre-authorization, a hosted-page collection does
 not make it optional here, since the new recurring series and its stored credential are created in
 the same step. It accepts exactly one credential source: raw card details, a SmartRetry `token`, or a
-processor `provider_token`. See [Payment methods](/integration/payment-methods) for the full field
+processor `provider_token` (with its `merchant_account`, `provider_key`, and for Adyen `provider_shopper_reference`). See [Payment methods](/integration/payment-methods) for the full field
 reference.
 
 Provide either `payer` or `payer_fingerprint` — not both. `payer_fingerprint` is a pre-computed

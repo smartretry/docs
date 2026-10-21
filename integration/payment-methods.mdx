@@ -54,7 +54,7 @@ When using `cards`, include the card details in `payment_instrument`:
 </Note>
 
 A `payment_instrument` carries exactly one credential source: card details, a SmartRetry `token`, or
-a processor `provider_token`. An optional `cvv` can accompany any of them.
+a processor `provider_token` (with its `merchant_account`, `provider_key`, and for Adyen `provider_shopper_reference`). An optional `cvv` can accompany any of them.
 
 ## Token-based payments
 
@@ -74,13 +74,37 @@ This removes the need to re-transmit raw card data, simplifying repeat billing a
 ## Provider-token payments
 
 If you already hold a credential issued directly by one of SmartRetry's connected processors, send it
-as `provider_token` (1–255 characters) instead:
+as `provider_token` (1–255 characters) instead. SmartRetry forwards it to the processor as-is. This
+differs from `token`, which is a SmartRetry Payment Instrument token.
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `provider_token` | Yes | The payment method reference issued by the provider, such as a Stripe `payment_method` or an Adyen `storedPaymentMethodId` |
+| `merchant_account` | Yes | The `friendly_id` of the merchant account that issued the `provider_token`. The token is only used on this account |
+| `provider_key` | Yes | The provider of that merchant account, such as `stripe` or `adyen`. Must match the account's provider |
+| `provider_shopper_reference` | Adyen only | The Adyen `shopperReference` the `provider_token` was stored under. Required when `provider_key` is `adyen`, and rejected for any other provider |
+| `cvv` | No | Card verification value - optional but recommended |
 
 ```json
 {
   "payment_instrument": {
     "provider_token": "pm_1AbCdEfGhIjKlMnOpQrStUv",
+    "merchant_account": "your-stripe-account",
+    "provider_key": "stripe",
     "cvv": "123"
+  }
+}
+```
+
+For Adyen, also send the `shopperReference` the credential was stored under:
+
+```json
+{
+  "payment_instrument": {
+    "provider_token": "M5N7TQ4TG5PFWR50",
+    "merchant_account": "your-adyen-account",
+    "provider_key": "adyen",
+    "provider_shopper_reference": "shopper-12345"
   }
 }
 ```

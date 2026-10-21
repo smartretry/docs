@@ -31,6 +31,7 @@ The SmartRetry API uses date-based versioning. The current version is **2026-04-
 - Renamed the request field `submission_session` to `transaction_session`.
 - Risk blocks now use the single status reason `RISK/BLOCKED`. See `risk_decision` for the blocking policies.
 - Added the status reason `PROCESSOR/UNAVAILABLE`.
+- Added `payment_instrument.provider_shopper_reference`, the Adyen `shopperReference` for a `provider_token`. It is required when `provider_key` is `adyen`.
 
 ### April 2026
 

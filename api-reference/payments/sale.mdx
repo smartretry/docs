@@ -9,7 +9,7 @@ A sale authorizes and captures a payment in one request. Use this endpoint when 
 ## Payment instrument
 
 `order.payment_instrument` accepts exactly one credential source: raw card details, a SmartRetry
-`token`, or a processor `provider_token`. An optional `cvv` can accompany any of them. See
+`token`, or a processor `provider_token` (with its `merchant_account`, `provider_key`, and for Adyen `provider_shopper_reference`). An optional `cvv` can accompany any of them. See
 [Payment methods](/integration/payment-methods) for the full field reference.
 
 Provide either `order.payer` or `order.payer_fingerprint` — not both. `payer_fingerprint` is a
