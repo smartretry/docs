@@ -27,18 +27,32 @@ yourself. Submitting them resumes the transaction.
 
 | Pending action | Response |
 |---|---|
-| `UPDATE_EXPIRY_DATE` | `{ "action": "UPDATE_EXPIRY_DATE", "expiry": { "month": "09", "year": "2030" } }`. Send it alone. |
+| `UPDATE_EXPIRY_DATE` | `{ "action": "UPDATE_EXPIRY_DATE", "expiry": { "month": "09", "year": "2030" } }` |
+| `ENTER_SECURITY_CODE` | `{ "action": "ENTER_SECURITY_CODE", "value": "012" }`. Requires a terminal enabled for raw card payments. |
 | `APPROVE_CURRENCY_CHANGE` | `{ "action": "APPROVE_CURRENCY_CHANGE", "approved": true }` |
 | `UPDATE_BILLING_ADDRESS` | `{ "action": "UPDATE_BILLING_ADDRESS", "address": { ... } }` |
+| `CONTACT_BANK` | `{ "action": "CONTACT_BANK", "outcome": "RESOLVED" }`. `outcome` is `RESOLVED`, `NOT_RESOLVED` or `SKIPPED`. Send it alone. |
 
-`responses` takes a single `UPDATE_EXPIRY_DATE` entry, or one or two entries from
-`APPROVE_CURRENCY_CHANGE` and `UPDATE_BILLING_ADDRESS`. Unknown fields are rejected.
+`responses` takes one of:
 
-## Actions the payer completes on the hosted page
+- a single `CONTACT_BANK` entry
+- one or two entries from `UPDATE_EXPIRY_DATE` and `ENTER_SECURITY_CODE`
+- one or two entries from `APPROVE_CURRENCY_CHANGE` and `UPDATE_BILLING_ADDRESS`
 
-`ENTER_SECURITY_CODE` and `CONTACT_BANK` can't be completed through this endpoint, because the
-payer must provide the security code and confirm the bank contact themselves. Send the payer to
-`payer_action_url` from the status response.
+Unknown fields are rejected.
+
+## Security code and bank contact
+
+Both answers belong to the payer. Send them only when the payer gave them on your own payment page.
+
+- **`ENTER_SECURITY_CODE`** sends the card security code through your backend, which keeps that backend
+  in PCI scope. SmartRetry accepts it only when the terminal is enabled for raw card payments. Otherwise
+  the request fails with `PAYMENT_METHOD/NOT_ALLOWED_AT_TERMINAL`, and the payer should answer on the
+  hosted page at `payer_action_url`.
+- **`CONTACT_BANK`** reports what the payer told you after contacting their bank. `RESOLVED` retries
+  the payment immediately, `NOT_RESOLVED` closes the recovery, and `SKIPPED` leaves the action pending.
+
+These answers resume the transaction immediately, like an answer given on the hosted page.
 
 ## Example
 
@@ -60,7 +74,8 @@ curl --request POST \
 
 | Status | Reason code | When it happens |
 |---|---|---|
-| `400` | `VALIDATION/...` | The body failed validation, for example an invalid expiry or address. The plan stays pending, so you can resubmit. |
+| `400` | `VALIDATION/...` | The body failed validation, for example an invalid expiry, address or security code. The plan stays pending, so you can resubmit. |
+| `400` | `PAYMENT_METHOD/NOT_ALLOWED_AT_TERMINAL` | You sent `ENTER_SECURITY_CODE` but the terminal isn't enabled for raw card payments. The plan stays pending. |
 | `401` | See [Authentication](/authentication#error-responses) | The request signature is missing or invalid. |
 | `403` | `ROUTING/TERMINAL_RESOURCE_ACCESS_DENIED` | The transaction belongs to another merchant, or `order_id` doesn't match. |
 | `404` | `ROUTING/RECORD_NOT_FOUND` | The terminal or transaction doesn't exist, or the plan is expired, already completed, or doesn't match `plan_id`, or `responses` doesn't match the pending actions exactly. |
